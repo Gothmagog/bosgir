@@ -1,0 +1,11 @@
+Hero name: Ungor
+Enemies: none
+Allies: none
+Physical status: healthy
+Mental status: healthy
+Posessions:
+- dagger
+- 10 gold
+Motivations:
+- to find adventure
+Current location: The Rusty Scabbard Inn
