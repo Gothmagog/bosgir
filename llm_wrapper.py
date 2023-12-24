@@ -14,7 +14,7 @@ boto3_bedrock = bedrock.get_bedrock_client(
 )
 
 prompt = PromptTemplate.from_template("""
-Human: You are a storyteller. You're telling the story of a hero on an adventure. Death and danger are a real threat to the hero, and neither their safety nor survival are guaranteed.
+Human: You are a storyteller. You're telling an elaborate tale of a hero on a grand adventure. Death and danger are a real threat to the hero, and neither their safety nor survival are guaranteed.
 
 The story so far is enclosed in <History> XML tags. The current state of things is enclosed in <Current> XML tags. Continue the story by narrating the consequences of what the hero does next, as provided inside the <Do> XML tags. Make sure the narrative is cohesive and not repetative.
 
@@ -30,7 +30,7 @@ The story so far is enclosed in <History> XML tags. The current state of things 
 {do}
 </Do>
 
-Wrap your output in <Output> XML tags. Stop at any point when the hero needs to do something. Do not assume what the hero will do next.
+Wrap your output in <Output> XML tags.
 
 Assistant: What style of writing should I use?
 
