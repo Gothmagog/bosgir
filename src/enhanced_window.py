@@ -30,7 +30,6 @@ class EnhancedWindow:
     def get_ttl_content(self, wrap=True):
         if wrap:
             return sep.join(self.content_lines)
-        print(self.content_lines)
         return str_from_arr(self.content_lines)
 
     def set_viewport_offset(self, offset):

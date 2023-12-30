@@ -13,7 +13,9 @@ import bedrock
 import logging
 from prompt_examples import examples
 from langchain_callback import CursesCallback
+from pathlib import Path
 
+src_dir = Path(__file__).parent
 log = logging.getLogger("api")
 os.environ["AWS_DEFAULT_REGION"] = "us-west-2"
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
@@ -28,18 +30,18 @@ llm_primary = Bedrock(
     metadata={"name": "Primary LLM"}
 )
 
-with open("prompt_primary.txt", "r") as f:
+with open(src_dir / "../data/prompt_primary.txt", "r") as f:
     prompt_primary = f.read()
 
 # Truncate Story prompt
 llm_truncate_story = Bedrock(
-    model_id="anthropic.claude-instant-v1",
+    model_id="anthropic.claude-v2",
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0},
     streaming=True,
     metadata={"name": "Story Truncation LLM"}
 )
 
-with open("prompt_truncate_story.txt", "r") as f:
+with open(src_dir / "../data/prompt_truncate_story.txt", "r") as f:
     prompt_truncate_story = f.read()
 
 # Update notes prompt
@@ -50,7 +52,7 @@ llm_update_notes = Bedrock(
     metadata={"name": "Update Notes LLM"}
 )
 
-with open("prompt_update_notes.txt", "r") as f:
+with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
     prompt_update_notes = f.read()
 
 # exec LLM

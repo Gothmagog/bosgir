@@ -87,18 +87,15 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
             curses.curs_set(0)
             input_win.erase()
             count = 1
+            prev_content_len = len(hw.get_ttl_content(False))
             hw.start_chunking()
-            output = ""
             try:
                 #print(dir(resp_stream))
                 for chunk in resp_stream:
                     set_win_text(status_win, f"Getting chunk {count}", True)
                     count += 1
                     if chunk:
-                        txt = chunk
-                        output += txt
-                        #apilog.debug(txt)
-                        hw.add_chunk(txt)
+                        hw.add_chunk(chunk)
             except ValueError as e:
                 if "AccessDeniedException" in e.args[0]:
                     log.error("It looks like you haven't configured proper access to the foundation models needed by this application. To do so:")
@@ -109,6 +106,8 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                     log.error("Here is the original exception: %s", e.args[0])
                     return 1
             hw.finish_chunking()
+            output = hw.get_ttl_content()[prev_content_len:]
+            log.debug("description input for update notes: %s", output)
             gs.history = hw.get_ttl_content(False)
             mode = "update_notes"
         elif mode == "input":

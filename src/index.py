@@ -12,9 +12,11 @@ from curses_utils import (
 )
 from text_utils import normalize_newlines_str
 from game_loop import game_loop
+from pathlib import Path
 
+src_dir = Path(__file__).parent
 log_config = None
-with open("logging.yml", "r") as f:
+with open(src_dir / "../logging.yml", "r") as f:
     log_config = yaml.safe_load(f)
 logging.config.dictConfig(log_config)
 log = logging.getLogger("main")
@@ -32,15 +34,20 @@ def new_game():
     tb_height = (sheight // 3) * 2
     curses.curs_set(1)
     s.clear()
+    init_background = ""
+    with open(src_dir / "../data/initial_background.txt", "r") as f:
+        init_background = f.read()
     tb, tb_win = textbox(s, tb_height, YPos.TOP, "Enter some initial background for the story and your character (Ctrl-G to save):", False)
-    tb_win.addstr(0, 0, "Once upon a time...")
+    log.debug(init_background)
+    tb_win.addstr(0, 0, init_background)
+    tb_win.move(len(init_background) // swidth, len(init_background) % swidth)
     tb_win.noutrefresh()
     background = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
 
     # get narrative style
     tb, tb_win = textbox(s, 1, YPos.CUSTOM, "What is the narrative style of the DM?", True, tb_height+2)
-    tb_win.addstr(0, 0, "pulp adventure stories")
+    tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
@@ -50,7 +57,7 @@ def new_game():
 
     # read initial notes from file
     notes = ""
-    with open("initial_notes.txt", "r") as f:
+    with open(src_dir / "../data/initial_notes.txt", "r") as f:
         notes = f.read()
     game_state = GameState(history=background, notes=notes, narrative_style=narrative_style)
     gs_persist = GameStatePersister(filename)
@@ -125,7 +132,7 @@ def main_menu():
     return ret
 
 def file_name_entry(y_pos: YPos, y_offset: int, exists: bool):
-    tb, tb_win = textbox(s, 1, y_pos, "Enter the file name for your save file (Ctrl-G to save):", True, y_offset)
+    tb, tb_win = textbox(s, 1, y_pos, "Enter the file name for your save file (relative to the 'saves' dir):", True, y_offset)
     w_height, w_width = tb_win.getmaxyx()
     w_y, w_x = tb_win.getyx()
     err_win = curses.newwin(1, w_width, w_y+w_height+3, 0)
@@ -134,7 +141,7 @@ def file_name_entry(y_pos: YPos, y_offset: int, exists: bool):
     if exists:
         mode = "r"
     while True:
-        filename = tb.edit()
+        filename = src_dir.parent / "saves" / tb.edit()
         curses.doupdate()
         try:
             f = open(filename, mode, encoding="utf-8")
@@ -143,7 +150,7 @@ def file_name_entry(y_pos: YPos, y_offset: int, exists: bool):
         except Exception as e:
             tb_win.erase()
             err_win.erase()
-            err_win.addstr(0, 0, f"Error accessing file: {str(e)}", curses.A_ITALIC)
+            err_win.addstr(0, 0, f"Error accessing {filename}: {str(e)}", curses.A_ITALIC)
             err_win.noutrefresh()
             curses.doupdate()
     return filename
