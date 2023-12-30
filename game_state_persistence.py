@@ -9,6 +9,18 @@ class GameStatePersister:
 
     def save(self, gs: GameState):
         with open(self.filename, "wb") as f:
-            f.write(gs.notes.encode(errors="replace"))
+            f.write(gs.notes.encode(encoding="utf-8", errors="replace"))
             f.write(sep)
-            f.write(gs.history.encode(errors="replace"))
+            f.write(gs.narrative_style.encode(encoding="utf-8", errors="replace"))
+            f.write(sep)
+            f.write(gs.history.encode(encoding="utf-8", errors="replace"))
+
+    def load(self, gs: GameState):
+        buffer_ = None
+        with open(self.filename, "rb") as f:
+            buffer_ = bytearray(f.read())
+        sep_idx1 = buffer_.find(sep)
+        gs.notes = buffer_[:sep_idx1].decode(encoding="utf-8")
+        sep_idx2 = buffer_.find(sep)
+        gs.narrative_style = buffer_[sep_idx1 + len(sep):sep_idx2].decode(encoding="utf-8")
+        gs.history = buffer_[sep_idx2:].decode(encoding="utf-8")

@@ -1,56 +1,20 @@
-import curses
 from curses import window
-from text_utils import normalize_newlines_arr
+import logging
 from markedup_chunker import markedup_chunker_decorator, reset_chunker
+from enhanced_window import EnhancedWindow
 import re
-import io
 
 sep = "\n"
 tokenizer_re = re.compile("([a-zA-Z\.-_!?;:0-9""']+)")
+log = logging.getLogger("main")
 
-class HistoryWindow:
+class HistoryWindow(EnhancedWindow):
     def __init__(self, s: window):
-        self.content_lines = []
-        self.win = s
-        self.viewport_offset = 0
-        
-    def add_content(self, new_content):
-        new_lines = normalize_newlines_arr(new_content, 1, self.get_viewport_width())
-        self.content_lines += new_lines
-
-    def get_viewport_width(self):
-        return self.win.getmaxyx()[1] - 2
-
-    def get_viewport_height(self):
-        return self.win.getmaxyx()[0] - 1
-    
-    def get_ttl_height(self):
-        return len(self.content_lines)
-
-    def get_ttl_content(self, wrap=True):
-        if wrap:
-            return sep.join(self.content_lines)
-        return " ".join(self.content_lines)
-
-    def set_viewport_offset(self, offset):
-        if offset < self.get_ttl_height() - 1 and offset >= 0:
-            self.viewport_offset = offset
-
-    def print_content(self, scroll_to_bottom=False):
-        # print(self.content_lines)
-        vp_height = self.get_viewport_height()
-        num_lines = self.get_ttl_height()
-        if scroll_to_bottom:
-            self.viewport_offset = max(num_lines - vp_height, 0)
-        self.win.erase()
-        for i in range(self.viewport_offset, self.viewport_offset + vp_height):
-            if i >= num_lines:
-                break
-            self.win.addstr(i - self.viewport_offset, 0, self.content_lines[i])
-        self.win.noutrefresh()
+        super().__init__(s)
         
     def start_chunking(self):
         # find starting point for cursor
+        log.debug("***** BEGIN STREAMING RESPONSE *****")
         vp_height = self.get_viewport_height() - 1 # to make room for new lines
         num_lines = self.get_ttl_height()
         self.viewport_offset = max(num_lines - vp_height, 0)
@@ -67,7 +31,7 @@ class HistoryWindow:
         cury, curx = self.win.getyx()
         vp_width = self.get_viewport_width()
         lines = chunk.splitlines()
-        print(lines)
+        log.debug(lines)
         for (i, l) in enumerate(lines):
             if curx + len(l) > vp_width:
                 words = tokenizer_re.split(l)
@@ -98,6 +62,7 @@ class HistoryWindow:
         self.win.refresh()
 
     def finish_chunking(self):
+        log.debug("***** END STREAMING RESPONSE *****")
         cury, curx = self.win.getyx()
         vp_width = self.get_viewport_width()
         cury, curx = self.complete_line(cury, vp_width)

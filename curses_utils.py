@@ -43,7 +43,7 @@ def textbox(s: window, height: int, ypos: YPos, label: str = None, ws_strip = Tr
         s.hline(y+1, x, sep, swidth)
         y += 2
     tb_win = curses.newwin(height, swidth, y, 0)
-    tb = Textbox(tb_win)
+    tb = Textbox(tb_win, insert_mode=True)
     tb.stripspaces = ws_strip
 
     # refresh windows

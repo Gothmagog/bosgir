@@ -1,0 +1,33 @@
+version: 1
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    stream: ext://sys.stdout
+    formatter: normal
+  file:
+    class: logging.FileHandler
+    level: DEBUG
+    filename: api.log
+    formatter: api
+formatters:
+  normal:
+    format: "%(asctime)s %(levelname)s %(name)s: %(message)s"
+  api:
+    format: "%(asctime)s |%(message)s|"
+loggers:
+  api:
+    level: DEBUG
+    handlers: [file]
+    propogate: no
+  main:
+    level: DEBUG
+    handlers: [console]
+  langchain:
+    level: DEBUG
+    handlers: [file]
+  editor:
+    level: DEBUG
+    handlers: [console]
+root:
+  level: DEBUG

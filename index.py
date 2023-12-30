@@ -1,5 +1,8 @@
 import curses
 from curses import wrapper
+import logging
+import logging.config
+import yaml
 from game_state_persistence import GameStatePersister
 from game_state import GameState
 from curses_utils import (
@@ -9,6 +12,12 @@ from curses_utils import (
 )
 from text_utils import normalize_newlines_str
 from game_loop import game_loop
+
+log_config = None
+with open("logging.yml", "r") as f:
+    log_config = yaml.safe_load(f)
+logging.config.dictConfig(log_config)
+log = logging.getLogger("main")
 
 s = None
 sep = "-"
@@ -20,35 +29,24 @@ def new_game():
     
     # get initial character history
     sheight, swidth = s.getmaxyx()
-    tb_height = sheight // 3
+    tb_height = (sheight // 3) * 2
     curses.curs_set(1)
     s.clear()
     tb, tb_win = textbox(s, tb_height, YPos.TOP, "Enter some initial background for the story and your character (Ctrl-G to save):", False)
+    tb_win.addstr(0, 0, "Once upon a time...")
+    tb_win.noutrefresh()
     background = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
 
     # get narrative style
     tb, tb_win = textbox(s, 1, YPos.CUSTOM, "What is the narrative style of the DM?", True, tb_height+2)
+    tb_win.addstr(0, 0, "pulp adventure stories")
+    tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
     
     # get file name
-    tb, tb_win = textbox(s, 1, YPos.CUSTOM, "Enter the file name for your save file (Ctrl-G to save):", True, tb_height+6)
-    err_win = curses.newwin(1, swidth, tb_height+9, 0)
-    filename = None
-    while True:
-        filename = tb.edit()
-        curses.doupdate()
-        try:
-            f = open(filename, "x", encoding="utf-8")
-            f.close()
-            break
-        except Exception as e:
-            tb_win.erase()
-            err_win.erase()
-            err_win.addstr(0, 0, f"Error creating file: {str(e)}", curses.A_ITALIC)
-            err_win.noutrefresh()
-            curses.doupdate()
+    filename = file_name_entry(YPos.CUSTOM, tb_height+6, False)
 
     # read initial notes from file
     notes = ""
@@ -60,13 +58,24 @@ def new_game():
     return continue_()
 
 def load_game():
-    pass
-
-def continue_():
-    game_loop(s, game_state, gs_persist)
-    choice = main_menu()
-    choice()
+    global gs_persist, game_state
+    s.erase()
+    curses.curs_set(1)
+    filename = file_name_entry(YPos.TOP, 0, True)
+    gs_persist = GameStatePersister(filename)
+    if not game_state:
+        game_state = GameState(None, None, None)
+    gs_persist.load(game_state)
+    continue_()
     
+def continue_():
+    ret = game_loop(s, game_state, gs_persist)
+    if ret == 0:
+        choice = main_menu()
+        choice()
+    else:
+        quit_()
+        
 def quit_():
     quit()
 
@@ -114,7 +123,31 @@ def main_menu():
             ret = menu_funcs[3]
         
     return ret
-            
+
+def file_name_entry(y_pos: YPos, y_offset: int, exists: bool):
+    tb, tb_win = textbox(s, 1, y_pos, "Enter the file name for your save file (Ctrl-G to save):", True, y_offset)
+    w_height, w_width = tb_win.getmaxyx()
+    w_y, w_x = tb_win.getyx()
+    err_win = curses.newwin(1, w_width, w_y+w_height+3, 0)
+    filename = None
+    mode = "x"
+    if exists:
+        mode = "r"
+    while True:
+        filename = tb.edit()
+        curses.doupdate()
+        try:
+            f = open(filename, mode, encoding="utf-8")
+            f.close()
+            break
+        except Exception as e:
+            tb_win.erase()
+            err_win.erase()
+            err_win.addstr(0, 0, f"Error accessing file: {str(e)}", curses.A_ITALIC)
+            err_win.noutrefresh()
+            curses.doupdate()
+    return filename
+
 def main(stdscr):
     global s
 

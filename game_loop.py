@@ -2,6 +2,7 @@ import curses
 from curses import window
 from curses.textpad import Textbox
 import json
+import logging
 from game_state import GameState
 from game_state_persistence import GameStatePersister
 from curses_utils import (
@@ -11,9 +12,12 @@ from curses_utils import (
     redraw_frame
 )
 from history_win import HistoryWindow
-from llm_wrapper import proc_command
+from notes_window import NotesWindow
+from llm_wrapper import proc_command, update_notes
 
 escaped = False
+apilog = logging.getLogger("api")
+log = logging.getLogger("main")
 
 K_ESC = 27
 K_UP = curses.KEY_UP
@@ -21,31 +25,32 @@ K_DOWN = curses.KEY_DOWN
 K_1 = 49
 K_2 = 50
 K_3 = 51
+K_DBLQUOTE = 460
+K_SNGQUOTE = 530
 
-def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister):
+def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     # draw main screen
     s.erase()
     hist_win, notes_win, input_win, status_win, main_tb = main_screen(s)
     hw = HistoryWindow(hist_win)
-
+    nw = NotesWindow(notes_win)
+    
     # initialize history window content
     hw.add_content(gs.history)
     hw.print_content(True)
-    curses.doupdate()
 
     # initialize notes window content
-    notes_tb = Textbox(notes_win)
-    notes_win.erase()
-    notes_win.addstr(0, 0, gs.notes)
-    notes_win.noutrefresh()
+    log.debug(gs.notes)
+    nw.add_content(gs.notes)
+    nw.print_content(False)
     
-    # initial "none" mode
-    mode = "none"
+    # initial "input" mode
+    mode = "input"
+    focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
     new_command = ""
     char = -1
     resp_stream = None
-    label_all(s, hist_win, notes_win, input_win)
-    curses.curs_set(0)
+    curses.curs_set(1)
     curses.doupdate()
     
     while True:
@@ -60,49 +65,62 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister):
                 mode = "input"
                 focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
             elif char == K_ESC:
-                return
+                return 0
             else:
                 mode = "none"
             if char >= K_1 and char <= K_3:
                 curses.doupdate()
+        elif mode == "update_notes":
+            resp = update_notes(gs.notes, output, status_win)
+            log.debug(resp)
+            if resp and len(resp):
+                resp = resp.strip()
+                nw.set_content(resp)
+                nw.print_content()
+                gs.notes = resp
+            set_win_text(status_win, "Saving game...", False)
+            curses.doupdate()
+            gs_persist.save(gs)
+            set_win_text(status_win, "Complete", True)
+            mode = "input"
         elif mode == "proc_input":
-            #curses.curs_set(0)
+            curses.curs_set(0)
             input_win.erase()
             count = 1
             hw.start_chunking()
-            for event in resp_stream:
-                set_win_text(status_win, f"Getting chunk {count}", True)
-                chunk = event.get("chunk")
-                count += 1
-                if chunk:
-                    chunk_obj = json.loads(chunk.get("bytes").decode())
-                    hw.add_chunk(chunk_obj["completion"])
+            output = ""
+            try:
+                #print(dir(resp_stream))
+                for chunk in resp_stream:
+                    set_win_text(status_win, f"Getting chunk {count}", True)
+                    count += 1
+                    if chunk:
+                        txt = chunk
+                        output += txt
+                        #apilog.debug(txt)
+                        hw.add_chunk(txt)
+            except ValueError as e:
+                if "AccessDeniedException" in e.args[0]:
+                    log.error("It looks like you haven't configured proper access to the foundation models needed by this application. To do so:")
+                    log.error("  1. From the Bedrock console in AWS, go to ""Model Access"" from the left-hand menu")
+                    log.error("  2. Click ""Manage model access\"")
+                    log.error("  3. Scroll down to ""Anthropic"" and click both ""Claude"" and ""Claude Instant\"")
+                    log.error("  4. Click ""Save changes"" at  the bottom.")
+                    log.error("Here is the original exception: %s", e.args[0])
+                    return 1
             hw.finish_chunking()
-            gs.history = hw.get_ttl_content()
-            set_win_text(status_win, "Saving game...", True)
-            gs_persist.save(gs)
-            set_win_text(status_win, "Complete", True)
-            resp_stream = None
-            mode = "input"
+            gs.history = hw.get_ttl_content(False)
+            mode = "update_notes"
         elif mode == "input":
             curses.curs_set(1)
             new_command = main_tb.edit(input_validator)
             if escaped:
                 mode = none_mode(s, hist_win, notes_win, input_win, True)
             else:
+                if new_command.startswith('"') or new_command.startswith("'"):
+                    hw.add_content(new_command)
                 set_win_text(status_win, "Invoking API...", True)
-                resp_stream = proc_command(new_command, gs.notes, gs.history, gs.narrative_style)
-                # resp_stream = [
-                #     { "chunk": { "bytes": b'{ "completion": "This should be ignored\\n  <Output>\\n " }' } },
-                #     { "chunk": { "bytes": b'{ "completion": "Heres a chunk. " }' } },
-                #     { "chunk": { "bytes": b'{ "completion": " Heres another one." }' } },
-                #     { "chunk": { "bytes": b'{ "completion": "And another one. This one should be split up by the word wrapper, because it is quite long.\\n\\nWe also have to contend" }' } },
-                #     { "chunk": { "bytes": b'{ "completion": " with embedded new lines\\n" }' } },
-                #     { "chunk": { "bytes": b'{ "completion": "Heres an example of </Out" }' } },
-                #     { "chunk": { "bytes": b'{ "completion": " almost doing the Output tag.\\n But...\\n" }' } },
-                #     { "chunk": { "bytes": b'{ "completion": "Were ending now </Outp" }' } },
-                #     { "chunk": { "bytes": b'{ "completion": "ut> This too should be ignored" }' } }
-                # ]
+                resp_stream = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, status_win)
                 if resp_stream:
                     mode = "proc_input"
                 else:
@@ -119,16 +137,15 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister):
             curses.doupdate()
         elif mode == "notes":
             curses.curs_set(1)
-            new_notes = notes_tb.edit(input_validator)
-            if escaped:
-                notes_win.erase()
-                notes_win.addstr(0, 0, gs.notes)
-                notes_win.noutrefresh()
-                mode = none_mode(s, hist_win, notes_win, input_win)
-                curses.doupdate()
+            lines_copy = nw.get_ttl_content()
+            #log.debug(lines_copy)
+            ret = nw.edit()
+            if not ret:
+                nw.set_content(lines_copy)
+                nw.print_content()
             else:
-                gs.notes = new_notes
-                mode = none_mode(s, hist_win, notes_win, input_win, True)
+                gs.notes = nw.get_ttl_content()
+            mode = none_mode(s, hist_win, notes_win, input_win, True)
                 
         if mode in ["hist", "none"]:
             char = s.getch()
@@ -165,11 +182,19 @@ def debug_char(s, char):
     
 def input_validator(char):
     global escaped
+
+    # Set escaped flag as applicable
     if char == K_ESC:
         escaped = True
         return 7
     else:
         escaped = False
+
+    # Re-interpret blocked characters
+    if char == K_DBLQUOTE:
+        return 34
+    elif char == K_SNGQUOTE:
+        return 39
 
     return char
 
