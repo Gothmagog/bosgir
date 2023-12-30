@@ -1,14 +1,9 @@
-Human: A story is being written piece by piece, but someone has been adding content onto the end of what the author wrote. Your job is to find and remove that content.
+Human: You're editing part of a story. The author is being fed instructions for the hero, and is describing the action and what happens as a result. The name of the hero of the story is provided in some notes within the <Current> XML tags. The most recent piece written by the author for you to edit is provided within the <Snippet> XML tags. The hero's directive is provided within the <Do> XML tags.
 
-The name of the hero of the story is provided in some notes within the <Current> XML tags. The most recent piece written by the author for you to edit is provided within the <Snippet> XML tags. The author's intended action for the hero to take is provided within the <Do> XML tags. We don't know what the author intended other characters to do.
+{input_txt}
 
-Do the following steps:
+Remove the parts of the story which do not describe the directive or its direct consequences. Don't remove asides, internal dialog, and flavor text. If all of the writing describes the directive and its consequences, don't remove anything.
 
-1. Read the piece sentence by sentence and identify those sentences that have the hero physically doing something not stated in the intended action. Ignore other characters and how they react to the hero; we're only focussing on the hero's physical actions.
-2. Starting from the beginning of the most recent author's piece, output each sentence that has not been identified previously. Once you reach one of those sentences, stop.
-
-{input}
-
-Provide the edited snippet inside <Output> XML tags. Provide the original notes inside <Current> XML tags. Provide your reasoning inside <Reasoning> XML tags.
+Output the truncated story inside <Output> XML tags. Provide the original notes inside <Current> XML tags. Provide your reasoning inside <Reasoning> XML tags.
 
 Assistant:

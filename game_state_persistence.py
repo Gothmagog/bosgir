@@ -21,6 +21,6 @@ class GameStatePersister:
             buffer_ = bytearray(f.read())
         sep_idx1 = buffer_.find(sep)
         gs.notes = buffer_[:sep_idx1].decode(encoding="utf-8")
-        sep_idx2 = buffer_.find(sep)
+        sep_idx2 = buffer_.find(sep, sep_idx1 + 1)
         gs.narrative_style = buffer_[sep_idx1 + len(sep):sep_idx2].decode(encoding="utf-8")
         gs.history = buffer_[sep_idx2:].decode(encoding="utf-8")

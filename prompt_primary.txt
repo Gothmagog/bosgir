@@ -8,7 +8,7 @@ Human: Do the following steps:
 
 3. Identify which arc from the previous step best matches the indicated hero action. Note that the hero may or may not succeed at the action indicated, and that the hero's failure, not success, may drive any given arc forward. Make a note of the hero success or failure criteria for the arc.
 
-4. Based on the matched arc and the hero's success or failure of their current action, describe what happens as a result. Again, the action should match the arc chosen. Use the following guidlines when writing:
+4. Based on the matched arc and the hero's success or failure of their current action, describe what happens as a result. Again, the action should match the arc chosen. Use the following guidelines when writing:
 
 <guidelines>
 - For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.

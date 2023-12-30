@@ -56,14 +56,14 @@ with open("prompt_update_notes.txt", "r") as f:
 # exec LLM
 def proc_command(command, notes, history, narrative, status_win):
     # Setup request
-    wrap_dict = RunnableLambda(lambda x: ({"input": x}))
+    wrap_dict = RunnableLambda(lambda x: ({"input_txt": x}))
     prompt1 = PromptTemplate(
         input_variables=["history", "current", "do", "narrative"],
         template=prompt_primary
     )
     prompt2 = PromptTemplate(
         template=prompt_truncate_story,
-        input_variables=["input"]
+        input_variables=["input_txt"]
     )
     chain = prompt1 | llm_primary | wrap_dict | prompt2 | llm_truncate_story
 
