@@ -1,5 +1,4 @@
 from curses import window
-import logging
 from text_utils import normalize_newlines_arr, str_from_arr
 
 sep = "\n"
@@ -10,8 +9,8 @@ class EnhancedWindow:
         self.win = s
         self.viewport_offset = 0
         
-    def add_content(self, new_content):
-        new_lines = normalize_newlines_arr(new_content, 0, self.get_viewport_width())
+    def add_content(self, new_content, num_new_lines_after=0):
+        new_lines = normalize_newlines_arr(new_content, num_new_lines_after, self.get_viewport_width())
         self.content_lines += new_lines
 
     def set_content(self, new_content):

@@ -35,7 +35,7 @@ class NotesWindow(EnhancedWindow):
         return 1
 
     def print_line(self, y, line):
-        log.debug("%s: %s", y, line)
+        #log.debug("%s: %s", y, line)
         line_len = len(line)
         vp_width = self.get_viewport_width()
         if line_len > vp_width:
@@ -60,7 +60,7 @@ class NotesWindow(EnhancedWindow):
         while cont:
             char_code = self.win.getch()
             keyname = curses.keyname(char_code)
-            #log.debug(keyname)
+            log.debug(keyname)
             if keyname == b"^G": #ctrl-G
                 cont = False
                 commit = True
@@ -68,7 +68,7 @@ class NotesWindow(EnhancedWindow):
                 cont = False
                 commit = False
             elif keyname == b"KEY_DC": #delete
-                if cur_line_pos < len(cur_line):
+                if cur_line_pos <= len(cur_line):
                     cury, curx = self.win.getyx()
                     if cur_line_idx == len(self.content_lines) - 1 and cur_line_pos == len(cur_line_pos):
                         pass
@@ -76,32 +76,22 @@ class NotesWindow(EnhancedWindow):
                         self.content_lines[cur_line_idx] += self.content_lines[cur_line_idx + 1]
                         cur_line = self.content_lines[cur_line_idx]
                         self.content_lines = self.content_lines[:cur_line_idx+1] + self.content_lines[cur_line_idx+2:]
-                        self.print_content()
                     else:
-                        real_line_pos = vp_line_pos(cur_line_pos, self.get_viewport_width())[1]
-                        cur_line = cur_line[:real_line_pos] + cur_line[real_line_pos+1:]
+                        cur_line = cur_line[:cur_line_pos] + cur_line[cur_line_pos+1:]
                         self.content_lines[cur_line_idx] = cur_line
-                        if self._get_line_height(cur_line) > 1:
-                            self.print_content()
-                        else:
-                            self.win.addstr(cury, len(cur_line), " ")
-                            self.win.addstr(cury, 0, cur_line)
+                    self.print_content()
                     self.win.move(cury, curx)
                     self.win.refresh()
             elif keyname == b"^H": #backspace
                 if cur_line_pos > 0:
                     cury, curx = self.win.getyx()
-                    real_line_pos = vp_line_pos(cur_line_pos, cury, self.get_viewport_width())[1]
-                    cur_line = cur_line[:real_line_pos-1] + cur_line[real_line_pos:]
+                    cur_line = cur_line[:cur_line_pos-1] + cur_line[cur_line_pos:]
                     self.content_lines[cur_line_idx] = cur_line
-                    if self._get_line_height(cur_line) > 1:
-                        self.print_content()
-                    else:
-                        self.win.addstr(cury, len(cur_line), " ")
-                        self.win.addstr(cury, 0, cur_line)
+                    cur_line_pos -= 1
+                    self.print_content()
                     self.win.move(cury, curx - 1)
                     self.win.refresh()
-            elif keyname == b"enter":
+            elif keyname == b"enter" or keyname == b"^J":
                 cury, curx = self.win.getyx()
                 before = cur_line[:cur_line_pos]
                 after = cur_line[cur_line_pos:]
@@ -126,7 +116,7 @@ class NotesWindow(EnhancedWindow):
                     cur_line_pos = min(len(cur_line), cur_line_pos)
                     self.win.move(cury - 1, cur_line_pos % self.get_viewport_width())
                 elif keyname == b"KEY_DOWN" and cury < self.get_ttl_height() - self.viewport_offset:
-                    if self._get_line_height(cur_line) == 1 or cur_line_pos > (len(cur_line) // self.get_viewport_width()) * self.get_viewport_width():
+                    if self._get_line_height(cur_line) == 1 or cur_line_pos >= (len(cur_line) // self.get_viewport_width()) * self.get_viewport_width():
                         if cur_line_idx < len(self.content_lines) - 1:
                             cur_line_idx += 1
                             cur_line_pos = curx
@@ -139,8 +129,10 @@ class NotesWindow(EnhancedWindow):
                     self.win.move(cury, cur_line_pos % self.get_viewport_width())
                 elif keyname == b"KEY_LEFT":
                     cur_line_pos, cury, cur_line_idx = self._move_pos_left(cury, curx, cur_line_pos, cur_line_idx)
+                    cur_line = self.content_lines[cur_line_idx]
                 elif keyname == b"KEY_RIGHT":
                     cur_line_pos, cury, cur_line_idx = self._move_pos_right(cury, curx, cur_line_pos, cur_line_idx)
+                    cur_line = self.content_lines[cur_line_idx]
                 self.win.refresh()
                 log.debug("line %s, pos %s, cury %s", cur_line_idx, cur_line_pos, cury)
             elif len(keyname) == 1:
@@ -153,17 +145,9 @@ class NotesWindow(EnhancedWindow):
                 else:
                     cur_line = cur_line[:cur_line_pos] + name + cur_line[cur_line_pos:]
                 self.content_lines[cur_line_idx] = cur_line
-                if len(cur_line) > self.get_viewport_width():
-                    # we have to move all the following lines down;
-                    # easiest way is to just reprint the whole window
-                    self.print_content()
-                    cur_line_pos, cury, cur_line_idx = self._move_pos_right(cury, curx, cur_line_pos, cur_line_idx)
-                    curses.doupdate()
-                else:
-                    cur_line_pos += 1
-                    self.win.addstr(cury, 0, cur_line)
-                    self.win.move(cury, curx + 1)
-                    self.win.refresh()
+                self.print_content()
+                cur_line_pos, cury, cur_line_idx = self._move_pos_right(cury, curx, cur_line_pos, cur_line_idx)
+                curses.doupdate()
                 #log.debug("line %s, pos %s, curx %s, cury %s", cur_line_idx, cur_line_pos, curx, cury)
         return commit
 
@@ -175,6 +159,7 @@ class NotesWindow(EnhancedWindow):
                 cury += 1
             elif cur_line_pos > len(cur_line):
                 cur_line_idx += 1
+                cury += 1
                 cur_line_pos = 0
             self.win.move(cury, cur_line_pos % self.get_viewport_width())
         return (cur_line_pos, cury, cur_line_idx)

@@ -11,7 +11,7 @@ repl_nl2 = re.compile("[ \t]*\n")
 
 # Removes superflous whitespace from a string
 def normalize_newlines_str(str_, num_newlines_to_add):
-    new_str = repl_nl1.sub("|||", str_)
+    new_str = repl_nl1.sub("|||", str_.strip())
     new_str = repl_nl2.sub(" ", new_str)
     ret = new_str.replace("|||", "\n\n")
     return ret
@@ -21,8 +21,8 @@ def normalize_newlines_str(str_, num_newlines_to_add):
 # whether word-wrapping is applied, newline characters are removed
 # (each str in the array is a separate line), and paragraphs are
 # separated by a single blank line.
-def normalize_newlines_arr(str, num_newlines_to_add, width = 0):
-    paragraphs = str.lstrip().splitlines()
+def normalize_newlines_arr(str_, num_newlines_to_add, width = 0):
+    paragraphs = str_.strip().splitlines()
     new_lines = []
     for p in paragraphs:
         if p.isspace() or not len(p):
@@ -42,13 +42,21 @@ def normalize_newlines_arr(str, num_newlines_to_add, width = 0):
 # paragraphs, and no other newlines.
 def str_from_arr(arr):
     ret = ""
-    sep = "\n\n"
+    new_p = True
     for (i, ln) in enumerate(arr):
         line_len = len(ln)
         if line_len and i == 0:
             ret += ln
-        elif line_len:
+            new_p = False
+        elif line_len and not new_p:
             ret += " " + ln
+        elif line_len:
+            ret += ln
+            new_p = False
         else:
-            ret += "\n\n"
+            if new_p:
+                ret += "\n"
+            else:
+                ret += "\n\n"
+            new_p = True
     return ret

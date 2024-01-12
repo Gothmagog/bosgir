@@ -13,8 +13,8 @@ Human: Do the following steps:
 <guidelines>
 - For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.
 - For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
-- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far.
-<guidelines>
+- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
+</guidelines>
 
 <History>
 {history}
@@ -33,5 +33,7 @@ Provide the following in your output:
 - The original action enclosed in <Do> XML tags
 - The current state of things in <Current> XML tags
 - What happens next, within <Snippet> XML tags
+
+{format_instructions}
 
 Assistant:

@@ -5,11 +5,16 @@ handlers:
     level: DEBUG
     stream: ext://sys.stdout
     formatter: normal
-  file:
+  api_file:
     class: logging.FileHandler
     level: DEBUG
     filename: api.log
     formatter: api
+  editor_file:
+    class: logging.FileHandler
+    level: DEBUG
+    filename: editor.log
+    formatter: normal
 formatters:
   normal:
     format: "%(asctime)s %(levelname)s %(name)s: %(message)s"
@@ -18,16 +23,16 @@ formatters:
 loggers:
   api:
     level: DEBUG
-    handlers: [file]
+    handlers: [api_file]
     propogate: no
   main:
     level: DEBUG
     handlers: [console]
   langchain:
     level: DEBUG
-    handlers: [file]
+    handlers: [api_file]
   editor:
     level: DEBUG
-    handlers: [console]
+    handlers: [editor_file]
 root:
   level: DEBUG
