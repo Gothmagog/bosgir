@@ -1,6 +1,7 @@
 import textwrap
 import re
 import logging
+from nltk import tokenize
 
 log = logging.getLogger("main")
 
@@ -60,3 +61,27 @@ def str_from_arr(arr):
                 ret += "\n\n"
             new_p = True
     return ret
+
+def get_last_paragraph(text):
+    paragraphs = text.strip().splitlines()
+    plen = len(paragraphs)
+    if plen == 1:
+        return text
+    ret = ""
+    for i in range(plen - 1, -1, -1):
+        isempty = paragraphs[i].isspace() or len(paragraphs[i]) == 0
+        if isempty and i < plen - 1:
+            return paragraphs[i+1]
+    return ret
+
+def is_position_in_mid_sentence(text, position):
+    sentences = tokenize.sent_tokenize(text)
+    last_sent_pos = -1
+    last_sent_len = 0
+    for sent in sentences:
+        sent_pos = text.find(sent, last_sent_pos + 1)
+        if last_sent_pos > -1 and sent_pos > position:
+            return position > last_sent_pos and position < last_sent_pos + last_sent_len
+        last_sent_pos = sent_pos
+        last_sent_len = len(sent)
+    return False

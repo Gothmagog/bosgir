@@ -3,24 +3,32 @@ import json
 import os
 import sys
 from langchain.llms import Bedrock
+from langchain_community.embeddings import BedrockEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.output_parsers import XMLOutputParser
 from langchain.schema.runnable.base import RunnableLambda
 from langchain.callbacks.tracers.stdout import ConsoleCallbackHandler
+from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
+from langchain_community.vectorstores import Chroma
 import re
 import bedrock
 import logging
 from prompt_examples import examples_notes, examples_trunc
 from langchain_callback import CursesCallback
 from pathlib import Path
+from text_utils import get_last_paragraph, is_position_in_mid_sentence
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
+main_log = logging.getLogger("main")
 os.environ["AWS_DEFAULT_REGION"] = "us-west-2"
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 
 max_output_tokens = 1000
+
+# Embeddings (for prompt selector)
+embeddings = BedrockEmbeddings()
 
 # Primary LLM prompt
 llm_primary = Bedrock(
@@ -35,14 +43,22 @@ with open(src_dir / "../data/prompt_primary.txt", "r") as f:
 
 # Truncate Story prompt
 llm_truncate_story = Bedrock(
+    #model_id="anthropic.claude-instant-v1",
     model_id="anthropic.claude-v2",
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0, "top_p": .1},
     streaming=True,
     metadata={"name": "Story Truncation LLM"}
 )
 
-with open(src_dir / "../data/prompt_truncate_story.txt", "r") as f:
-    prompt_truncate_story = f.read()
+trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
+    examples_trunc,
+    embeddings,
+    Chroma,
+    k=3,
+    input_keys=["_do", "_snippet"]
+)
+trunc_example_selector.input_keys = ["do", "snippet"]
+
 with open(src_dir / "../data/prompt_truncate_story_example.txt", "r") as f:
     prompt_truncate_story_example = f.read()
 with open(src_dir / "../data/prompt_truncate_story_prefix.txt", "r") as f:
@@ -64,11 +80,11 @@ def proc_command(command, notes, history, narrative, status_win):
     # Setup request
     # if not command.endswith('"'):
     #     command += " and wait for a reaction"
-    out_parser1 = XMLOutputParser(tags=["Root", "Do", "Current", "Snippet"])
+    out_parser1 = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
     out_parser2 = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
     out_ws_strip = RunnableLambda(lambda x: x.strip())
     prompt1 = PromptTemplate(
-        input_variables=["history", "current", "do", "narrative"],
+        input_variables=["history", "current", "do", "narrative", "continue_from"],
         template=prompt_primary,
         partial_variables={"format_instructions": out_parser1.get_format_instructions()}
     )
@@ -77,34 +93,55 @@ def proc_command(command, notes, history, narrative, status_win):
         input_variables=["_current", "_do", "_snippet", "output"]
     )
     prompt2 = FewShotPromptTemplate(
-        examples=examples_trunc,
+        example_selector=trunc_example_selector,
         example_prompt=example_prompt,
         prefix=prompt_truncate_story_prefix,
         suffix=prompt_truncate_story_example,
         input_variables=["current", "do", "snippet"]
     )
-    #print(prompt2.format(do=command, current=notes, snippet="Test snippet"))
     chain1 = prompt1 | llm_primary | out_parser1
-    chain2 = prompt2 | llm_truncate_story | out_ws_strip | out_parser2
+    chain2 = prompt2 | llm_truncate_story | out_parser2
 
-    # invoke API
-    log.debug("***** Invoking Claude V2 API *****")
-    response1 = chain1.invoke({"do": command, "history": history, "current": notes, "narrative": narrative}, config={"callbacks": [CursesCallback(status_win)]})
+    # Chain #1
+    log.debug("***** Invoking 1st chain *****")
+    main_log.debug("***** Invoking 1st chain *****")
+    response1 = chain1.invoke({"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraph(history)}, config={"callbacks": [CursesCallback(status_win)]})
     #log.debug(response1)
     snippet = get_xml_val(response1, "Snippet")
+
+    # Chain #2
+    log.debug(prompt2.format(do=command, current=notes, snippet=snippet))
+    log.debug("***** Invoking 2nd chain *****")
+    main_log.debug("***** Invoking 2nd chain *****")
     response2 = chain2.invoke({"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win)]})
     log.debug(response2)
 
     sentence = get_xml_val(response2, "Output")
+    ret = ""
+    idx = -1
     if sentence:
         idx = snippet.find(sentence)
         if idx == -1:
             idx = snippet.find(sentence.strip())
         if idx != -1:
-            return snippet[:idx]
+            ret = snippet[:idx]
         else:
             log.warn("Couldn't find the sentence given from the truncate story LLM result")
-    return snippet
+            main_log.warn("Couldn't find the sentence given from the truncate story LLM result")
+    else:
+        ret = snippet
+
+    main_log.debug("Checking for bad truncation...")
+    if ret.isspace():
+        main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
+        ret = proc_command(command, notes, history, narrative, status_win)
+    elif is_position_in_mid_sentence(snippet, idx):
+        main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
+        ret = proc_command(command, notes, history, narrative, status_win)
+    elif ret[:-1] != "\n":
+        ret += "\n"
+        
+    return ret
 
 def update_notes(notes, description, status_win):
     rem_last_xml = RunnableLambda(lambda x: x[:x.find("</Output>")])

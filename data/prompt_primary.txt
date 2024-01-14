@@ -30,10 +30,13 @@ Human: Do the following steps:
 
 Provide the following in your output:
 
-- The original action enclosed in <Do> XML tags
-- The current state of things in <Current> XML tags
 - What happens next, within <Snippet> XML tags
+- Your reasoning, within <Reasoning> XML tags
 
 {format_instructions}
+
+As a reminder, here's where the story should continue from:
+
+{continue_from}
 
 Assistant:
