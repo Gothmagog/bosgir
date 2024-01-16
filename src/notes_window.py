@@ -35,13 +35,16 @@ class NotesWindow(EnhancedWindow):
         return 1
 
     def print_line(self, y, line):
-        #log.debug("%s: %s", y, line)
+        log.debug("y %s, line %s long", y, len(line))
         line_len = len(line)
         vp_width = self.get_viewport_width()
         if line_len > vp_width:
             self.win.addstr(y, 0, line[:vp_width])
             self.win.addstr(y, vp_width, chr(unicode_elipse))
-            return 1 + self.print_line(y + 1, line[vp_width:])
+            if y + 1 <= self.get_viewport_height():
+                return 1 + self.print_line(y + 1, line[vp_width:])
+            else:
+                return 0
         return super().print_line(y, line)
 
     def edit(self):
@@ -70,7 +73,7 @@ class NotesWindow(EnhancedWindow):
             elif keyname == b"KEY_DC": #delete
                 if cur_line_pos <= len(cur_line):
                     cury, curx = self.win.getyx()
-                    if cur_line_idx == len(self.content_lines) - 1 and cur_line_pos == len(cur_line_pos):
+                    if cur_line_idx == len(self.content_lines) - 1 and cur_line_pos == len(cur_line):
                         pass
                     elif cur_line_pos == len(cur_line):
                         self.content_lines[cur_line_idx] += self.content_lines[cur_line_idx + 1]
@@ -105,11 +108,16 @@ class NotesWindow(EnhancedWindow):
                 curses.doupdate()
             elif keyname in dirs: # direction keys
                 cury, curx = self.win.getyx()
-                # log.debug("curx: %s, cury: %s, vp_width: %s", curx, cury, self.get_viewport_width())
                 if keyname == b"KEY_UP" and cury > 0:
                     if self._get_line_height(cur_line) == 1 or cur_line_pos < self.get_viewport_width():
+                        log.debug("here1")
                         cur_line_idx -= 1
-                        cur_line_pos = curx
+                        if self._get_line_height(self.content_lines[cur_line_idx]) > 1:
+                            log.debug("here2")
+                            cur_line_pos = ((len(self.content_lines[cur_line_idx]) // self.get_viewport_width()) * self.get_viewport_width()) + curx
+                        else:
+                            log.debug("here3")
+                            cur_line_pos = curx
                     else:
                         cur_line_pos -= self.get_viewport_width()
                     cur_line = self.content_lines[cur_line_idx]

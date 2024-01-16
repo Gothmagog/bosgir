@@ -16,3 +16,4 @@ Motivations:
 - to find adventure
 Current location: Spielburg 
 Time of day: late afternoon
+Weather: pleasant

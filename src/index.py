@@ -38,7 +38,6 @@ def new_game():
     with open(src_dir / "../data/initial_background.txt", "r") as f:
         init_background = f.read()
     tb, tb_win = textbox(s, tb_height, YPos.TOP, "Enter some initial background for the story and your character (Ctrl-G to save):", False)
-    log.debug(init_background)
     tb_win.addstr(0, 0, init_background)
     tb_win.move(len(init_background) // swidth, len(init_background) % swidth)
     tb_win.noutrefresh()

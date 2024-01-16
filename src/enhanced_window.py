@@ -1,5 +1,8 @@
 from curses import window
 from text_utils import normalize_newlines_arr, str_from_arr
+import logging
+
+log = logging.getLogger("main")
 
 sep = "\n"
 
@@ -43,7 +46,7 @@ class EnhancedWindow:
         self.win.erase()
         wrap_offset = 0
         for i in range(self.viewport_offset, self.viewport_offset + vp_height):
-            if i + wrap_offset >= num_lines:
+            if i + wrap_offset >= num_lines or i - self.viewport_offset + wrap_offset > vp_height:
                 break
             wrap_offset += self.print_line(i - self.viewport_offset + wrap_offset, self.content_lines[i])
         self.win.noutrefresh()

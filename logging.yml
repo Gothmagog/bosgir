@@ -22,11 +22,11 @@ formatters:
     format: "%(asctime)s |%(message)s|"
 loggers:
   api:
-    level: DEBUG
+    level: INFO
     handlers: [api_file]
     propogate: no
   main:
-    level: DEBUG
+    level: INFO
     handlers: [console]
   langchain:
     level: DEBUG

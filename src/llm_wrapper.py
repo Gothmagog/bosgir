@@ -18,6 +18,7 @@ from prompt_examples import examples_notes, examples_trunc
 from langchain_callback import CursesCallback
 from pathlib import Path
 from text_utils import get_last_paragraph, is_position_in_mid_sentence
+from lin_backoff import lin_backoff
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
@@ -31,23 +32,24 @@ max_output_tokens = 1000
 embeddings = BedrockEmbeddings()
 
 # Primary LLM prompt
+model_id = "anthropic.claude-v2"
 llm_primary = Bedrock(
-    model_id="anthropic.claude-v2",
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": .3},
+    model_id=model_id,
+    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
     streaming=True,
-    metadata={"name": "Primary LLM"}
+    metadata={"name": "Story Generation", "model_id": model_id}
 )
 
 with open(src_dir / "../data/prompt_primary.txt", "r") as f:
     prompt_primary = f.read()
 
 # Truncate Story prompt
+model_id = "anthropic.claude-v2"
 llm_truncate_story = Bedrock(
-    #model_id="anthropic.claude-instant-v1",
-    model_id="anthropic.claude-v2",
+    model_id=model_id,
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0, "top_p": .1},
     streaming=True,
-    metadata={"name": "Story Truncation LLM"}
+    metadata={"name": "Story Truncation", "model_id": model_id}
 )
 
 trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
@@ -57,6 +59,10 @@ trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
     k=3,
     input_keys=["_do", "_snippet"]
 )
+# We have to change the input_keys var after initialization because
+# the SemanticSimilarityExampleSelector apparently doesn't support
+# cases where the example input variables are different from the
+# actual input variables.
 trunc_example_selector.input_keys = ["do", "snippet"]
 
 with open(src_dir / "../data/prompt_truncate_story_example.txt", "r") as f:
@@ -65,24 +71,26 @@ with open(src_dir / "../data/prompt_truncate_story_prefix.txt", "r") as f:
     prompt_truncate_story_prefix = f.read()
 
 # Update notes prompt
+model_id = "anthropic.claude-instant-v1"
 llm_update_notes = Bedrock(
-    model_id="anthropic.claude-instant-v1",
+    model_id=model_id,
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0},
     streaming=False,
-    metadata={"name": "Update Notes LLM"}
+    metadata={"name": "Update Notes", "model_id": model_id}
 )
 
 with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
     prompt_update_notes = f.read()
 
 # exec LLM
-def proc_command(command, notes, history, narrative, status_win):
+def proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win):
     # Setup request
     # if not command.endswith('"'):
     #     command += " and wait for a reaction"
     out_parser1 = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
-    out_parser2 = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
-    out_ws_strip = RunnableLambda(lambda x: x.strip())
+    out_parser2_preferred = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
+    out_parser2_fallback = RunnableLambda(lambda r: r[r.rfind("<Output>")+8:r.find("</Output>")])
+    out_parser2 = out_parser2_preferred.with_fallbacks([out_parser2_fallback])
     prompt1 = PromptTemplate(
         input_variables=["history", "current", "do", "narrative", "continue_from"],
         template=prompt_primary,
@@ -103,20 +111,25 @@ def proc_command(command, notes, history, narrative, status_win):
     chain2 = prompt2 | llm_truncate_story | out_parser2
 
     # Chain #1
-    log.debug("***** Invoking 1st chain *****")
-    main_log.debug("***** Invoking 1st chain *****")
-    response1 = chain1.invoke({"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraph(history)}, config={"callbacks": [CursesCallback(status_win)]})
+    log.info("***** Invoking 1st chain *****")
+    main_log.info("***** Invoking 1st chain *****")
+    response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraph(history)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     #log.debug(response1)
     snippet = get_xml_val(response1, "Snippet")
 
     # Chain #2
+    response2 = None
     log.debug(prompt2.format(do=command, current=notes, snippet=snippet))
-    log.debug("***** Invoking 2nd chain *****")
-    main_log.debug("***** Invoking 2nd chain *****")
-    response2 = chain2.invoke({"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win)]})
+    log.info("***** Invoking 2nd chain *****")
+    main_log.info("***** Invoking 2nd chain *****")
+    response2 = lin_backoff(chain2.invoke, status_win, {"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     log.debug(response2)
 
-    sentence = get_xml_val(response2, "Output")
+    if type(response2) == dict:
+        sentence = get_xml_val(response2, "Output")
+    else:
+        main_log.warn("Had to use fallback output parser")
+        sentence = response2
     ret = ""
     idx = -1
     if sentence:
@@ -131,19 +144,19 @@ def proc_command(command, notes, history, narrative, status_win):
     else:
         ret = snippet
 
-    main_log.debug("Checking for bad truncation...")
+    main_log.info("Checking for bad truncation...")
     if ret.isspace():
         main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win)
+        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
     elif is_position_in_mid_sentence(snippet, idx):
         main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win)
+        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
     elif ret[:-1] != "\n":
         ret += "\n"
         
     return ret
 
-def update_notes(notes, description, status_win):
+def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     rem_last_xml = RunnableLambda(lambda x: x[:x.find("</Output>")])
     example_prompt = PromptTemplate(
         input_variables=["_description", "_notes", "output"],
@@ -157,12 +170,12 @@ def update_notes(notes, description, status_win):
     )
     #print(prompt3.format(description=description, notes=notes))
     chain = prompt3 | llm_update_notes | rem_last_xml
-    log.debug("***** Invoking Claude Instant V1 API *****")
-    response = chain.invoke({"description": description, "notes": notes}, config={"callbacks": [CursesCallback(status_win)]})
+    log.info("***** Invoking Claude Instant V1 API *****")
+    response = chain.invoke({"description": description, "notes": notes}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     log.debug(response)
     match = embedded_xml_re.search(response)
     if match:
-        log.debug("Found embedded XML tags in the response, removing it...")
+        log.info("Found embedded XML tags in the response, removing it...")
         response = match.group(1)
     return response
 

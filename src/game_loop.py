@@ -11,7 +11,8 @@ from curses_utils import (
     label_win,
     redraw_frame
 )
-from history_win import HistoryWindow
+#from history_win import HistoryWindow
+from enhanced_window import EnhancedWindow
 from notes_window import NotesWindow
 from llm_wrapper import proc_command, update_notes
 
@@ -31,8 +32,9 @@ K_SNGQUOTE = 530
 def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     # draw main screen
     s.erase()
-    hist_win, notes_win, input_win, status_win, main_tb = main_screen(s)
-    hw = HistoryWindow(hist_win)
+    hist_win, notes_win, input_win, status_win, main_tb, in_cost_win, out_cost_win = main_screen(s)
+    #hw = HistoryWindow(hist_win)
+    hw = EnhancedWindow(hist_win)
     nw = NotesWindow(notes_win)
     
     # initialize history window content
@@ -40,7 +42,6 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     hw.print_content(True)
 
     # initialize notes window content
-    log.debug(gs.notes)
     nw.add_content(gs.notes)
     nw.print_content(False)
     
@@ -71,7 +72,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
             if char >= K_1 and char <= K_3:
                 curses.doupdate()
         elif mode == "update_notes":
-            resp = update_notes(gs.notes, output, status_win)
+            resp = update_notes(gs.notes, output, status_win, in_cost_win, out_cost_win)
             #log.debug(resp)
             if resp and len(resp):
                 resp = resp.strip()
@@ -123,7 +124,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 if new_command.startswith('"') or new_command.startswith("'"):
                     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                resp_stream = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, status_win)
+                resp_stream = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, status_win, in_cost_win, out_cost_win)
                 if resp_stream:
                     mode = "proc_input"
                 else:
@@ -141,7 +142,6 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
         elif mode == "notes":
             curses.curs_set(1)
             lines_copy = nw.get_ttl_content()
-            #log.debug(lines_copy)
             ret = nw.edit()
             if not ret:
                 nw.set_content(lines_copy)
@@ -165,14 +165,17 @@ def focus(s, window_label, hw, nw, iw):
     redraw_frame(s, iw, win_labels["LAB_INPUT"])
 
     if window_label == win_labels["LAB_HIST"]:
-        label_win(s, hw, "*", "*", win_labels["LAB_HIST"])
+        label_win(s, hw, "*", "* (arrow keys to nav)", win_labels["LAB_HIST"])
     elif window_label == win_labels["LAB_NOTES"]:
-        label_win(s, nw, "*", "*", win_labels["LAB_NOTES"])
+        label_win(s, nw, "*", "* (Ctrl-G: save, ESC: undo)", win_labels["LAB_NOTES"])
     elif window_label == win_labels["LAB_INPUT"]:
         label_win(s, iw, "*", "*", win_labels["LAB_INPUT"])
 
-def none_mode(s, hist_win, notes_win, input_win, redraw=False):
-    label_all(s, hist_win, notes_win, input_win)
+def none_mode(s, hw, nw, iw, redraw=False):
+    redraw_frame(s, hw, win_labels["LAB_HIST"])
+    redraw_frame(s, nw, win_labels["LAB_NOTES"])
+    redraw_frame(s, iw, win_labels["LAB_INPUT"])
+    label_all(s, hw, nw, iw)
     curses.curs_set(0)
     if redraw:
         curses.doupdate()

@@ -109,14 +109,16 @@ def main_screen(s: window):
     status_win_width = 50
     
     hist_win, hist_win_height, hist_win_width = framed_win(s, 1, .7, 0, 0, win_labels["LAB_HIST"], -4)
-    notes_win, notes_win_height, notes_win_width = framed_win(s, 1, .3, 0, hist_win_width, win_labels["LAB_NOTES"], -4)
+    notes_win, notes_win_height, notes_win_width = framed_win(s, 1, .3, 0, hist_win_width, win_labels["LAB_NOTES"], -5)
+    in_cost_win = s.derwin(1, 15, notes_win_height, hist_win_width)
+    out_cost_win = s.derwin(1, 15, notes_win_height, hist_win_width + 15)
     input_win, input_height, input_width = framed_win(s, 0, 1, hist_win_height, 0, win_labels["LAB_INPUT"], 3, -status_win_width)
     status_win, status_height, status_width = framed_win(s, 0, 0, hist_win_height, input_width, win_labels["LAB_STATUS"], 3, status_win_width)
     tb = Textbox(input_win)
     curses.curs_set(1)
     input_win.noutrefresh()
 
-    return (hist_win, notes_win, input_win, status_win, tb)
+    return (hist_win, notes_win, input_win, status_win, tb, in_cost_win, out_cost_win)
 
 def label_win(s: window, w: window, before_str: str, after_str: str, label: str = None):
     ul_y, ul_x = w.getparyx()
