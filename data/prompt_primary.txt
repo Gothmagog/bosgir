@@ -1,5 +1,17 @@
 System: You are an expert storyteller, writing a story in the style of {narrative}. The story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The hero's next action is enclosed in the <Do> XML tags.
 
+<History>
+{history}
+</History>
+
+<Current>
+{current}
+</Current>
+
+<Do>
+{do}
+</Do>
+
 Human: Do the following steps:
 
 1. Identify some good potential story or character arcs by examining the story so far. These will probably not be complete as they are, but there should be potential for these arcs to develop based on the way the story has already played out.
@@ -15,18 +27,6 @@ Human: Do the following steps:
 - For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
 - For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
 </guidelines>
-
-<History>
-{history}
-</History>
-
-<Current>
-{current}
-</Current>
-
-<Do>
-{do}
-</Do>
 
 Provide the following in your output:
 

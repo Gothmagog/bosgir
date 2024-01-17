@@ -1,0 +1,7 @@
+Human: Summarize the following story contained in <story> XML tags. Emphasize the most recent action.
+
+<story>
+{story}
+</story>
+
+Assistant:

@@ -8,6 +8,7 @@ from langchain.prompts import PromptTemplate
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.output_parsers import XMLOutputParser
 from langchain.schema.runnable.base import RunnableLambda
+from langchain.schema.runnable.passthrough import RunnablePassthrough
 from langchain.callbacks.tracers.stdout import ConsoleCallbackHandler
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
 from langchain_community.vectorstores import Chroma
@@ -19,6 +20,7 @@ from langchain_callback import CursesCallback
 from pathlib import Path
 from text_utils import get_last_paragraph, is_position_in_mid_sentence
 from lin_backoff import lin_backoff
+from simple_callable import S
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
@@ -31,17 +33,33 @@ max_output_tokens = 1000
 # Embeddings (for prompt selector)
 embeddings = BedrockEmbeddings()
 
-# Primary LLM prompt
+# Primary LLM prompts (1-3)
+model_id = "anthropic.claude-instant-v1"
+llm_primary1 = Bedrock(
+    model_id=model_id,
+    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": .1},
+    streaming=True,
+    metadata={"name": "Story Summarization", "model_id": model_id}
+)
+with open(src_dir / "../data/prompt_primary1.txt", "r") as f:
+    prompt_primary1 = f.read()
+llm_primary2 = Bedrock(
+    model_id=model_id,
+    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
+    streaming=True,
+    metadata={"name": "Plot Generation", "model_id": model_id}
+)
+with open(src_dir / "../data/prompt_primary2.txt", "r") as f:
+    prompt_primary2 = f.read()
 model_id = "anthropic.claude-v2"
-llm_primary = Bedrock(
+llm_primary3 = Bedrock(
     model_id=model_id,
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
     streaming=True,
     metadata={"name": "Story Generation", "model_id": model_id}
 )
-
-with open(src_dir / "../data/prompt_primary.txt", "r") as f:
-    prompt_primary = f.read()
+with open(src_dir / "../data/prompt_primary3.txt", "r") as f:
+    prompt_primary3 = f.read()
 
 # Truncate Story prompt
 model_id = "anthropic.claude-v2"
@@ -84,75 +102,79 @@ with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
 
 # exec LLM
 def proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win):
-    # Setup request
-    # if not command.endswith('"'):
-    #     command += " and wait for a reaction"
-    out_parser1 = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
+    out_parser1_preferred = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
+    out_parser1_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
+    out_parser1 = out_parser1_preferred.with_fallbacks([out_parser1_fallback])
     out_parser2_preferred = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
-    out_parser2_fallback = RunnableLambda(lambda r: r[r.rfind("<Output>")+8:r.find("</Output>")])
+    out_parser2_fallback = RunnableLambda(lambda r: r[r.rfind("<Output>")+8:r.rfind("</Output>")])
     out_parser2 = out_parser2_preferred.with_fallbacks([out_parser2_fallback])
+    out_parser3 = RunnableLambda(lambda r: r[r.find("<Output>")+8:r.rfind("</Output>")])
     prompt1 = PromptTemplate(
-        input_variables=["history", "current", "do", "narrative", "continue_from"],
-        template=prompt_primary,
-        partial_variables={"format_instructions": out_parser1.get_format_instructions()}
+        input_variables=["story"],
+        template=prompt_primary1
+    )
+    prompt2 = PromptTemplate(
+        input_variables=["summary", "action", "narrative"],
+        template=prompt_primary2
+    )
+    prompt3 = PromptTemplate(
+        input_variables=["summary", "action", "narrative", "nextplot"],
+        template=prompt_primary3,
+        partial_variables={"format_instructions": out_parser1_preferred.get_format_instructions()}
     )
     example_prompt = PromptTemplate(
         template=(prompt_truncate_story_example.replace("{", "{_") + "{output}"),
         input_variables=["_current", "_do", "_snippet", "output"]
     )
-    prompt2 = FewShotPromptTemplate(
+    prompt4 = FewShotPromptTemplate(
         example_selector=trunc_example_selector,
         example_prompt=example_prompt,
         prefix=prompt_truncate_story_prefix,
         suffix=prompt_truncate_story_example,
         input_variables=["current", "do", "snippet"]
     )
-    chain1 = prompt1 | llm_primary | out_parser1
-    chain2 = prompt2 | llm_truncate_story | out_parser2
 
-    # Chain #1
+    # Chain 1
+    chain1 = prompt1 | llm_primary1
     log.info("***** Invoking 1st chain *****")
     main_log.info("***** Invoking 1st chain *****")
-    response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraph(history)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    #log.debug(response1)
-    snippet = get_xml_val(response1, "Snippet")
+    response1 = lin_backoff(chain1.invoke, status_win, {"story": history}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
 
-    # Chain #2
-    response2 = None
-    log.debug(prompt2.format(do=command, current=notes, snippet=snippet))
+    # Chain 2
+    chain2 =  prompt2 | llm_primary2 | out_parser3 | {"summary": S(response1), "action": S(command), "narrative": S(narrative), "nextplot": RunnablePassthrough()} | prompt3 | llm_primary3 | out_parser1
     log.info("***** Invoking 2nd chain *****")
     main_log.info("***** Invoking 2nd chain *****")
-    response2 = lin_backoff(chain2.invoke, status_win, {"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    log.debug(response2)
+    response2 = lin_backoff(chain2.invoke, status_win, {"summary": response1, "action": command, "narrative": narrative}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
 
-    if type(response2) == dict:
-        sentence = get_xml_val(response2, "Output")
-    else:
-        main_log.warn("Had to use fallback output parser")
-        sentence = response2
-    ret = ""
-    idx = -1
-    if sentence:
-        idx = snippet.find(sentence)
-        if idx == -1:
-            idx = snippet.find(sentence.strip())
-        if idx != -1:
-            ret = snippet[:idx]
-        else:
-            log.warn("Couldn't find the sentence given from the truncate story LLM result")
-            main_log.warn("Couldn't find the sentence given from the truncate story LLM result")
-    else:
-        ret = snippet
+    ret = get_xml_val(response2, "Snippet")
+    
+    # # Chain 3
+    # chain3 = prompt4 | llm_truncate_story | out_parser2
 
-    main_log.info("Checking for bad truncation...")
-    if ret.isspace():
-        main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
-    elif is_position_in_mid_sentence(snippet, idx):
-        main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
-    elif ret[:-1] != "\n":
-        ret += "\n"
+    # sentence = get_xml_val(response2, "Output")
+    # ret = ""
+    # idx = -1
+    # if sentence:
+    #     idx = snippet.find(sentence)
+    #     if idx == -1:
+    #         idx = snippet.find(sentence.strip())
+    #     if idx != -1:
+    #         ret = snippet[:idx]
+    #     else:
+    #         log.warn("Couldn't find the sentence given from the truncate story LLM result")
+    #         main_log.warn("Couldn't find the sentence given from the truncate story LLM result")
+    # else:
+    #     ret = snippet
+
+    # main_log.info("Checking for bad truncation...")
+    # if ret.isspace():
+    #     main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
+    #     ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
+    # elif is_position_in_mid_sentence(snippet, idx):
+    #     main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
+    #     ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
+    # elif ret[:-1] != "\n":
+    #     ret += "\n"
         
     return ret
 
@@ -180,7 +202,11 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     return response
 
 def get_xml_val(obj, attr_name):
-    for e in obj["Root"]:
-        if attr_name in e:
-            return e[attr_name]
+    if type(obj) == dict:
+        for e in obj["Root"]:
+            if attr_name in e:
+                return e[attr_name]
+    else:
+        main_log.warn("Had to use fallback output parser")
+        return obj
     return None

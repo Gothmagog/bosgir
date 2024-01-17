@@ -1,0 +1,13 @@
+Human: Given the story summary provided below within the <summary> XML tags and the hero's next action provided within the <action> XML tags, determine what the next plot development should be, according to the {narrative} style. The plot development should be a consequence of the hero's next action.
+
+Go for maximum reader engagement and immersion while adhering to the {narrative} style. Only describe the major plot points of the plot development; do not attemp to narrate what happens. Wrap your output inside <Output> XML tags.
+
+<summary>
+{summary}
+</summary>
+
+<action>
+{action}
+</action>
+
+Assistant:

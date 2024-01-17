@@ -1,0 +1,34 @@
+System: You are an expert storyteller, writing a story in the style of {narrative}. The story so far is enclosed in <summary> XML tags. The hero's next action is enclosed in the <action> XML tags. The next plot development is enclosed in the <nextplot> XML tags. It is crude and needs polishing.
+
+<summary>
+{summary}
+</summary>
+
+<action>
+{action}
+</action>
+
+<nextplot>
+{nextplot}
+</nextplot>
+
+Human: Do the following steps:
+
+1. The next plot development is disconnected from the story so far. Determine how to transition into the plot development given by incorporating the hero's next action.
+
+2. Continue the story using the transition. Only narrate what happens up until the hero's next voluntary, physical action. Use the following guidelines when writing:
+
+<guidelines>
+- For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.
+- For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
+- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
+</guidelines>
+
+Provide the following in your output:
+
+- What happens next, within <Snippet> XML tags
+- Your reasoning, within <Reasoning> XML tags
+
+{format_instructions}
+
+Assistant:
