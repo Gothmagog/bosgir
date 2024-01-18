@@ -41,13 +41,10 @@ def count_tokens(text):
     return len(enc.ids)
 
 def calc_cost(text, for_input, model_id):
-    #log.debug("called calc_cost(%s, %s, %s)", text, for_input, model_id)
     tok_count = count_tokens(text)
-    #log.debug("here1")
     price_per_1k = 0
     if for_input:
         price_per_1k = pricing[model_id]["price_per_1k_input"]
     else:
         price_per_1k = pricing[model_id]["price_per_1k_output"]
-    #log.debug("price_per_1k = %s, tok_count = %s", price_per_1k, tok_count)
     return (tok_count / 1000) * price_per_1k

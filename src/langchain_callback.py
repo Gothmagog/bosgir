@@ -50,9 +50,7 @@ class CursesCallback(BaseCallbackHandler):
         self.last = name
         for p in prompts:
             ttl_in_cost += calc_cost(p, True, self.model_id)
-        log.debug("ttl_in_cost: %s", ttl_in_cost)
         if self.in_token_win:
-            log.debug("setting ttl in cost in window")
             self.in_token_win.erase()
             self.in_token_win.addstr(0, 0, f"in: ${ttl_in_cost:.4f}")
             self.in_token_win.noutrefresh()
@@ -67,10 +65,8 @@ class CursesCallback(BaseCallbackHandler):
         global ttl_out_cost
         #log.debug("on_llm_end: %s", kwargs)
         ttl_out_cost += self.out_cost
-        log.debug("ttl_out_cost: %s", ttl_out_cost)
         self.out_cost = 0
         if self.out_token_win:
-            log.debug("setting ttl out cost in window")
             self.out_token_win.erase()
             self.out_token_win.addstr(0, 0, f"out: ${ttl_out_cost:.4f}")
             self.out_token_win.noutrefresh()

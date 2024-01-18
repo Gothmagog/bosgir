@@ -87,14 +87,16 @@ def proc_command(command, notes, history, narrative, status_win, in_tok_win, out
     # Setup request
     # if not command.endswith('"'):
     #     command += " and wait for a reaction"
-    out_parser1 = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
+    out_parser1_preferred = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
+    out_parser1_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
+    out_parser1 = out_parser1_preferred.with_fallbacks([out_parser1_fallback])
     out_parser2_preferred = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
     out_parser2_fallback = RunnableLambda(lambda r: r[r.rfind("<Output>")+8:r.find("</Output>")])
     out_parser2 = out_parser2_preferred.with_fallbacks([out_parser2_fallback])
     prompt1 = PromptTemplate(
         input_variables=["history", "current", "do", "narrative", "continue_from"],
         template=prompt_primary,
-        partial_variables={"format_instructions": out_parser1.get_format_instructions()}
+        partial_variables={"format_instructions": out_parser1_preferred.get_format_instructions()}
     )
     example_prompt = PromptTemplate(
         template=(prompt_truncate_story_example.replace("{", "{_") + "{output}"),
@@ -125,11 +127,7 @@ def proc_command(command, notes, history, narrative, status_win, in_tok_win, out
     response2 = lin_backoff(chain2.invoke, status_win, {"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     log.debug(response2)
 
-    if type(response2) == dict:
-        sentence = get_xml_val(response2, "Output")
-    else:
-        main_log.warn("Had to use fallback output parser")
-        sentence = response2
+    sentence = get_xml_val(response2, "Output")
     ret = ""
     idx = -1
     if sentence:
@@ -180,7 +178,11 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     return response
 
 def get_xml_val(obj, attr_name):
-    for e in obj["Root"]:
-        if attr_name in e:
-            return e[attr_name]
+    if type(obj) == dict:
+        for e in obj["Root"]:
+            if attr_name in e:
+                return e[attr_name]
+    else:
+        main_log.warn("Had to use fallback output parser")
+        return obj
     return None

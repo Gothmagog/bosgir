@@ -1,21 +1,5 @@
 System: You are an expert storyteller, writing a story in the style of {narrative}. The story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The hero's next action is enclosed in the <Do> XML tags.
 
-Human: Do the following steps:
-
-1. Identify some good potential story or character arcs by examining the story so far. These will probably not be complete as they are, but there should be potential for these arcs to develop based on the way the story has already played out.
-
-2. Pick the top 3 based on complexity. That is, which story or character arc has the longest sequence of events to complete. Identify where, in each arc, the story so far is.
-
-3. Identify which arc from the previous step best matches the indicated hero action. Note that the hero may or may not succeed at the action indicated, and that the hero's failure, not success, may drive any given arc forward. Make a note of the hero success or failure criteria for the arc.
-
-4. Based on the matched arc and the hero's success or failure of their current action, describe what happens as a result. Again, the action should match the arc chosen. Use the following guidelines when writing:
-
-<guidelines>
-- For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.
-- For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
-- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
-</guidelines>
-
 <History>
 {history}
 </History>
@@ -27,6 +11,22 @@ Human: Do the following steps:
 <Do>
 {do}
 </Do>
+
+Human: Do the following steps:
+
+1. Identify some good potential story or character arcs by examining the story so far. These will probably not be complete as they are, but there should be potential for these arcs to develop based on the way the story has already played out.
+
+2. Pick the top 3 based on complexity and adherence to the {narrative} style. That is, which story or character arc has the longest sequence of events to complete in the preferred style. Identify where, in each arc, the story so far is.
+
+3. Identify which arc from the previous step best matches the indicated hero action. Note that the hero may or may not succeed at the action indicated, and that the hero's failure, not success, may drive any given arc forward. Make a note of the hero success or failure criteria for the arc.
+
+4. Based on the matched arc and the hero's success or failure of their current action, describe what happens as a result. Again, the action should match the arc chosen. Use the following guidelines when writing:
+
+<guidelines>
+- For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.
+- For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
+- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
+</guidelines>
 
 Provide the following in your output:
 
