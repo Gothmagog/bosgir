@@ -17,8 +17,9 @@ import logging
 from prompt_examples import examples_notes, examples_trunc
 from langchain_callback import CursesCallback
 from pathlib import Path
-from text_utils import get_last_paragraph, is_position_in_mid_sentence
+from text_utils import get_last_paragraphs, is_position_in_mid_sentence
 from lin_backoff import lin_backoff
+from summarization import do_compression
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
@@ -84,9 +85,10 @@ with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
 
 # exec LLM
 def proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win):
-    # Setup request
-    # if not command.endswith('"'):
-    #     command += " and wait for a reaction"
+    # Summarize the story, if needed
+    history = do_compression(history)
+
+    # Setup parsers and prompts
     out_parser1_preferred = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
     out_parser1_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
     out_parser1 = out_parser1_preferred.with_fallbacks([out_parser1_fallback])
@@ -115,7 +117,7 @@ def proc_command(command, notes, history, narrative, status_win, in_tok_win, out
     # Chain #1
     log.info("***** Invoking 1st chain *****")
     main_log.info("***** Invoking 1st chain *****")
-    response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraph(history)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraphs(history)[0]}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     #log.debug(response1)
     snippet = get_xml_val(response1, "Snippet")
 
