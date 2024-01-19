@@ -1,4 +1,6 @@
+import sys
 import boto3
+import botocore.exceptions
 import json
 import os
 import sys
@@ -29,6 +31,14 @@ embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 
 max_output_tokens = 1000
 
+# Verify AWS credentials
+try:
+    sts_client = boto3.client("sts")
+    sts_client.get_caller_identity()
+except botocore.exceptions.NoCredentialsError as e:
+    main_log.error("Couldn't locate the AWS credentials: have you configured the AWS CLI per the instructions in README.md?")
+    sys.exit(2)
+
 # Embeddings (for prompt selector)
 embeddings = BedrockEmbeddings()
 
@@ -53,19 +63,29 @@ llm_truncate_story = Bedrock(
     metadata={"name": "Story Truncation", "model_id": model_id}
 )
 
-trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
-    examples_trunc,
-    embeddings,
-    Chroma,
-    k=3,
-    input_keys=["_do", "_snippet"]
-)
-# We have to change the input_keys var after initialization because
-# the SemanticSimilarityExampleSelector apparently doesn't support
-# cases where the example input variables are different from the
-# actual input variables.
-trunc_example_selector.input_keys = ["do", "snippet"]
-
+# This is the first piece of code that invokes an AWS API (asside from
+# the call to GetCallerIdentity above), so we're wrapping it in a
+# try/catch and exiting upon failure
+try:
+    trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
+        examples_trunc,
+        embeddings,
+        Chroma,
+        k=3,
+        input_keys=["_do", "_snippet"]
+    )
+    # We have to change the input_keys var after initialization
+    # because the SemanticSimilarityExampleSelector apparently doesn't
+    # support cases where the example input variables are different
+    # from the actual input variables.
+    trunc_example_selector.input_keys = ["do", "snippet"]
+except ValueError as e:
+    main_log.error(e)
+    if "AccessDeniedException" in e.args[0]:
+        main_log.error("")
+        main_log.error("Have you setup a User in the AWS Console per the instructions in README.md?")
+    sys.exit(3)
+    
 with open(src_dir / "../data/prompt_truncate_story_example.txt", "r") as f:
     prompt_truncate_story_example = f.read()
 with open(src_dir / "../data/prompt_truncate_story_prefix.txt", "r") as f:

@@ -1,3 +1,4 @@
+import sys
 import curses
 from curses import wrapper
 import logging
@@ -158,7 +159,14 @@ def main(stdscr):
     global s
 
     s = stdscr
-    choice = main_menu()
-    choice()
+
+    # ensure minimum terminal dimensions
+    my, mx = s.getmaxyx()
+    if my < 33 or mx < 130:
+        log.error("The minimum terminal dimensions to run the game are 130x33. Avoid resizing the terminal window while playing the game.")
+        sys.exit(1)
+    else:
+        choice = main_menu()
+        choice()
     
 wrapper(main)
