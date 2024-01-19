@@ -3,13 +3,28 @@ Text adventure game powered by the magic of LLMs.
 
 Bald Old Short Guy In Red (or BOSGIR) is powered by the Bedrock service on AWS, so it requires and account there in order to play. It is a fully text-drive app, running on the client in a command-line window, with a UI powered by curses.
 
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [Installation](#installation)
+   * [Prerequisites](#prerequisites)
+   * [AWS Setup](#aws-setup)
+   * [AWS CLI Setup](#aws-cli-setup)
+   * [Game Installation](#game-installation)
+- [Running the Game](#running-the-game)
+- [Some Notes on Playing the Game](#some-notes-on-playing-the-game)
+
+<!-- TOC end -->
+
+<!-- TOC --><a name="installation"></a>
 ## Installation
 
+<!-- TOC --><a name="prerequisites"></a>
 ### Prerequisites
 * Python w/Pip
 * AWS account
 * AWS CLI
 
+<!-- TOC --><a name="aws-setup"></a>
 ### AWS Setup
 BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses the Bedrock service to invoke the Claude LLMs via an API. There is no requirement to deploy infrastructure via CloudFormation or anything, it just needs the Bedrock API which provides everything else. But there is some configuration required in the AWS console in order to be able to access the right foundation models.
 
@@ -35,7 +50,7 @@ BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses
 1. Close the Policies tab and go back to the Set Permissions tab for the new user. Click the refresh button next to the "Create policy" button, enter "bedrock" in the search box, check the policy you just created, then click Next
 ![Attach permissions](imgs/install09.png)
 1. Click "Create user"
-![Create user](imgs/install0.png)
+![Create user](imgs/install10.png)
 1. Click on the "bosgir_api" user you just created
 ![User select](imgs/install11.png)
 1. Click on the "Security Credentials tab, then click the "Create access key" button
@@ -49,6 +64,7 @@ BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses
 1. You should see your access key listed on the user's Access keys section with an active status
 ![Access key status](imgs/install16.png)
 
+<!-- TOC --><a name="aws-cli-setup"></a>
 ### AWS CLI Setup
 1. Install the AWS CLI by following [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 1. Open a command line
@@ -58,12 +74,18 @@ BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses
 1. You will be prompted for the "Default region name", enter the region you decided on from step 1 of AWS Setup
 1. Keep the default output format, then you're done.
 
+<!-- TOC --><a name="game-installation"></a>
 ### Game Installation
 1. Grab the code via git: open a command line and execute `git clone https://github.com/Gothmagog/bosgir.git`
+1. cd into the root directory of the game: `cd bosgir`
 1. Create a virtual environment by following the instructions [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments)
 1. Install the Python dependencies: `pip install -r requirements.txt`
 
+<!-- TOC --><a name="running-the-game"></a>
 ## Running the Game
 1. Open a command line and cd into the base directory of the code
 1. [Activate the virtual environment](https://docs.python.org/3/library/venv.html#how-venvs-work)
 1. `python src/index.py`
+
+<!-- TOC --><a name="some-notes-on-playing-the-game"></a>
+## Some Notes on Playing the Game
