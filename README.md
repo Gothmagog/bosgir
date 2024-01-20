@@ -98,6 +98,25 @@ BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses
 
 ![Access key status](imgs/install16.png)
 
+1. Now we need to configure access to the Claude foundation models. In the console, type "bedrock" in the upper-left search bar, and click on the Bedrock service from the dropdown.
+
+1. Click on the upper-left menu icon to expand the menu on the left of the page...
+
+![Bedrock menu](imgs/install17.png)
+
+1. ...then click "Model access" near the bottom-left.
+
+![Model access](imgs/install18.png)
+
+1. Click "Manage model access"
+
+![Manage model access](imgs/install19.png)
+
+1. Click the checkbox next to "Anthropic" to check it and both Claude models below it, then scroll down and click "Save changes"
+
+![Add Claude](imgs/install20.png)
+![Add Claude](imgs/install21.png)
+
 <!-- TOC --><a name="aws-cli-setup"></a>
 ### AWS CLI Setup
 1. Install the AWS CLI by following [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
