@@ -24,6 +24,9 @@ with open(src_dir / "../logging.yml", "r") as f:
 logging.config.dictConfig(log_config)
 log = logging.getLogger("main")
 
+if not (src_dir.parent / "saves").exists():
+    (src_dir.parent / "saves/").mkdir()
+
 s = None
 sep = "-"
 game_state = None
