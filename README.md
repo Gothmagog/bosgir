@@ -1,7 +1,7 @@
 # BOSGIR
-Text adventure game powered by the magic of LLMs.
+Text adventure game powered by the magic of LLMs. It is a free-form adventure game, meaning you can literally play out any kind of story you like. You and the AI will be telling a story together.
 
-Bald Old Short Guy In Red (or BOSGIR) is powered by the Bedrock service on AWS, so it requires and account there in order to play. It is a fully text-drive app, running on the client in a command-line window, with a UI powered by curses.
+Bald Old Short Guy In Red (or BOSGIR) is powered by the Bedrock service on AWS, so it requires an account there in order to play. It is a fully text-drive app, running on the client in a command-line window, with a UI powered by curses.
 
 <!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
 
