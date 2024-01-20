@@ -32,87 +32,87 @@ Bald Old Short Guy In Red (or BOSGIR) is powered by the Bedrock service on AWS, 
 BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses the Bedrock service to invoke the Claude LLMs via an API. There is no requirement to deploy infrastructure via CloudFormation or anything, it just needs the Bedrock API which provides everything else. But there is some configuration required in the AWS console in order to be able to access the right foundation models.
 
 1. Decide which AWS region you will be using. Basically, if you're on the east coast, it will be `us-east-1`, on the west coast it will be `us-west-2`. This decision shouldn't have any impact on your bill from AWS in regards to the Bedrock service.
-1. Browse to the AWS IAM console: https://???.console.aws.amazon.com/iam/home?region=???#/users (replace both ???'s with the region string from the previous step)
+2. Browse to the AWS IAM console: https://???.console.aws.amazon.com/iam/home?region=???#/users (replace both ???'s with the region string from the previous step)
 **If this is the first time you've ever accessed the console, you will be logging in with your root account. If not, use whichever login has enough permissions to create a new user**
-1. Click "Create user"
+3. Click "Create user"
 
 ![Create user](imgs/install01.png)
 
-1. Enter "bosgir_api" for the user name, leave the checkbox unchecked, click Next
+4. Enter "bosgir_api" for the user name, leave the checkbox unchecked, click Next
 
 ![User details](imgs/install02.png)
 
-1. On the Permissions page, click "Attach policies directly," then the "Create policy" button
+5. On the Permissions page, click "Attach policies directly," then the "Create policy" button
 
 ![Permissions options](imgs/install03.png)
 
-1. A new tab should open; click the Service drop-down and choose the Bedrock service
+6. A new tab should open; click the Service drop-down and choose the Bedrock service
 
 ![Select service](imgs/install04.png)
 
-1. Expand the Read list
+7. Expand the Read list
 
 ![Actions allowed](imgs/install05.png)
 
-1. Check "InvokeModel" and "InvokeModelWithResponseStream"
+8. Check "InvokeModel" and "InvokeModelWithResponseStream"
 
 ![InvokeModel](imgs/install06.png)
 
-1. Scroll down to Resources and select the "All" radio button and click Next
+9. Scroll down to Resources and select the "All" radio button and click Next
 
 ![Resources](imgs/install07.png)
 
-1. Name the policy "bedrock" then click Create policy
+10. Name the policy "bedrock" then click Create policy
 
 ![Create policy](imgs/install08.png)
 
-1. Close the Policies tab and go back to the Set Permissions tab for the new user. Click the refresh button next to the "Create policy" button, enter "bedrock" in the search box, check the policy you just created, then click Next
+11. Close the Policies tab and go back to the Set Permissions tab for the new user. Click the refresh button next to the "Create policy" button, enter "bedrock" in the search box, check the policy you just created, then click Next
 
 ![Attach permissions](imgs/install09.png)
 
-1. Click "Create user"
+12. Click "Create user"
 
 ![Create user](imgs/install10.png)
 
-1. Click on the "bosgir_api" user you just created
+13. Click on the "bosgir_api" user you just created
 
 ![User select](imgs/install11.png)
 
-1. Click on the "Security Credentials tab, then click the "Create access key" button
+14. Click on the "Security Credentials tab, then click the "Create access key" button
 
 ![Security Credentials](imgs/install12.png)
 
-1. Select "Local code," then check the check box at the bottom, then click Next
+15. Select "Local code," then check the check box at the bottom, then click Next
 
 ![Access key best practices](imgs/install13.png)
 
-1. Click "Create access key"
+16. Click "Create access key"
 
 ![Create access key](imgs/install14.png)
 
-1. Click the copy icons next to each key (Access key and Secrete access key) and copy them into Notepad or another text editor; you will need them later. Click Done (Click Continue if you get a warning dialog about not viewing or downloading your key).
+17. Click the copy icons next to each key (Access key and Secrete access key) and copy them into Notepad or another text editor; you will need them later. Click Done (Click Continue if you get a warning dialog about not viewing or downloading your key).
 
 ![Copy keys](imgs/install15.png)
 
-1. You should see your access key listed on the user's Access keys section with an active status
+18. You should see your access key listed on the user's Access keys section with an active status
 
 ![Access key status](imgs/install16.png)
 
-1. Now we need to configure access to the Claude foundation models. In the console, type "bedrock" in the upper-left search bar, and click on the Bedrock service from the dropdown.
+19. Now we need to configure access to the Claude foundation models. In the console, type "bedrock" in the upper-left search bar, and click on the Bedrock service from the dropdown.
 
-1. Click on the upper-left menu icon to expand the menu on the left of the page...
+20. Click on the upper-left menu icon to expand the menu on the left of the page...
 
 ![Bedrock menu](imgs/install17.png)
 
-1. ...then click "Model access" near the bottom-left.
+21. ...then click "Model access" near the bottom-left.
 
 ![Model access](imgs/install18.png)
 
-1. Click "Manage model access"
+22. Click "Manage model access"
 
 ![Manage model access](imgs/install19.png)
 
-1. Click the checkbox next to "Anthropic" to check it and both Claude models below it, then scroll down and click "Save changes"
+23. Click the checkbox next to "Anthropic" to check it and both Claude models below it, then scroll down and click "Save changes"
 
 ![Add Claude](imgs/install20.png)
 ![Add Claude](imgs/install21.png)
