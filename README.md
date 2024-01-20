@@ -12,7 +12,10 @@ Bald Old Short Guy In Red (or BOSGIR) is powered by the Bedrock service on AWS, 
    * [Game Installation](#game-installation)
 - [Running the Game](#running-the-game)
 - [Some Notes on Playing the Game](#some-notes-on-playing-the-game)
-
+   * [1. Entering Instructions For the Hero](#entering-instructions-for-the-hero)
+   * [2. Tweaking Top-of-Mind Notes](#tweaking-top-of-mind-notes)
+   * [3. Navigating the Story](#navigating-the-story)
+   
 <!-- TOC end -->
 
 <!-- TOC --><a name="installation"></a>
@@ -104,6 +107,7 @@ You'll be doing 3 things in the game, as follows (in order of frequency):
 1. Tweaking the top-of-mind notes
 1. Reading portions of the story that have scrolled out of sight
 
+<!-- TOC --><a name="entering-instructions-for-the-hero"></a>
 ### 1. Entering Instructions For the Hero
 
 ![Entering commands](imgs/game03.png)
@@ -129,6 +133,7 @@ leave
 
 ...which will result in 4-8 paragraphs worth of response from the AI. By describing the larger action, you're basically letting the AI fill in the gaps and narrate a larger portion of the story for you. I'ts really up to you, how much narrative control you want to cede to the AI.
 
+<!-- TOC --><a name="tweaking-top-of-mind-notes"></a>
 ### 2. Tweaking Top-of-Mind Notes
 
 ![Tweaking notes](imgs/game04.png)
@@ -153,7 +158,8 @@ Once you hit "2" you're editing the text in the notes window. Arrow keys, del, b
 
 You can add and remove items from the notes as you see fit. You could in theory even create new sections, i.e. add a list of magic spells your character has learned. The only caveat is that the LLM is being given specific examples on how to update the notes as part of the prompt, so the further you edit the notes away from that initial format, the auto-updating of the notes may not work as well.
 
+<!-- TOC --><a name="navigating-the-story"></a>
 ### 3. Navigating the Story
-IF you've been playing awhile and want to refer to a part of the story that has since scrolled out of view in the main window, you can choose the Story window ("1" after hitting escape) and use the arrow keys to scroll the content up or down; hit ESCAPE to return the window choice.
+If you've been playing awhile and want to refer to a part of the story that has since scrolled out of view in the main window, you can choose the Story window ("1" after hitting escape) and use the arrow keys to scroll the content up or down; hit ESCAPE to return the window choice.
 
 If you leave it scrolled away from the bottom of the story, the game will auto-scroll down to the latest part of the story once it processes your next command.
