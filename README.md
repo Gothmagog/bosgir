@@ -87,5 +87,73 @@ BOSGIR relies on AWS to provide the LLM powering the game. Specifically, it uses
 1. [Activate the virtual environment](https://docs.python.org/3/library/venv.html#how-venvs-work)
 1. `python src/index.py`
 
+## Cost
+Since BOSGIR is powered by the AWS Bedrock service, you will accrue charges as you play the game. BOSGIR keeps track of these charges for you, just below the Notes area on the right of the screen:
+
+![Game](imgs/game02.png)
+
+This is a running tab, separated into costs accrued from input tokens ("in:") and output tokens ("out:"). The Bedrock service charges a certain amount per 1000 tokens, for both input and output tokens. The pricing differs depending on which foundation model is chosen. BOSGIR uses the Claude v2 and Claude Instant v1 models.
+
+The cost area will reset every time you play the game, so if you want to keep a closer, long-term eye on the costs associated with playing, you might look into [some options within the AWS console](https://console.aws.amazon.com/billing/home#/budgets/overview?tutorials=visible) (look on the right-side of the page for tutorials).
+
 <!-- TOC --><a name="some-notes-on-playing-the-game"></a>
 ## Some Notes on Playing the Game
+You'll be doing 3 things in the game, as follows (in order of frequency):
+
+1. Entering instructions on what your hero does next
+1. Tweaking the top-of-mind notes
+1. Reading portions of the story that have scrolled out of sight
+
+### 1. Entering Instructions For the Hero
+
+![Entering commands](imgs/game03.png)
+
+This being a text adventure game, you will be typing a description of what your hero/character does next in the story, based on what's already happened in the story so far. Unlike traditional text adventure games, you don't have to worry about typing specific words, phrases, etc. Just describe what you want to do the way you would to a human being, then press enter (or CTRL-G).
+
+For conversations with other characters, you can either describe what you want to say indirectly (`tell the priest about my bannana`), or you can say it directly by providing quotation marks around your text (`"I've got this incredible bannanna I'd like you to meet, father."`).
+
+**HINT: Making your actions ambiguous, or stringing together multiple actions with "and" gives the AI more story-telling leeway**
+
+To elaborate on this, say your character wants to go shopping at a store in the story. You could either enter the individual actions in minute detail, step-by-step:
+
+```
+open the door to the store
+look for a hammer
+pay for the hammer
+leave
+```
+
+...which will result in each command yielding one or two paragraphs in response from the AI. Or you could do something like:
+
+`shop for a hammer`
+
+...which will result in 4-8 paragraphs worth of response from the AI. By describing the larger action, you're basically letting the AI fill in the gaps and narrate a larger portion of the story for you. I'ts really up to you, how much narrative control you want to cede to the AI.
+
+### 2. Tweaking Top-of-Mind Notes
+
+![Tweaking notes](imgs/game04.png)
+
+First, what are top-of-mind notes? It's a way to subtly guide and remind the AI about the state of the game and what's important. Since [LLMs are text predictors](https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/), including important notes as part of their input right before they start spewing text helps keep it on track, so-to-speak.
+
+These notes will get updated automatically by another LLM after the main output is generated. It's using this fresh output as a guide to tell it what it should update in those notes. For instance, if there was a part of the notes that indicates the hero is healthy, and then, as a result of the player typing `fight troll` the game describes the hero getting beaten to a pulp, the notes *should* update that status indicator to "injured" or something similar.
+
+I emphasized "should" because this doesn't always happen. Sometimes the AI forgets to update a part of the notes. Sometimes it makes an update that doesn't make sense. Sometimes your hero's motivations might have changed and we want the AI to know about that. That's when we need to edit those notes before our next command.
+
+But you start the game on the text prompt for entering commands, so how do I go about editing what's in that box on the right?
+
+**Hit the ESCAPE key to choose which window to interact with**
+
+![Window choice](imgs/game01.png)
+
+*Hitting ESCAPE again from here will take you to the main menu where you can load a game, start a new one, or quit*
+
+Press the number of the window you want to interact with. For notes, press "2".
+
+Once you hit "2" you're editing the text in the notes window. Arrow keys, del, backspace, all work as you would expect. When you want to save your changes, press CTRL-G, or if you want to undo all the changes you've made, hit ESCAPE.
+
+You can add and remove items from the notes as you see fit. You could in theory even create new sections, i.e. add a list of magic spells your character has learned. The only caveat is that the LLM is being given specific examples on how to update the notes as part of the prompt, so the further you edit the notes away from that initial format, the auto-updating of the notes may not work as well.
+
+### 3. Navigating the Story
+IF you've been playing awhile and want to refer to a part of the story that has since scrolled out of view in the main window, you can choose the Story window ("1" after hitting escape) and use the arrow keys to scroll the content up or down; hit ESCAPE to return the window choice.
+
+If you leave it scrolled away from the bottom of the story, the game will auto-scroll down to the latest part of the story once it processes your next command.
