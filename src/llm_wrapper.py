@@ -4,7 +4,7 @@ import botocore.exceptions
 import json
 import os
 import sys
-from langchain.llms import Bedrock
+from langchain_community.llms import Bedrock
 from langchain_community.embeddings import BedrockEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.prompts.few_shot import FewShotPromptTemplate
