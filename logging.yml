@@ -26,7 +26,7 @@ loggers:
     handlers: [api_file]
     propogate: no
   main:
-    level: INFO
+    level: WARN
     handlers: [console]
   langchain:
     level: DEBUG

@@ -15,6 +15,8 @@ from text_utils import normalize_newlines_str
 from game_loop import game_loop
 from pathlib import Path
 
+version = "1.0.0"
+
 src_dir = Path(__file__).parent
 log_config = None
 with open(src_dir / "../logging.yml", "r") as f:
@@ -158,6 +160,8 @@ def file_name_entry(y_pos: YPos, y_offset: int, exists: bool):
 def main(stdscr):
     global s
 
+    print(f"BOSGIR v{version}")
+    
     s = stdscr
 
     # ensure minimum terminal dimensions
