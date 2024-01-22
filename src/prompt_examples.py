@@ -358,4 +358,45 @@ Mr. Belsham then, forcefully, pushed Eddie to the ground and stood over him.
 The hero then replies to Mr. Belsham's inquiry and demands his dog be returned, which is a different development of the plot, as he is now conversing with Mr. Belsham, not attacking. Therefore I've identified this as the point at which the plot diverges.</Reasoning>
 <Output>"Give me back my dog! Give him back!" shouted Eddie.</Output>
 </Root>"""
+}, {
+    "_current": """Hero name: Anna
+Married to: Michael
+Physical status: healthy
+Mental status: worried but sympathetic
+Posessions:
+- umbrella
+- skeleton keys to new home
+Wearing:
+- wedding ring
+- trenchcoat
+Motivations:
+- find michael
+- get settled into our new home
+Current location: Diner on main street in Anchorhead
+Time of day: late afternoon
+Weather: heavy rainstorm, possible flooding
+""",
+    "_do": "ask the waitress for directions to my home",
+    "_snippet": """Anna glanced up at the clock again. Nearly an hour and a half had passed since she'd first ducked into the diner, but the storm showed no signs of relenting. She had to get to the mansion soon, with or without Michael. 
+
+Steeling her resolve, she pulled a few damp bills from her wallet and placed them on the counter to cover her coffee. As she stood, the friendly waitress glanced her way.
+
+"Heading out, hun?" the woman asked, gesturing to the still-pouring rain.
+
+Anna nodded. "I need to get to the Darroch Estate on the edge of town. Would you be able to point me in the right direction?"
+
+The waitress' face paled slightly at the mention of the mansion. "The Darroch place, huh? Can't say I'd want to be headed there in this weather, especially with its...history." She shook her head. "But if you're set on going, it's out Crawford Road on the northeast edge of town. Just follow Main Street out til you see the signs."
+
+Anna nodded her thanks, pulling her coat tightly around herself as she pushed open the diner door. Anna braved the rain and trudged through the dismal downpour towards her new home.
+""",
+    "output": """<Root>
+<Reasoning>The hero asks the waitress for directions to her house, which aligns with the intended action. The waitress then provides directions, which is a natural response. 
+
+After this, the story continues with the hero leaving the diner and heading to the house. This extends the plot beyond just asking for directions. The first sentence showing the plot deviation is:
+
+"Anna nodded her thanks, pulling her coat tightly around herself as she pushed open the diner door."
+
+This is the first action the hero takes that is unrelated to asking for directions, so it marks the point where the plot deviates from just the intended action.</Reasoning>
+<Output>Anna nodded her thanks, pulling her coat tightly around herself as she pushed open the diner door.</Output>
+</Root>"""
 }]

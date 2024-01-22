@@ -2,7 +2,6 @@ import sys
 import boto3
 import botocore.exceptions
 import json
-import os
 import sys
 from langchain_community.llms import Bedrock
 from langchain_community.embeddings import BedrockEmbeddings
@@ -26,7 +25,6 @@ from summarization import do_compression
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
 main_log = logging.getLogger("main")
-os.environ["AWS_DEFAULT_REGION"] = "us-west-2"
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 
 max_output_tokens = 1000
