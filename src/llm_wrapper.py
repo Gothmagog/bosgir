@@ -21,6 +21,7 @@ from pathlib import Path
 from text_utils import get_last_paragraphs, is_position_in_mid_sentence
 from lin_backoff import lin_backoff
 from summarization import do_compression
+from writing_examples import get_writing_examples
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
@@ -147,7 +148,7 @@ def proc_command(command, notes, history, narrative, current_plot, status_win, i
         partial_variables={"format_instructions": out_parser2_preferred.get_format_instructions()}
     )
     prompt3 = PromptTemplate(
-        input_variables=["history", "current", "plot", "do", "narrative"],
+        input_variables=["history", "current", "plot", "do", "narrative", "writing_examples"],
         template=prompt_primary,
         partial_variables={"format_instructions": out_parser3_preferred.get_format_instructions()}
     )
@@ -185,7 +186,7 @@ def proc_command(command, notes, history, narrative, current_plot, status_win, i
     # Chain #3
     log.info("***** Invoking 3rd chain *****")
     main_log.info("***** Invoking 3rd chain *****")
-    response3 = lin_backoff(chain3.invoke, status_win, {"do": command, "history": get_last_paragraphs(history, 36)[0], "current": notes, "plot": current_plot, "narrative": narrative}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    response3 = lin_backoff(chain3.invoke, status_win, {"do": command, "history": get_last_paragraphs(history, 36)[0], "current": notes, "plot": current_plot, "narrative": narrative, "writing_examples": get_writing_examples(command)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     #log.debug(response1)
     snippet = get_xml_val(response3, "Snippet")
     

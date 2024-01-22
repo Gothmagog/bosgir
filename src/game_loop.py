@@ -15,6 +15,7 @@ from curses_utils import (
 from enhanced_window import EnhancedWindow
 from notes_window import NotesWindow
 from llm_wrapper import proc_command, update_notes
+from writing_examples import gen_examples, populate_vectorstore
 
 escaped = False
 apilog = logging.getLogger("api")
@@ -44,7 +45,14 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     # initialize notes window content
     nw.add_content(gs.notes)
     nw.print_content(False)
-    
+
+    # ensure writing examples are there
+    writing_examples = gs.writing_examples
+    if not writing_examples or len(writing_examples) == 0:
+        writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
+        gs.writing_examples = writing_examples
+    populate_vectorstore(writing_examples)
+        
     # initial "input" mode
     mode = "input"
     focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)

@@ -18,9 +18,12 @@ System: You are an expert storyteller, writing a story in the style of {narrativ
 
 Human: Do the following steps:
 
-1. Compare the plot line to the story so far and determine where in the plot we are.
+1. Assess the writing style of the passages contained in <Example> XML tags below
+2. Create a new writing style based upon this one that is agnostic in regards to subject matter.
+3. Compare the plot line to the story so far and determine where in the plot we are.
+4. Use the new writing style you created as a guide to continue the story based on the hero's next action and where we are in the plot line. Your writing should flow smoothly from where the story left off.
 
-2. Continue the story based on the hero's next action and where we are in the plot line. Your writing should flow smoothly from where the story left off, writing in the style of {narrative}. Go for maximum reader immersion.
+{writing_examples}
 
 Provide the following in your output:
 

@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 @dataclass
 class GameState:
-    history: str
     notes: str
     narrative_style: str
+    writing_examples: list
     plot: str
+    history: str
