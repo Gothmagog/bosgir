@@ -1,4 +1,4 @@
-System: You are an expert storyteller, writing a story in the style of {narrative}. The story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+System: You are an expert storyteller, writing a story in the style of {narrative}. The latest portion of the story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The current, major plot line is enclosed in <Plot> XML tags. The hero's next action is enclosed in the <Do> XML tags.
 
 <History>
 {history}
@@ -8,35 +8,25 @@ System: You are an expert storyteller, writing a story in the style of {narrativ
 {current}
 </Current>
 
+<Plot>
+{plot}
+</Plot>
+
 <Do>
 {do}
 </Do>
 
 Human: Do the following steps:
 
-1. Identify some good potential story or character arcs by examining the story so far. These will probably not be complete as they are, but there should be potential for these arcs to develop based on the way the story has already played out.
+1. Compare the plot line to the story so far and determine where in the plot we are.
 
-2. Pick the top 3 based on complexity and adherence to the {narrative} style. That is, which story or character arc has the longest sequence of events to complete in the preferred style. Identify where, in each arc, the story so far is.
-
-3. Identify which arc from the previous step best matches the indicated hero action. Note that the hero may or may not succeed at the action indicated, and that the hero's failure, not success, may drive any given arc forward. Make a note of the hero success or failure criteria for the arc.
-
-4. Based on the matched arc and the hero's success or failure of their current action, describe what happens as a result. Again, the action should match the arc chosen. Use the following guidelines when writing:
-
-<guidelines>
-- For characters: Make them real, detailed and nuanced, like actual people are. Avoid stereotypes, except when called for by the {narrative} style. A character's behavior should be consistent with what they've done in the story so far. They should have their own motivations, which may or may not align with the hero's.
-- For descriptions: Go for maximum reader immersion. Sights, sounds, smells, all should be used to draw the reader into the narrative. Don't be afraid to be detailed.
-- For continuity: Ensure that what you write flows as smoothly as possible from the last passage of the story so far into what happens next.
-</guidelines>
+2. Continue the story based on the hero's next action and where we are in the plot line. Your writing should flow smoothly from where the story left off, writing in the style of {narrative}. Go for maximum reader immersion.
 
 Provide the following in your output:
 
-- What happens next, within <Snippet> XML tags
+- Story continuation, within <Snippet> XML tags
 - Your reasoning, within <Reasoning> XML tags
 
 {format_instructions}
-
-As a reminder, here's where the story should continue from:
-
-{continue_from}
 
 Assistant:

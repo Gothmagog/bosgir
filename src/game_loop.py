@@ -50,7 +50,8 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
     new_command = ""
     char = -1
-    resp_stream = None
+    new_story = None
+    cur_plot = ""
     curses.curs_set(1)
     curses.doupdate()
     
@@ -87,33 +88,12 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
         elif mode == "proc_input":
             curses.curs_set(0)
             input_win.erase()
-            # count = 1
-            # prev_content_len = len(hw.get_ttl_content(False))
-            # hw.start_chunking()
-            # try:
-            #     #print(dir(resp_stream))
-            #     for chunk in resp_stream:
-            #         set_win_text(status_win, f"Getting chunk {count}", True)
-            #         count += 1
-            #         if chunk:
-            #             hw.add_chunk(chunk)
-            # except ValueError as e:
-            #     if "AccessDeniedException" in e.args[0]:
-            #         log.error("It looks like you haven't configured proper access to the foundation models needed by this application. To do so:")
-            #         log.error("  1. From the Bedrock console in AWS, go to ""Model Access"" from the left-hand menu")
-            #         log.error("  2. Click ""Manage model access\"")
-            #         log.error("  3. Scroll down to ""Anthropic"" and click both ""Claude"" and ""Claude Instant\"")
-            #         log.error("  4. Click ""Save changes"" at  the bottom.")
-            #         log.error("Here is the original exception: %s", e.args[0])
-            #         return 1
-            # hw.finish_chunking()
-            # output = hw.get_ttl_content()[prev_content_len:]
-            output = resp_stream
+            output = new_story
             hw.add_content(output, 2)
             hw.print_content(True)
             curses.doupdate()
-            #log.debug("description input for update notes: %s", output)
             gs.history = hw.get_ttl_content(False)
+            gs.plot = cur_plot
             mode = "update_notes"
         elif mode == "input":
             curses.curs_set(1)
@@ -124,8 +104,8 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 if new_command.startswith('"') or new_command.startswith("'"):
                     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                resp_stream = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, status_win, in_cost_win, out_cost_win)
-                if resp_stream:
+                new_story, cur_plot = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, gs.plot, status_win, in_cost_win, out_cost_win)
+                if new_story:
                     mode = "proc_input"
                 else:
                     set_win_text(status_win, "Received null stream!", True)

@@ -13,6 +13,8 @@ class GameStatePersister:
             f.write(sep)
             f.write(gs.narrative_style.encode(encoding="utf-8", errors="replace"))
             f.write(sep)
+            f.write(gs.plot.encode(encoding="utf-8", errors="replace"))
+            f.write(sep)
             f.write(gs.history.encode(encoding="utf-8", errors="replace"))
 
     def load(self, gs: GameState):
@@ -23,4 +25,6 @@ class GameStatePersister:
         gs.notes = buffer_[:sep_idx1].decode(encoding="utf-8")
         sep_idx2 = buffer_.find(sep, sep_idx1 + 1)
         gs.narrative_style = buffer_[sep_idx1 + len(sep):sep_idx2].decode(encoding="utf-8")
-        gs.history = buffer_[sep_idx2 + len(sep):].decode(encoding="utf-8")
+        sep_idx3 = buffer_.find(sep, sep_idx2 + 1)
+        gs.plot = buffer_[sep_idx2 + len(sep):sep_idx3].decode(encoding="utf-8")
+        gs.history = buffer_[sep_idx3 + len(sep):].decode(encoding="utf-8")

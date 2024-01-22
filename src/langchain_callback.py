@@ -24,21 +24,6 @@ class CursesCallback(BaseCallbackHandler):
 
     def ignore_chat_model(self):
         return True
-
-    # def on_chain_start(self, serialized, inputs, **kwargs):
-    #     #log.debug("on_chain_start: %s", kwargs)
-    #     if self.status_win:
-    #         self.status_win.erase()
-    #         self.status_win.addstr(0, 0, kwargs["tags"][0])
-    #         self.status_win.refresh()
-        
-        
-    # def on_chain_end(self, outputs, **kwargs):
-    #     #log.debug("on_chain_end: %s", kwargs)
-    #     if self.status_win:
-    #         self.status_win.erase()
-    #         self.status_win.addstr(0, 0, kwargs["tags"][0])
-    #         self.status_win.refresh()
         
     def on_llm_start(self, serialized, prompts, **kwargs):
         global ttl_in_cost
@@ -49,6 +34,7 @@ class CursesCallback(BaseCallbackHandler):
         self.model_id = kwargs["metadata"]["model_id"]
         self.last = name
         for p in prompts:
+            #log.debug(p)
             ttl_in_cost += calc_cost(p, True, self.model_id)
         if self.in_token_win:
             self.in_token_win.erase()

@@ -1,0 +1,9 @@
+Human: Given the story contained in the <Story> XML tags, tell me whether or not we should introduce a change in the plot right after the very end. A simple yes or no will do.
+
+<Story>
+{story}
+</Story>
+
+Skip the preamble. Output nothing other than "yes" or "no".
+
+Assistant:
