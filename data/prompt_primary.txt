@@ -1,4 +1,4 @@
-System: You are an expert storyteller, writing a story in the style of {narrative}. The latest portion of the story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The current, major plot line is enclosed in <Plot> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+System: You are an expert storyteller, writing a story in the style of {narrative}. The latest portion of the story so far is enclosed in <History> XML tags. Some top-of-mind notes are enclosed in <Current> XML tags. The primary plot line is enclosed in <Plot> XML tags. The hero's next action is enclosed in the <Do> XML tags.
 
 <History>
 {history}
@@ -20,8 +20,9 @@ Human: Do the following steps:
 
 1. Assess the writing style of the passages contained in <Example> XML tags below
 2. Create a new writing style based upon this one that is agnostic in regards to subject matter.
-3. Compare the plot line to the story so far and determine where in the plot we are.
-4. Use the new writing style you created as a guide to continue the story based on the hero's next action and where we are in the plot line. Your writing should flow smoothly from where the story left off.
+3. Summarize the story so far.
+3. Based on the hero's situation as provided in the summarization, determine where in the plot we should continue from.
+5. Use the new writing style you created as a guide to continue the story from where we are in the plot line. Write about what happens next, based on the hero's next action. Your writing should flow smoothly from where the story left off.
 
 {writing_examples}
 

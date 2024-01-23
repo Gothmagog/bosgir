@@ -98,3 +98,43 @@ def is_position_in_mid_sentence(text, position):
         last_sent_pos = sent_pos
         last_sent_len = len(sent)
     return False
+
+def fuzzy_sentence_match(search_text, sentence):
+    idx = search_text.find(sentence)
+    if idx == -1:
+        idx = search_text.find(sentence.strip())
+    if idx != -1:
+        if is_position_in_mid_sentence(search_text, idx):
+            return get_end_prev_sentence(search_text, idx)
+        return idx
+
+    sent_toks = sentence.split(" ")
+    num_toks = len(sent_toks)
+
+    for i in range(1, num_toks):
+        if i > num_toks // 2:
+            break
+        sentence = " ".join(sent_toks[i:])
+        idx = search_text.find(sentence)
+        if idx != -1:
+            return get_end_prev_sentence(search_text, idx)
+
+    for i in range(num_toks, -1, -1):
+        if i <= num_toks // 2:
+            break
+        sentence = " ".join(sent_toks[:i])
+        idx = search_text.find(sentence)
+        if idx != -1:
+            return idx
+
+    return -1
+
+def get_end_prev_sentence(search_text, idx):
+    sentences = tokenize.sent_tokenize(search_text)
+    prev_sidx = search_text.find(sentences[0])
+    for s in sentences[1:]:
+        sidx = search_text.find(s, prev_sidx+1)
+        if sidx > idx:
+            return prev_sidx
+        prev_sidx = sidx
+    return -1

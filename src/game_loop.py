@@ -51,6 +51,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     if not writing_examples or len(writing_examples) == 0:
         writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
         gs.writing_examples = writing_examples
+        set_win_text(status_win, "Ready for player input", True)
     populate_vectorstore(writing_examples)
         
     # initial "input" mode

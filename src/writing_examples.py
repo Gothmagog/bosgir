@@ -8,15 +8,18 @@ from langchain.schema.runnable.base import RunnableLambda
 from langchain_callback import CursesCallback
 from lin_backoff import lin_backoff
 import logging
+import tempfile
 
 log = logging.getLogger("main")
 
 prompt_text = """Human: Do the following steps:
 
 1. Identify four writing qualities that exemplify the writing style of {style}.
-2. For each quality, write four separate paragraphs in the style of {style} that highlight this quality. Wrap each paragraph inside <Paragraph> XML tags. Wrap each quality group inside XML tags named after the quality highlighted by the paragraphs. Each paragraph should be 2-4 sentences in length.
+2. For each quality, write four separate paragraphs in the style of {style} that highlight this quality. Wrap each paragraph inside <Paragraph> XML tags. Wrap each quality group inside XML tags named after the quality highlighted by the paragraphs. Each paragraph should be 2-4 sentences in length, and written in the 3rd person.
 
 {format_instructions}
+
+Remember, each paragraph should be 2-4 sentences in length, and written in the 3rd person.
 
 Assistant:"""
 model_id = "anthropic.claude-v2:1"
@@ -49,11 +52,17 @@ def gen_examples(style, status_win, in_tok_win, out_tok_win):
     log.debug(paragraphs)
     return paragraphs
 
+def clear_vectorstore():
+    global db
+    db._collection.delete()
+    db = None
+    
 def populate_vectorstore(examples):
     global db
-    paragraphs = [Document(page_content=e) for e in examples]
-    log.info("Adding %s passages of writing examples to vector DB...", len(paragraphs))
-    db = Chroma.from_documents(paragraphs, embeddings)
+    if not db:
+        paragraphs = [Document(page_content=e) for e in examples]
+        log.info("Adding %s passages of writing examples to vector DB...", len(paragraphs))
+        db = Chroma.from_documents(paragraphs, embeddings, persist_directory=f"{tempfile.gettempdir()}/chroma_writing")
 
 def get_writing_examples(hero_action):
     return [f"<Example>{doc.page_content}</Example>" for doc in db.similarity_search(hero_action)]

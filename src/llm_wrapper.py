@@ -15,10 +15,15 @@ from langchain_community.vectorstores import Chroma
 import re
 import bedrock
 import logging
+import tempfile
 from prompt_examples import examples_notes, examples_trunc
 from langchain_callback import CursesCallback
 from pathlib import Path
-from text_utils import get_last_paragraphs, is_position_in_mid_sentence
+from text_utils import (
+    get_last_paragraphs,
+    is_position_in_mid_sentence,
+    fuzzy_sentence_match
+)
 from lin_backoff import lin_backoff
 from summarization import do_compression
 from writing_examples import get_writing_examples
@@ -91,7 +96,8 @@ try:
         embeddings,
         Chroma,
         k=3,
-        input_keys=["_do", "_snippet"]
+        input_keys=["_do", "_snippet"],
+        persist_directory=f"{tempfile.gettempdir()}/chroma_trunc"
     )
     # We have to change the input_keys var after initialization
     # because the SemanticSimilarityExampleSelector apparently doesn't
@@ -200,44 +206,19 @@ def proc_command(command, notes, history, narrative, current_plot, status_win, i
 
     sentence = get_xml_val(response4, "Output")
     ret = ""
-    idx = -1
     if sentence:
-        idx = snippet.find(sentence)
-        if idx == -1:
-            idx = snippet.find(sentence.strip())
+        sentence = sentence.strip()
+        idx = fuzzy_sentence_match(snippet, sentence)
         if idx != -1:
             ret = snippet[:idx]
         else:
-            log.warn("Couldn't find the sentence given from the truncate story LLM result, searching alts...")
-            main_log.warn("Couldn't find the sentence given from the truncate story LLM result, searching alts...")
-            pos = sentence.find(" ")
-            while pos < len(sentence) - 1 and pos != -1:
-                idx = snippet.find(sentence[pos+1:])
-                main_log.debug("  idx = %s", idx)
-                if idx != -1:
-                    ret = snippet[:idx]
-                    break
-                pos = sentence.find(" ", pos + 1)
-            if ret == "":
-                main_log.debug("Failed the forward search, switching to backwards search")
-                pos = sentence.rfind(" ")
-                while pos < len(sentence) and pos != -1:
-                    idx = snippet.find(sentence[:pos])
-                    main_log.debug("  idx = %s", idx)
-                    if idx != -1:
-                        ret = snippet[:idx]
-                        break
-                    pos = sentence.rfind(" ", pos - 1)
-            main_log.info("ret = %s", ret)
+            main_log.warn("Couldn't locate the sentence given from the LLM.")
     else:
         ret = snippet
-
+        
     main_log.info("Checking for bad truncation...")
-    if ret.isspace():
+    if len(ret) == 0 or ret.isspace():
         main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, current_plot, status_win, in_tok_win, out_tok_win)
-    elif is_position_in_mid_sentence(snippet, idx):
-        main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
         ret = proc_command(command, notes, history, narrative, current_plot, status_win, in_tok_win, out_tok_win)
     elif ret[:-1] != "\n":
         ret += "\n"
