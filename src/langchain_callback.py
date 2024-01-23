@@ -74,7 +74,7 @@ class CursesCallback(BaseCallbackHandler):
             self.status_win.addstr(0, name_len, " " * len_rest_of_win)
             self.out_cost += calc_cost(token, False, self.model_id)
             self.out_chunks += 1
-            self.status_win.addstr(0, name_len + (len_rest_of_win % self.out_chunks), "*")
+            self.status_win.addstr(0, name_len + (self.out_chunks % len_rest_of_win), "*")
             self.status_win.refresh()
 
     def on_text(self, text, **kwargs):
