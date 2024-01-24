@@ -2,6 +2,14 @@ import textwrap
 import re
 import logging
 from nltk import tokenize
+import spacy
+from spacy import parts_of_speech as _pos
+from spacy.tokens.span import Span
+from spacy.tokens import Doc
+from spacy.lang.en import English
+from spacy.training import Example
+from spacy_experimental.coref.coref_util import get_clusters_from_doc
+from pathlib import Path
 
 log = logging.getLogger("main")
 
@@ -98,3 +106,81 @@ def is_position_in_mid_sentence(text, position):
         last_sent_pos = sent_pos
         last_sent_len = len(sent)
     return False
+
+def fuzzy_sentence_match(search_text, sentence):
+    idx = search_text.find(sentence)
+    if idx == -1:
+        idx = search_text.find(sentence.strip())
+    if idx != -1:
+        if is_position_in_mid_sentence(search_text, idx):
+            return get_end_prev_sentence(search_text, idx)
+        return idx
+
+    sent_toks = sentence.split(" ")
+    num_toks = len(sent_toks)
+
+    for i in range(1, num_toks):
+        if i > num_toks // 2:
+            break
+        sentence = " ".join(sent_toks[i:])
+        idx = search_text.find(sentence)
+        if idx != -1:
+            return get_end_prev_sentence(search_text, idx)
+
+    for i in range(num_toks, -1, -1):
+        if i <= num_toks // 2:
+            break
+        sentence = " ".join(sent_toks[:i])
+        idx = search_text.find(sentence)
+        if idx != -1:
+            return idx
+
+    return -1
+
+def get_end_prev_sentence(search_text, idx):
+    sentences = tokenize.sent_tokenize(search_text)
+    prev_sidx = search_text.find(sentences[0])
+    for s in sentences[1:]:
+        sidx = search_text.find(s, prev_sidx+1)
+        if sidx > idx:
+            return prev_sidx
+        prev_sidx = sidx
+    return -1
+
+print("Loading spacy model...")
+nlp = spacy.load("en_coreference_web_trf")
+#nlp.add_pipe("")
+
+def do_it(text):
+    print("Doing corefs...")
+    doc = nlp(text)
+    for k, v, in doc.spans.items():
+        print(f"k={k}, v={v}")
+    for s in doc.sents:
+        ents = s.ents
+        for e in ents:
+            v = get_verb_for_ne(e)
+            print(f"Verb for {e} is {v}")
+    print("Done")
+    
+def get_verb_for_ne(tok):
+    print(f"called with {tok} ({type(tok)}")
+    if type(tok) is Span:
+        for t in tok:
+            ret = get_verb_for_ne(t)
+            if ret:
+                return ret
+        return None
+    else:
+        print(get_pos_str(tok))
+        if tok.pos == _pos.VERB:
+            return tok
+        if tok.head == tok:
+            return None
+    return get_verb_for_ne(tok.head)
+
+def get_pos_str(tok):
+    for e in dir(_pos):
+        if e[0].isupper() and tok.pos == getattr(_pos, e):
+            return e
+    return "(unknown)"
