@@ -2,6 +2,14 @@ import textwrap
 import re
 import logging
 from nltk import tokenize
+import spacy
+from spacy import parts_of_speech as _pos
+from spacy.tokens.span import Span
+from spacy.tokens import Doc
+from spacy.lang.en import English
+from spacy.training import Example
+from spacy_experimental.coref.coref_util import get_clusters_from_doc
+from pathlib import Path
 
 log = logging.getLogger("main")
 
