@@ -15,7 +15,7 @@ from text_utils import normalize_newlines_str
 from game_loop import game_loop
 from pathlib import Path
 
-version = "1.0.1"
+version = "1.1.0"
 
 src_dir = Path(__file__).parent
 log_config = None
@@ -51,7 +51,7 @@ def new_game():
     curses.doupdate()
 
     # get narrative style
-    tb, tb_win = textbox(s, 1, YPos.CUSTOM, "What is the narrative style of the DM?", True, tb_height+2)
+    tb, tb_win = textbox(s, 1, YPos.CUSTOM, "What writing style or author should the story emulate?", True, tb_height+2)
     tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)

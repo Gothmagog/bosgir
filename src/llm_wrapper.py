@@ -8,6 +8,7 @@ from langchain_community.embeddings import BedrockEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.output_parsers import XMLOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain.schema.runnable.base import RunnableLambda
 from langchain.callbacks.tracers.stdout import ConsoleCallbackHandler
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
@@ -18,7 +19,11 @@ import logging
 from prompt_examples import examples_notes, examples_trunc
 from langchain_callback import CursesCallback
 from pathlib import Path
-from text_utils import get_last_paragraphs, is_position_in_mid_sentence
+from text_utils import (
+    get_last_paragraphs,
+    fuzzy_sentence_match,
+    get_hero_action_sentences
+)
 from lin_backoff import lin_backoff
 from summarization import do_compression
 
@@ -27,7 +32,7 @@ log = logging.getLogger("api")
 main_log = logging.getLogger("main")
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 
-max_output_tokens = 1000
+max_output_tokens = 1500
 
 # Verify AWS credentials
 try:
@@ -40,8 +45,19 @@ except botocore.exceptions.NoCredentialsError as e:
 # Embeddings (for prompt selector)
 embeddings = BedrockEmbeddings()
 
+# Story reuse prompt
+model_id = "anthropic.claude-instant-v1"
+llm_story_reuse = Bedrock(
+    model_id=model_id,
+    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0},
+    streaming=True,
+    metadata={"name": "Story Reuse", "model_id": model_id}
+)
+with open(src_dir / "../data/prompt_truncate_story.txt", "r") as f:
+    prompt_story_reuse = f.read()
+
 # Primary LLM prompt
-model_id = "anthropic.claude-v2"
+model_id = "anthropic.claude-v2:1"
 llm_primary = Bedrock(
     model_id=model_id,
     model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
@@ -53,41 +69,15 @@ with open(src_dir / "../data/prompt_primary.txt", "r") as f:
     prompt_primary = f.read()
 
 # Truncate Story prompt
-model_id = "anthropic.claude-v2"
+#model_id = "anthropic.claude-instant-v1"
 llm_truncate_story = Bedrock(
     model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0, "top_p": .1},
+    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0},
     streaming=True,
     metadata={"name": "Story Truncation", "model_id": model_id}
 )
-
-# This is the first piece of code that invokes an AWS API (asside from
-# the call to GetCallerIdentity above), so we're wrapping it in a
-# try/catch and exiting upon failure
-try:
-    trunc_example_selector = SemanticSimilarityExampleSelector.from_examples(
-        examples_trunc,
-        embeddings,
-        Chroma,
-        k=3,
-        input_keys=["_do", "_snippet"]
-    )
-    # We have to change the input_keys var after initialization
-    # because the SemanticSimilarityExampleSelector apparently doesn't
-    # support cases where the example input variables are different
-    # from the actual input variables.
-    trunc_example_selector.input_keys = ["do", "snippet"]
-except ValueError as e:
-    main_log.error(e)
-    if "AccessDeniedException" in e.args[0]:
-        main_log.error("")
-        main_log.error("Have you setup a User in the AWS Console per the instructions in README.md?")
-    sys.exit(3)
-    
-with open(src_dir / "../data/prompt_truncate_story_example.txt", "r") as f:
-    prompt_truncate_story_example = f.read()
-with open(src_dir / "../data/prompt_truncate_story_prefix.txt", "r") as f:
-    prompt_truncate_story_prefix = f.read()
+with open(src_dir / "../data/prompt_truncate_story.txt", "r") as f:
+    prompt_truncate_story = f.read()
 
 # Update notes prompt
 model_id = "anthropic.claude-instant-v1"
@@ -101,8 +91,11 @@ llm_update_notes = Bedrock(
 with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
     prompt_update_notes = f.read()
 
+leftover_response = ""
+
 # exec LLM
-def proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win):
+def proc_command(command, hero_name, notes, history, narrative, status_win, in_tok_win, out_tok_win):
+    global leftover_response
     # Summarize the story, if needed
     history = do_compression(history)
 
@@ -110,68 +103,98 @@ def proc_command(command, notes, history, narrative, status_win, in_tok_win, out
     out_parser1_preferred = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
     out_parser1_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
     out_parser1 = out_parser1_preferred.with_fallbacks([out_parser1_fallback])
-    out_parser2_preferred = XMLOutputParser(tags=["Root", "Output", "Reasoning"])
-    out_parser2_fallback = RunnableLambda(lambda r: r[r.rfind("<Output>")+8:r.find("</Output>")])
+    out_parser_pre = RunnableLambda(lambda r: r[r.find("<Root>"):r.find("</Root>")+7])
+    out_parser2_preferred = XMLOutputParser(tags=["Root", "Sentence", "Text", "Involuntary", "Response"])
+    out_parser2_fallback = StrOutputParser()
     out_parser2 = out_parser2_preferred.with_fallbacks([out_parser2_fallback])
     prompt1 = PromptTemplate(
         input_variables=["history", "current", "do", "narrative", "continue_from"],
         template=prompt_primary,
         partial_variables={"format_instructions": out_parser1_preferred.get_format_instructions()}
     )
-    example_prompt = PromptTemplate(
-        template=(prompt_truncate_story_example.replace("{", "{_") + "{output}"),
-        input_variables=["_current", "_do", "_snippet", "output"]
+    prompt2 = PromptTemplate(
+        input_variables=["command", "story", "sentences", "name"],
+        template=prompt_truncate_story,
+        partial_variables={"format_instructions": out_parser2_preferred.get_format_instructions()}
     )
-    prompt2 = FewShotPromptTemplate(
-        example_selector=trunc_example_selector,
-        example_prompt=example_prompt,
-        prefix=prompt_truncate_story_prefix,
-        suffix=prompt_truncate_story_example,
-        input_variables=["current", "do", "snippet"]
+    prompt3 = PromptTemplate(
+        input_variables=["command", "sentences"],
+        template=prompt_story_reuse,
+        partial_variables={"format_instructions": out_parser2_preferred.get_format_instructions()}
     )
     chain1 = prompt1 | llm_primary | out_parser1
-    chain2 = prompt2 | llm_truncate_story | out_parser2
+    chain2 = prompt2 | llm_truncate_story | out_parser_pre | out_parser2
+    chain3 = prompt3 | llm_story_reuse | out_parser_pre | out_parser2
 
-    # Chain #1
-    log.info("***** Invoking 1st chain *****")
-    main_log.info("***** Invoking 1st chain *****")
-    response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraphs(history)[0]}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    #log.debug(response1)
-    snippet = get_xml_val(response1, "Snippet")
+    snippet = ""
+    
+    # Check if we can use the leftover response
+    if len(leftover_response):
+        set_status_win(status_win, "Story Reuse Prep")
+        hero_action_sentences = get_hero_action_sentences(leftover_response, hero_name)
+        if len(hero_action_sentences):
+            sentences_xml = "</Sentence>\n<Sentence>".join(hero_action_sentences)
+            sentences_xml = f"<Sentence>{sentences_xml}</Sentence>"
+            log.info("***** Invoking 3rd chain *****")
+            main_log.info("***** Invoking 3rd chain *****")
+            response3 = lin_backoff(chain3.invoke, status_win, {"sentences": sentences_xml, "story": leftover_response, "command": command, "name": hero_name}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+            exclude_sentences = get_trunc_output(response3)
+            min_idx = 9999999
+            for s in exclude_sentences:
+                idx = fuzzy_sentence_match(leftover_response, s)
+                if idx == -1:
+                    raise Exception(f"Unable to find this sentence in the leftover response: {s}")
+                elif idx == 0:
+                    min_idx = 0
+                    break
+                min_idx = min(min_idx, idx)
+            if min_idx != 0:
+                snippet = leftover_response[:min_idx]
+                
+    if not len(snippet):
+        # Chain #1
+        log.info("***** Invoking 1st chain *****")
+        main_log.info("***** Invoking 1st chain *****")
+        response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "history": history, "current": notes, "narrative": narrative, "continue_from": get_last_paragraphs(history)[0]}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        snippet = get_xml_val(response1, "Snippet")
 
-    # Chain #2
-    response2 = None
-    log.debug(prompt2.format(do=command, current=notes, snippet=snippet))
-    log.info("***** Invoking 2nd chain *****")
-    main_log.info("***** Invoking 2nd chain *****")
-    response2 = lin_backoff(chain2.invoke, status_win, {"do": command, "current": notes, "snippet": snippet}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    log.debug(response2)
+    # Sentence extraction for story truncation
+    set_status_win(status_win, "Story Trunc Prep")
+    hero_action_sentences = get_hero_action_sentences(snippet, hero_name)
+    if len(hero_action_sentences):
+        sentences_xml = "</Sentence>\n<Sentence>".join(hero_action_sentences)
+        sentences_xml = f"<Sentence>{sentences_xml}</Sentence>"
+    
+        # Chain #2
+        response2 = None
+        #log.debug(prompt2.format(do=command, current=notes, snippet=snippet))
+        log.info("***** Invoking 2nd chain *****")
+        main_log.info("***** Invoking 2nd chain *****")
+        response2 = lin_backoff(chain2.invoke, status_win, {"sentences": sentences_xml, "story": snippet, "command": command, "name": hero_name}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        #log.debug(response2)
 
-    sentence = get_xml_val(response2, "Output")
-    ret = ""
-    idx = -1
-    if sentence:
-        idx = snippet.find(sentence)
-        if idx == -1:
-            idx = snippet.find(sentence.strip())
-        if idx != -1:
-            ret = snippet[:idx]
+        exclude_sentences = get_trunc_output(response2)
+        if len(exclude_sentences):
+            min_idx = 9999999
+            for s in exclude_sentences:
+                idx = fuzzy_sentence_match(snippet, s)
+                if idx == -1:
+                    raise Exception(f"Unable to find this sentence in the output from the generate story LLM: {s}")
+                elif idx == 0:
+                    log.warn("LLM identified the first sentence as not following the command, gotta redo.")
+                    min_idx = 0
+                    break
+                min_idx = min(min_idx, idx)
+            ret = snippet[:min_idx]
+            if min_idx > 0:
+                leftover_response = snippet[min_idx:].strip()
         else:
-            log.warn("Couldn't find the sentence given from the truncate story LLM result")
-            main_log.warn("Couldn't find the sentence given from the truncate story LLM result")
+            ret = snippet
+            leftover_response = ""
     else:
         ret = snippet
+        leftover_response = ""
 
-    main_log.info("Checking for bad truncation...")
-    if ret.isspace():
-        main_log.warn("LLM decided the entire passage was off-base, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
-    elif is_position_in_mid_sentence(snippet, idx):
-        main_log.warn("LLM decided to cut-off the snippet in mid-sentence, so let's redo it.")
-        ret = proc_command(command, notes, history, narrative, status_win, in_tok_win, out_tok_win)
-    elif ret[:-1] != "\n":
-        ret += "\n"
-        
     return ret
 
 def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
@@ -197,12 +220,39 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
         response = match.group(1)
     return response
 
-def get_xml_val(obj, attr_name):
+def get_xml_val(obj, attr_name, root="Root", is_arr=False):
     if type(obj) == dict:
-        for e in obj["Root"]:
-            if attr_name in e:
-                return e[attr_name]
+        ret = [e[attr_name] for e in obj[root] if attr_name in e]
+        if not is_arr and len(ret):
+            ret = ret[0]
+        return ret
     else:
         main_log.warn("Had to use fallback output parser")
         return obj
     return None
+
+def get_trunc_output(response):
+    sentences_resp = get_xml_val(response, "Sentence", "Root", True)
+    ret = []
+    for pair in sentences_resp:
+        is_resp = False
+        is_inv = False
+        text = ""
+        for dict_ in pair:
+            if "Response" in dict_:
+                is_resp = dict_["Response"].lower() == "yes"
+            elif "Involuntary" in dict_:
+                is_inv = dict_["Involuntary"].lower() == "yes"
+            else:
+                text = dict_["Text"]
+        if not is_inv and not is_resp:
+            log.debug("Keeping: '%s'", text)
+            ret.append(text)
+    return ret
+
+def set_status_win(status_win, text):
+    if status_win:
+        status_win.erase()
+        status_win.addstr(0, 0, text)
+        status_win.refresh()
+    
