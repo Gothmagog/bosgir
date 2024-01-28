@@ -15,6 +15,7 @@ from enhanced_window import EnhancedWindow
 from notes_window import NotesWindow
 from llm_wrapper import proc_command, update_notes
 from text_utils import get_name_from_notes
+from writing_examples import gen_examples, populate_vectorstore
 
 escaped = False
 apilog = logging.getLogger("api")
@@ -44,13 +45,22 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     nw.add_content(gs.notes)
     nw.print_content(False)
     hero_name = get_name_from_notes(gs.notes)
-    
+
+    # ensure writing examples are there
+    writing_examples = gs.writing_examples
+    if not writing_examples or len(writing_examples) == 0:
+        writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
+        gs.writing_examples = writing_examples
+        set_win_text(status_win, "Ready for player input", True)
+    populate_vectorstore(writing_examples)
+        
     # initial "input" mode
     mode = "input"
     focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
     new_command = ""
     char = -1
-    resp_stream = None
+    new_story = None
+    cur_plot = ""
     curses.curs_set(1)
     curses.doupdate()
     
@@ -87,12 +97,12 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
         elif mode == "proc_input":
             curses.curs_set(0)
             input_win.erase()
-            output = resp_stream
+            output = new_story
             hw.add_content(output, 2)
             hw.print_content(True)
             curses.doupdate()
-            #log.debug("description input for update notes: %s", output)
             gs.history = hw.get_ttl_content(False)
+            gs.plot = cur_plot
             mode = "update_notes"
         elif mode == "input":
             curses.curs_set(1)
@@ -103,8 +113,8 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 if new_command.startswith('"') or new_command.startswith("'"):
                     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                resp_stream = proc_command(new_command, hero_name, gs.notes, gs.history, gs.narrative_style, status_win, in_cost_win, out_cost_win)
-                if resp_stream:
+                new_story, cur_plot = proc_command(new_command, hero_name, gs.notes, gs.history, gs.narrative_style, gs.plot, status_win, in_cost_win, out_cost_win)
+                if new_story:
                     mode = "proc_input"
                 else:
                     set_win_text(status_win, "Received null stream!", True)
