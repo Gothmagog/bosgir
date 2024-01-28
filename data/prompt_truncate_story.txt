@@ -1,0 +1,25 @@
+System: You are a writer, well-versed in story plots and how characters affect them.
+
+Human: Given the command below wrapped inside <Command> XML tags, part of a story wrapped in <Story> XML tags, and some sentences extracted from it, wrapped inside <Sentence> XML tags:
+
+<Story>
+{story}
+</Story>
+
+<Command>
+{command}
+</Command>
+
+{sentences}
+
+For each sentence do the following steps:
+
+1. Output the original sentence text inside <Text> XML.
+2. Pick out the main action within the sentence.
+3. Determine if the action is {name}'s involuntary reaction to something else. Output the indicator (yes / no) inside <Involuntary> XML.
+4. Determine if the action could be interpretted as part of {name}'s response to the command. Output the indicator (yes / no) inside <Response> XML.
+5. Wrap all the previous output inside <Sentence> XML tags.
+
+{format_instructions}
+
+Assistant:

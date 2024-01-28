@@ -11,10 +11,10 @@ from curses_utils import (
     label_win,
     redraw_frame
 )
-#from history_win import HistoryWindow
 from enhanced_window import EnhancedWindow
 from notes_window import NotesWindow
 from llm_wrapper import proc_command, update_notes
+from text_utils import get_name_from_notes
 from writing_examples import gen_examples, populate_vectorstore
 
 escaped = False
@@ -34,7 +34,6 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     # draw main screen
     s.erase()
     hist_win, notes_win, input_win, status_win, main_tb, in_cost_win, out_cost_win = main_screen(s)
-    #hw = HistoryWindow(hist_win)
     hw = EnhancedWindow(hist_win)
     nw = NotesWindow(notes_win)
     
@@ -45,6 +44,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     # initialize notes window content
     nw.add_content(gs.notes)
     nw.print_content(False)
+    hero_name = get_name_from_notes(gs.notes)
 
     # ensure writing examples are there
     writing_examples = gs.writing_examples
@@ -113,7 +113,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 if new_command.startswith('"') or new_command.startswith("'"):
                     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                new_story, cur_plot = proc_command(new_command, gs.notes, gs.history, gs.narrative_style, gs.plot, status_win, in_cost_win, out_cost_win)
+                new_story, cur_plot = proc_command(new_command, hero_name, gs.notes, gs.history, gs.narrative_style, gs.plot, status_win, in_cost_win, out_cost_win)
                 if new_story:
                     mode = "proc_input"
                 else:
@@ -137,6 +137,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 nw.print_content()
             else:
                 gs.notes = nw.get_ttl_content()
+                hero_name = get_name_from_notes(gs.notes)
             mode = none_mode(s, hist_win, notes_win, input_win, True)
                 
         if mode in ["hist", "none"]:

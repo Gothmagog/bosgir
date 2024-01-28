@@ -34,7 +34,7 @@ class CursesCallback(BaseCallbackHandler):
         self.model_id = kwargs["metadata"]["model_id"]
         self.last = name
         for p in prompts:
-            #log.debug(p)
+            log.debug(p)
             ttl_in_cost += calc_cost(p, True, self.model_id)
         if self.in_token_win:
             self.in_token_win.erase()
