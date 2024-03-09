@@ -14,7 +14,7 @@ from curses_utils import (
 from enhanced_window import EnhancedWindow
 from notes_window import NotesWindow
 from llm_wrapper import proc_command, update_notes
-from text_utils import get_name_from_notes
+from nlp import get_name_from_notes
 from writing_examples import gen_examples, populate_vectorstore
 
 escaped = False

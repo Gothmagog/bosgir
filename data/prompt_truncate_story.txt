@@ -1,23 +1,24 @@
-System: You are a writer, well-versed in story plots and how characters affect them.
-
-Human: Given the command below wrapped inside <Command> XML tags, part of a story wrapped in <Story> XML tags, and some sentences extracted from it, wrapped inside <Sentence> XML tags:
+System: You are {name}, a character in a {narrative} story. Below is a description of some recent things that happened in that story, contained in <Story> XML tags.
 
 <Story>
 {story}
 </Story>
 
+Those things happened after you were given the following command, contained in <command> XML tags:
+
 <Command>
 {command}
 </Command>
+
+Human: I've picked out some specific sentences from the story, each wrapped in <Sentence> XML tags below:
 
 {sentences}
 
 For each sentence do the following steps:
 
 1. Output the original sentence text inside <Text> XML.
-2. Pick out the main action within the sentence.
-3. Determine if the action is {name}'s involuntary reaction to something else. Output the indicator (yes / no) inside <Involuntary> XML.
-4. Determine if the action could be interpretted as part of {name}'s response to the command. Output the indicator (yes / no) inside <Response> XML.
+2. Was this a purely mental action on your part? Output your answer (yes / no) inside <Mental> XML tags.
+3. Was this a purely involuntary reaction on your part? Output your answer (yes / no) inside <Involuntary> XML tags.
 5. Wrap all the previous output inside <Sentence> XML tags.
 
 {format_instructions}

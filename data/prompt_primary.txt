@@ -8,10 +8,6 @@ System: You are an expert storyteller, writing a story in the style of {narrativ
 {current}
 </Current>
 
-<Plot>
-{plot}
-</Plot>
-
 <Do>
 {do}
 </Do>
@@ -20,9 +16,7 @@ Human: Do the following steps:
 
 1. Assess the writing style of the passages contained in <Example> XML tags below
 2. Create a new writing style based upon this one that is agnostic in regards to subject matter.
-3. Summarize the story so far.
-3. Based on the hero's situation as provided in the summarization, determine where in the plot we should continue from.
-5. Use the new writing style you created as a guide to continue the story from where we are in the plot line. Write about what happens next, based on the hero's next action. Your writing should flow smoothly from where the story left off.
+3. Using the new writing style you created, continue the story from where it left off. Write about what happens next, based on the hero's next action. Your writing should transition smoothly from where the story left off.
 
 {writing_examples}
 

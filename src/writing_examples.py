@@ -39,7 +39,7 @@ prompt = PromptTemplate(
 db = None
 
 def gen_examples(style, status_win, in_tok_win, out_tok_win):
-    preamble_purge = RunnableLambda(lambda x: x[x.find("<"):])
+    preamble_purge = RunnableLambda(lambda x: x[x.find("<"):x.rfind(">")+1])
     chain = prompt | llm | preamble_purge | out_parser
     log.info("Generating writing examples...")
     resp = lin_backoff(chain.invoke, status_win, {"style": style}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})

@@ -1,4 +1,8 @@
-Human: Given the story contained in the <Story> XML tags, tell me whether or not we should introduce a change in the plot right after the very end. A simple yes or no will do.
+Human: Given the current plot outline inside the <Plot> XML tags and the story contained in the <Story> XML tags, tell me whether or not the last half of the story diverges from the plot. A simple yes or no will do.
+
+<Plot>
+{plot}
+</Plot>
 
 <Story>
 {story}

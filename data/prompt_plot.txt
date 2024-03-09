@@ -12,18 +12,23 @@ Human: Do the following steps:
 
 1. Identify some good potential story or character arcs by examining the story so far and the top-of-mind notes. The arcs may not be complete as they are, but there should be potential for them to develop based on the way the story has already played out.
 
-2. Pick the top one based on complexity and adherence to the {narrative} style. That is, which story or character arc has the longest sequence of events to complete in the preferred style. Identify where, in the arc, the story so far is.
+2. Pick the top one based on complexity and adherence to the {narrative} style. That is, which story or character arc has the longest sequence of events to complete in the {narrative} style. Identify where, in the arc, the story so far is.
 
-3. Output the arc using the following format:
+3. Summarize the story so far in a single paragraph.
+
+4. Output the story summary and the arc you've chosen, starting from where in the arc the story has progressed to. Use the following format for your output:
 
 <Plot>
-  1 - Plot beat #1
-  2 - Plot beat #2
+  1 - Story summary
+  2 - Plot beat
+  3 - Plot beat
   ...
-  N - Plot beat #n
+  N - Plot beat
 </Plot>
 
-4. Output your reasoning inside <Reasoning> XML tags
+Don't include anything other than the story summary and the plot beats of the arc you've chose inside the <Plot> XML.
+
+5. Output your reasoning inside <Reasoning> XML tags
 
 {format_instructions}
 

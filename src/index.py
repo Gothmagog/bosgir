@@ -37,7 +37,7 @@ def new_game():
     
     # get initial character history
     sheight, swidth = s.getmaxyx()
-    tb_height = (sheight // 3) * 2
+    tb_height = sheight - 2
     curses.curs_set(1)
     s.clear()
     init_background = ""
@@ -45,20 +45,21 @@ def new_game():
         init_background = f.read()
     tb, tb_win = textbox(s, tb_height, YPos.TOP, "Enter some initial background for the story and your character (Ctrl-G to save):", False)
     tb_win.addstr(0, 0, init_background)
-    tb_win.move(len(init_background) // swidth, len(init_background) % swidth)
     tb_win.noutrefresh()
     background = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
+    tb_win.erase()
 
     # get narrative style
-    tb, tb_win = textbox(s, 1, YPos.CUSTOM, "What writing style or author should the story emulate?", True, tb_height+2)
+    tb, tb_win = textbox(s, 1, YPos.TOP, "What writing style or author should the story emulate?", True)
     tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
+    tb_win.erase()
     
     # get file name
-    filename = file_name_entry(YPos.CUSTOM, tb_height+6, False)
+    filename = file_name_entry(YPos.TOP, 0, False)
 
     # read initial notes from file
     notes = ""
