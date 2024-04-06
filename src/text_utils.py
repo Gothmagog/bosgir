@@ -140,3 +140,10 @@ def get_end_prev_sentence(search_text, idx):
             return prev_sidx
         prev_sidx = sidx
     return -1
+
+def str_in_arr(str_, arr):
+    for e in arr:
+        if fuzzy_sentence_match(str_, e) != -1:
+            log.debug("'%s' matches '%s'", str_, e)
+            return True
+    return False

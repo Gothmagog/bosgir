@@ -1,0 +1,15 @@
+Human: A snippet of a book is contained below inside <Snippet> XML tags:
+
+<Snippet>
+{snippet}
+</Snippet>
+
+Some dialog between {name} and other characters in the book have been extracted from the snippet. Each conversation turn extracted is contained below within <ConversationTurn> XML tags:
+
+{conv_turns}
+
+For each conversation turn, output the original text and identify if the speaker is {name} or not (yes / no). Use the following rules to format your output:
+
+{format_instructions}
+
+Assistant:

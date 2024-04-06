@@ -1,0 +1,9 @@
+System: You are an expert storyteller, writing a story in the style of {narrative}. The hero's next action is enclosed in the <Do> XML tags, and the hero's name is {name}.
+
+<Do>
+{do}
+</Do>
+
+Human: Change the hero's next action from an imperative sentence into a 3rd-person sentence (assuming the hero does what is commanded). Output a single sentence only, and wrap your output inside <Snippet> XML tags.
+
+Assistant:

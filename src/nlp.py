@@ -2,7 +2,7 @@ print("Importing spacy...")
 import spacy
 import logging
 from collections import defaultdict
-from nltk import tokenize
+from nltk import tokenize as tokenize_
 from spacy.matcher import Matcher
 from spacy import parts_of_speech as _pos
 from spacy.tokens.span import Span
@@ -13,6 +13,7 @@ from spacy.training import Example
 from spacy.symbols import *
 from spacy_experimental.coref.coref_util import get_clusters_from_doc
 from pathlib import Path
+from text_utils import str_in_arr
 
 log = logging.getLogger("main")
 
@@ -33,8 +34,9 @@ vp_patterns=[
      {'POS': 'VERB'}
     ],
     [{'POS': {'IN': ['PRON', 'PROPN']}},
-     {'TEXT': 'had', 'OP': '?'},
-     {'LEMMA': {'IN': ['decide']}}
+     {'TEXT': {'IN': ['had', 'did']}, 'OP': '?'},
+     {'LEMMA': 'not', 'OP': '?'},
+     {'LEMMA': {'IN': ['decide', 'want']}}
      ],
     [{'POS': {'IN': ['PRON', 'PROPN']}},
      {'POS': 'PART', 'OP': '?'},
@@ -54,7 +56,25 @@ sentence_quote_pat = [
      {'IS_TITLE': True},
      {'TEXT': {'NOT_IN': ['"', '.', '!', '?']}, 'OP': '*'},
      {'TEXT': {'IN': ['.', '!', '?']}},
-     {'TEXT': '"'}]
+     {'TEXT': '"', 'OP': '?'}],
+    [{'TEXT': '"'},
+     {'IS_TITLE': True},
+     {'TEXT': {'NOT_IN': ['"']}, 'OP': '*'},
+     {'TEXT': ','},
+     {'TEXT': '"'},
+     {'TEXT': {'NOT_IN': ['"']}, 'OP': '*'},
+     {'TEXT': {'IN': ['.', '!', '?']}}],
+    [{'TEXT': '"'},
+     {'IS_TITLE': True},
+     {'TEXT': {'NOT_IN': ['"']}, 'OP': '*'},
+     {'TEXT': ','},
+     {'TEXT': '"'},
+     {'TEXT': {'NOT_IN': ['"']}, 'OP': '*'},
+     {'TEXT': ','},
+     {'TEXT': '"'},
+     {'TEXT': {'NOT_IN': ['"']}, 'OP': '*'},
+     {'TEXT': {'IN': ['.', '!', '?']}},
+     {'TEXT': '"'}],
 ]
 name_pat = [
     [{'LEMMA': 'name'},
@@ -79,14 +99,14 @@ quote_matcher.add("quotes", quote_pat, on_match=add_quote)
 sent_quote_matcher = Matcher(web_nlp.vocab)
 sent_quote_matcher.add("sent-quotes", sentence_quote_pat)
 
-def get_hero_action_sentences(text, hero_name):
+def get_hero_action_sentences(text, hero_name, not_hero):
     ret = []
     log.debug("Doing corefs...")
     coref_doc = coref_nlp(text)
     log.debug("Doing tokenization...")
     tok_doc = web_nlp(text)
     hero_refs = []
-    name_toks = tokenize.word_tokenize(hero_name)
+    name_toks = tokenize_.word_tokenize(hero_name)
     log.debug("Name tokens: %s", name_toks)
     for span_grp in coref_doc.spans.values():
         log.debug("Checking coref cluster to see if it's the hero")
@@ -106,26 +126,34 @@ def get_hero_action_sentences(text, hero_name):
 
     # Get quote spans tagged
     quote_matcher(tok_doc)
+    quotes = []
+    if "quotes" in tok_doc.spans:
+        quotes = tok_doc.spans["quotes"]
 
     hero_sentences = set([hr.sent for hr in hero_refs])
-    for sent in get_real_sentences(hero_sentences):
-        log.debug("Sentence with hero ref: %s", sent.text.strip())
-        verb_phrases = get_verb_phrases_from_matcher(sent)
+    real_hero_sentences = [s for s in get_real_sentences(hero_sentences) if not str_in_arr(s.text, not_hero)]
+    for real_sent in real_hero_sentences:
+        log.debug("Sentence with hero ref: %s", real_sent.text.strip())
+        verb_phrases = get_verb_phrases_from_matcher(real_sent)
         for vp in verb_phrases:
             log.debug("VP: %s", vp)
         flattened_verb_phrases = flatten(verb_phrases)
         for hr in hero_refs:
-            if is_span_inside(sent, hr.sent) and hr in flattened_verb_phrases:
-                span_to_add = sent
-                if "quotes" in tok_doc.spans:
-                    for q in tok_doc.spans["quotes"]:
-                        if spans_intersect(q, span_to_add):
-                            log.debug("Got a quote intersection: '%s' '%s'", q.text, span_to_add.text)
-                            span_to_add = union_spans(q, span_to_add)
+            # log.debug("Checking if hero ref sentence '%s' contains '%s'", hr.sent.text, real_sent.text)
+            if is_span_inside(real_sent, hr.sent) and hr in flattened_verb_phrases:
+                log.debug("This sentence is the real hero ref sentence: %s", real_sent)
+                span_to_add = real_sent
+                for q in quotes:
+                    if spans_intersect(q, span_to_add):
+                        log.debug("Got a quote intersection: '%s' '%s'", q.text, span_to_add.text)
+                        span_to_add = union_spans(q, span_to_add)
                 ret.append(span_to_add.text)
                 log.info("Selected: %s", span_to_add.text.strip())
                 break
     return ret
+
+def get_speaker_attribution(quote_spans):
+    pass
 
 def flatten(arr):
     ret = []
@@ -201,18 +229,21 @@ def get_name_from_notes(notes):
 # with the following sentence as a single sentence. This fixes that.
 def get_real_sentences(sentences):
     if isinstance(sentences, Span):
+        log.debug("get_real_sentences: Processing '%s'", sentences)
         count = 0
         last_end = 0
-        for m in sent_quote_matcher(sentences.as_doc()):
-            if count % 2 == 0:
-                log.debug("Caught a missed sentence...")
-                yield sentences[m[1]:m[2]]
-                last_end = m[2]
-            count += 1
-        if count == 0:
-            yield sentences
-        elif last_end > 0 and last_end < sentences.end:
-            yield sentences[last_end:]
+        sentence_start_doc_idx = sentences.start
+        sent_spans = [m for m in sent_quote_matcher(sentences.as_doc(), as_spans=True)]
+        log.debug("get_real_sentences: sent_spans = %s", sent_spans)
+        for s in sent_spans:
+            is_biggest = True
+            for s_ in sent_spans:
+                if s != s_ and is_span_inside(s, s_):
+                    is_biggest = False
+                    break
+            if is_biggest:
+                log.debug("get_real_sentences: '%s' is biggest span", s)
+                yield Span(sentences.doc, sentence_start_doc_idx + s.start, sentence_start_doc_idx + s.end)
     elif hasattr(sentences, '__iter__'):
         for s in sentences:
             yield from get_real_sentences(s)
@@ -301,3 +332,10 @@ def compare_tok_bags(bag1, bag2):
         score += 2 * abs(bag1_pos[k] - bag2_pos[k])
 
     return score
+
+def get_last_n_toks(text, n):
+    doc = web_nlp(text)
+    return doc[-n:].text
+
+def tokenize(text):
+    return tokenize_.word_tokenize(text)

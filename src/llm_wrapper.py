@@ -1,3 +1,9 @@
+import os
+
+env_name = "SM_ENDPOINT"
+if env_name not in os.environ:
+    raise Exception(f"{env_name} needs to be set in the environment variables to the sagemaker endpoint name hosting the LLM")
+
 import sys
 import boto3
 import botocore.exceptions
@@ -30,12 +36,18 @@ from nlp import (
     get_hero_action_sentences,
     get_verb_phrases_from_text,
     get_doc_span,
-    sort_by_sim
+    sort_by_sim,
+    get_last_n_toks,
+    tokenize
 )    
 from lin_backoff import lin_backoff
 from summarization import do_compression
 from writing_examples import get_writing_examples
+from sagemaker.predictor import Predictor
+from sagemaker.base_serializers import SimpleBaseSerializer
+from sagemaker.base_deserializers import SimpleBaseDeserializer
 
+sm_endpoint = os.environ[env_name]
 src_dir = Path(__file__).parent
 log = logging.getLogger("api")
 main_log = logging.getLogger("main")
@@ -58,158 +70,150 @@ except botocore.exceptions.NoCredentialsError as e:
 
 embeddings = BedrockEmbeddings()
 
-# Initial summarization prompt
+# Generate player action text prompt
 model_id = "anthropic.claude-instant-v1"
-llm_summarization = Bedrock(
+llm_player_action = Bedrock(
     model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": .5},
+    model_kwargs={"max_tokens_to_sample": 500, "temperature": 1, "top_p": 1, "top_k": 500},
     streaming=True,
-    metadata={"name": "Story Summarization", "model_id": model_id}
+    metadata={"name": "Generate Player Action Text", "model_id": model_id}
 )
-with open(src_dir / "../data/prompt_summarization.txt", "r") as f:
-    prompt_summarization = f.read()
+with open(src_dir / "../data/prompt_player_action.txt", "r") as f:
+    prompt_player_action = f.read()
 
-# Story from plot prompt
-model_id = "anthropic.claude-v2:1"
-llm_from_plot = Bedrock(
-    model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": 200, "temperature": 1},
-    streaming=True,
-    metadata={"name": "Plot-driven Story", "model_id": model_id}
-)
-with open(src_dir / "../data/prompt_from_plot.txt", "r") as f:
-    prompt_from_plot = f.read()
-plot_timer = 100
-plot_story = ""
+# Generate story LLM
+max_ttl_toks = 2048
+pred_parameters = {
+    "max_new_tokens": 500,
+    "num_return_sequences": 1,
+    "top_k": 250,
+    "top_p": 0.8,
+    "do_sample": True,
+    "temperature": 1,
+}
+class DictSerializer(SimpleBaseSerializer):
+    def serialize(self, data):
+        str_val = json.dumps(data)
+        return str_val.encode()
+class DictDeserializer(SimpleBaseDeserializer):
+    def deserialize(self, stream, content_type):
+        str_resp = stream.read().decode()
+        ret = json.loads(str_resp)
+        if type(ret) == list and len(ret) == 1:
+            ret = ret[0]
+        return ret
 
-# Plot LLM prompt
-model_id = "anthropic.claude-v2:1"
-llm_plot = Bedrock(
-    model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
-    streaming=True,
-    metadata={"name": "Plot Generation", "model_id": model_id}
-)
-with open(src_dir / "../data/prompt_plot.txt", "r") as f:
-    prompt_plot = f.read()
-
-# Primary LLM prompt
-llm_primary = Bedrock(
-    model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 1},
-    streaming=True,
-    metadata={"name": "Story Generation", "model_id": model_id}
-)
-with open(src_dir / "../data/prompt_primary.txt", "r") as f:
-    prompt_primary = f.read()
-
+predictor = Predictor(sm_endpoint, serializer=DictSerializer(), deserializer=DictDeserializer())
+        
 # Update notes prompt
 model_id = "anthropic.claude-instant-v1"
 llm_update_notes = Bedrock(
     model_id=model_id,
-    model_kwargs={"max_tokens_to_sample": max_output_tokens, "temperature": 0},
+    model_kwargs={"max_tokens_to_sample": 500, "temperature": 0},
     streaming=False,
     metadata={"name": "Update Notes", "model_id": model_id}
 )
 with open(src_dir / "../data/prompt_update_notes.txt", "r") as f:
     prompt_update_notes = f.read()
 
+# Speaker attribution prompt
+model_id = "anthropic.claude-v2:1"
+llm_speaker_attribution = Bedrock(
+    model_id=model_id,
+    model_kwargs={"max_tokens_to_sample": 3000, "temperature": 0},
+    streaming=True,
+    metadata={"name": "Speaker Attribution", "model_id": model_id}
+)
+with open(src_dir / "../data/prompt_speaker_attribution.txt", "r") as f:
+    prompt_speaker_attribution = f.read()
+    
 leftover_response = ""
+not_hero = None
 
 # exec LLM
-def proc_command(command, hero_name, notes, history, narrative, current_plot, status_win, in_tok_win, out_tok_win):
-    global leftover_response, plot_timer, plot_story
+def proc_command(command, hero_name, notes, history, narrative, status_win, in_tok_win, out_tok_win):
+    global leftover_response, not_hero
 
-    old_plot = current_plot
-    
+    hero_name_xml = hero_name.replace(" ", "_")
+
     # Summarize the story, if needed
     history = do_compression(history)
 
     # Setup parsers and prompts
-    out_parser_pre = RunnableLambda(lambda r: r[r.find("<Root>"):r.find("</Root>")+7])
-    out_parser2_preferred = XMLOutputParser(tags=["Root", "Plot", "Reasoning"])
-    out_parser2_fallback = RunnableLambda(lambda r: r[r.find("<Plot>")+6:r.find("</Plot>")])
-    out_parser2 = out_parser2_preferred.with_fallbacks([out_parser2_fallback])
-    out_parser3_preferred = XMLOutputParser(tags=["Root", "Snippet", "Reasoning"])
-    out_parser3_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
-    out_parser3 = out_parser3_preferred.with_fallbacks([out_parser3_fallback])
+    out_parser1 = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
+    xml_strip = RunnableLambda(lambda r: r[r.find("<Root>"):r.find("</Root>")+7])
+    out_parser2 = XMLOutputParser(tags=["Root", "ConversationTurn", "Text", f"Is{hero_name_xml}"])
     prompt1 = PromptTemplate(
-        input_variables=["narrative", "plot", "history", "examples"],
-        template=prompt_from_plot
+        # input_variables=["narrative", "do", "name", "history"],
+        input_variables=["narrative", "do", "name"],
+        template=prompt_player_action
     )
     prompt2 = PromptTemplate(
-        input_variables=["history", "current", "narrative"],
-        template=prompt_plot,
-        partial_variables={"format_instructions": out_parser2_preferred.get_format_instructions()}
-    )
-    prompt3 = PromptTemplate(
-        input_variables=["history", "current", "do", "narrative", "writing_examples"],
-        template=prompt_primary,
-        partial_variables={"format_instructions": out_parser3_preferred.get_format_instructions()}
+        input_variables=["snippet", "name", "conv_turns"],
+        template=prompt_speaker_attribution,
+        partial_variables={"format_instructions": out_parser2.get_format_instructions()}
     )
     
-    chain1 = prompt1 | llm_from_plot
-    chain2 = prompt2 | llm_plot | out_parser2
-    chain3 = prompt3 | llm_primary | out_parser3
+    chain1 = prompt1 | llm_player_action | out_parser1
+    # chain1 = prompt1 | llm_player_action
+    chain2 = prompt2 | llm_speaker_attribution | xml_strip | out_parser2
     
     ret = ""
     
     # Check if we can use the leftover response
     if len(leftover_response):
         set_status_win(status_win, "Story Reuse")
-        ret, leftover_response = get_text_aligned_with_command(leftover_response, command, hero_name)
-        
-    # No leftover response, let's see if we need to generate a new
-    # plot
+        ret, leftover_response = get_text_aligned_with_command(leftover_response, command, hero_name, not_hero)
     if not ret or len(ret) == 0:
-        if plot_timer > 3:
-            # Generate a new plot
-            log.info("***** Invoking 2nd chain *****")
-            main_log.info("***** Invoking 2nd chain *****")
-            response2 = lin_backoff(chain2.invoke, status_win, {"history": history, "current": notes, "narrative": narrative}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-            current_plot = get_xml_val(response2, "Plot")
-            plot_timer = 0
+        # Generate story from LLM, 1st generate the player action text
+        log.info("***** Invoking 1st chain *****")
+        main_log.info("***** Invoking 1st chain *****")
+        # response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "narrative": narrative, "name": hero_name, "history": get_last_n_toks(history, 50)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "narrative": narrative, "name": hero_name}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        num_toks_player_action = len(tokenize(response1))
 
-        if plot_timer > 3 or len(plot_story) == 0:
-            # Generate a new story from the plot
-            log.info("***** Invoking 1st chain *****")
-            main_log.info("***** Invoking 1st chain *****")
-            response1 = lin_backoff(chain1.invoke, status_win, {"history": history, "plot": current_plot, "narrative": narrative, "writing_examples": get_writing_examples(command)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-            plot_story = response1
+        # Now use the history + action to churn out a story prediction
+        # from the SageMaker endpoint
+        main_log.info("***** Invoking LLM endpoint *****")
+        set_status_win(status_win, "Story Generation")
+        history_snip = get_last_n_toks(history, max_ttl_toks - num_toks_player_action - pred_parameters["max_new_tokens"])
+        payload = {"inputs": f"{history_snip}\n\n{response1}", "parameters": pred_parameters}
+        log.debug(payload)
+        response2 = lin_backoff(predictor.predict, status_win, payload)
+        log.debug(response2["generated_text"])
 
-        # See if the command happens to follow the plot-driven story
-        set_status_win(status_win, "Checking Alignment With Plot")
-        ret, leftover_response = get_text_aligned_with_command(plot_story, command, hero_name)
-        if not ret:
-            # No alignment with the plot-driven story, generate a
-            # plotless story instead
-            plot_timer += 1
-            log.info("***** Invoking 3rd chain *****")
-            main_log.info("***** Invoking 3rd chain *****")
-            response3 = lin_backoff(chain3.invoke, status_win, {"do": command, "history": get_last_paragraphs(history, 36)[0], "current": notes, "narrative": narrative, "writing_examples": get_writing_examples(command)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-            snippet = get_xml_val(response3, "Snippet")
-
-            # Story truncation
-            ret, leftover_response = get_text_aligned_with_command(snippet, command, hero_name)
-            if not ret:
-                # 1st sentence didn't align with the command, let's
-                # just try leaving it in
-                ret = snippet
-                leftover_response = ""
+        # Now get dialog quotes from the snippet, and do speaker
+        # attribution (if we have dialog)
+        doc = get_doc_span(response2["generated_text"]).doc
+        not_hero = []
+        if "quotes" in doc.spans and len(doc.spans["quotes"]):
+            quotes = doc.spans["quotes"]
+            conv_turns = ""
+            for q in quotes:
+                conv_turns += f"<ConversationTurn>{q.text}</ConversationTurn>\n"
+            response3 = lin_backoff(chain2.invoke, status_win, {"snippet": response2["generated_text"], "name": hero_name, "conv_turns": conv_turns}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+            turns = [{"Text": xml[0]["Text"], f"Is{hero_name_xml}": xml[1][f"Is{hero_name_xml}"]} for xml in get_xml_val(response3, "ConversationTurn", is_arr=True)]
+            log.debug(turns)
+            not_hero = [t["Text"] for t in turns if t[f"Is{hero_name_xml}"].lower() == "no" and t["Text"] and len(t["Text"].strip())]
+            log.debug("not_hero = %s", not_hero)
+            
+        set_status_win(status_win, "Story Truncation")
+        ret, leftover_response = get_text_aligned_with_command(response2["generated_text"], command, hero_name, not_hero)
+        if ret:
+            ret = f"\n\n{response1}{ret}"
         else:
-            plot_timer = 0
-
-    if current_plot != old_plot:
-        main_log.info("Plot changed, new plot: %s", current_plot)
+            main_log.warn("None of the generated story matches the hero action")
+            ret = f"\n\n{response1}{response2['generated_text']}"
         
-    return (ret, current_plot)
+    return ret
 
-def get_text_aligned_with_command(text, command, hero_name):
-    hero_action_sentences = get_hero_action_sentences(text, hero_name)
+def get_text_aligned_with_command(text, command, hero_name, not_hero):
+    hero_action_sentences = get_hero_action_sentences(text, hero_name, not_hero)
     ret = text
     min_idx = 0
     if len(hero_action_sentences):
         exclude_sentences = get_sentences_to_exclude(hero_action_sentences, command, "modern")
+        log.debug("Num sentences to exclude: %s", len(exclude_sentences))
         if len(exclude_sentences):
             min_idx = 9999999
             for s in exclude_sentences:
@@ -248,8 +252,13 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     return response
 
 def get_xml_val(obj, attr_name, root="Root", is_arr=False):
-    if type(obj) == dict:
+    if type(obj) == dict and root:
         ret = [e[attr_name] for e in obj[root] if attr_name in e]
+        if not is_arr and len(ret):
+            ret = ret[0]
+        return ret
+    elif type(obj) == dict:
+        ret = obj[attr_name]
         if not is_arr and len(ret):
             ret = ret[0]
         return ret
@@ -281,7 +290,7 @@ def get_sentences_to_exclude(sentences, command, category):
         log.debug("get_sentences_to_exclude: Querying common table")
         recs_cur = db_conn.execute("SELECT embeddings FROM common")
         recs = recs_cur.fetchmany(size=1000)
-        log.debug("get_sentences_to_exclude: Fetched %s records", len(recs))
+
         passive_embeddings = [numpy.frombuffer(r[0]).reshape(1, -1) for r in recs]
     for sentence in sentences:
         sent_embedding = numpy.array(embeddings.embed_query(sentence)).reshape(1, -1)
@@ -321,13 +330,14 @@ def get_sentences_to_exclude(sentences, command, category):
             last_score = -1
             for i_sorted, (cmd_assoc_idx, vp_text, score) in enumerate(sorted_cmd_vp):
                 if score > 2 or (i_sorted > 10 and score != last_score):
-                    log.debug("get_sentences_to_exclude: %s > 2 or %s > 10", score, i_sorted)
+                    # log.debug("get_sentences_to_exclude: %s > 2 or %s > 10", score, i_sorted)
                     break
                 assoc_embedding = cmd_assoc_embeddings[i_vp][cmd_assoc_idx]
                 sim = cosine_similarity(sent_embedding, assoc_embedding)[0][0]
-                log.debug("get_sentences_to_exclude: '%s' <%s> '%s'", sentence, sim, vp_text)
+                # log.debug("get_sentences_to_exclude: '%s' <%s> '%s'", sentence, sim, vp_text)
                 if sim >= thresh:
                     sentence_matches = True
+                    log.debug("get_sentences_to_exclude: '%s' matches (%s)", sentence, sim)
                     break
             if sentence_matches:
                 break

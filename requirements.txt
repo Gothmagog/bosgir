@@ -8,5 +8,4 @@ chromadb==0.4.10
 spacy==3.4.4
 spacy-experimental==0.6.4
 thinc[torch]
-en_coreference_web_trf @  https://github.com/explosion/spacy-experimental/releases/download/v0.6.1/en_coreference_web_trf-3.4.0a2-py3-none-any.whl
-en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.4.1/en_core_web_trf-3.4.1-py3-none-any.whl
+-e file:///C:/Users/mbbecha/Source/sayswho/src

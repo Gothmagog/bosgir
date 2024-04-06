@@ -1,19 +1,15 @@
-Hero name: Elric the Unready
-Enemies: none
-Allies: none
+Hero name: Anna
+Married to: Michael
 Physical status: healthy
 Mental status: healthy
 Posessions:
-- sword
-- shield
-- 10 gold
+- umbrella
 Wearing:
-- clean white shirt
-- green pants
-- your lucky adventuring boots
-- a super duper red cape
+- wedding ring
+- trenchcoat
 Motivations:
-- to find adventure
-Current location: Spielburg 
+- get settled into our new home
+- get the keys from the real estate agent
+Current location: Anchorhead, outside real estate office
 Time of day: late afternoon
-Weather: pleasant
+Weather: cold and rainy

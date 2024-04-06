@@ -6,10 +6,13 @@ _asep = b"\x00"
 
 def get_members_arr(gs: GameState):
     members = [m for m in dir(gs) if not m.startswith("__")]
+
+    # ensure "history" is the last member
     h_idx = members.index("history")
-    old_v = members[-1]
-    members[-1] = members[h_idx]
-    members[h_idx] = old_v
+    if h_idx != len(members) - 1:
+        old_v = members[-1]
+        members[-1] = members[h_idx]
+        members[h_idx] = old_v
     return members
     
 class GameStatePersister:
