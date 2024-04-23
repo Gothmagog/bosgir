@@ -2,11 +2,6 @@ boto3>=1.34.5
 windows-curses>=2.3.2
 langchain>=0.0.352
 langchain-community>=0.0.6
-anthropic-bedrock>=0.5.9
-nltk>=3.8.1
 chromadb==0.4.10
-spacy==3.4.4
-spacy-experimental==0.6.4
-thinc[torch]
-en_coreference_web_trf @  https://github.com/explosion/spacy-experimental/releases/download/v0.6.1/en_coreference_web_trf-3.4.0a2-py3-none-any.whl
-en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.4.1/en_core_web_trf-3.4.1-py3-none-any.whl
+chevron>=0.14.0
+nltk>=3.8.1

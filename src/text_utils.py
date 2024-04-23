@@ -64,29 +64,39 @@ def str_from_arr(arr):
 
 def get_last_paragraphs(text, n=1):
     ret = ""
+    paragraphs = []
+    for p in get_paragraphs(text, n):
+        paragraphs.insert(0, p)
+    return ("\n\n".join(paragraphs), i)
+
+def get_num_paragraphs(text):
+    count = 0
+    for p in get_paragraphs(text):
+        count += 1
+    return count
+
+def get_paragraphs(text, n=0):
     pcount = 0
     start_paragraph_separator = False
     had_text = False
     last_pos = -1
-    paragraphs = []
     text = "\n" + text
     for i in range(len(text) - 1, -1, -1):
         if text[i] == "\n" and not start_paragraph_separator and had_text:
             start_paragraph_separator = True
             if last_pos == -1:
-                paragraphs = [text[i+1:].strip()]
+                yield [text[i+1:].strip()]
             else:
-                paragraphs.insert(0, text[i+1:last_pos])
+                yield text[i+1:last_pos]
             pcount += 1
         elif not text[i].isspace():
             had_text = True
             if start_paragraph_separator:
                 start_paragraph_separator = False
                 last_pos = i + 1
-        if pcount >= n:
+        if n and pcount >= n:
             break
-    return ("\n\n".join(paragraphs), i)
-
+    
 def is_position_in_mid_sentence(text, position):
     sentences = tokenize.sent_tokenize(text)
     last_sent_pos = -1

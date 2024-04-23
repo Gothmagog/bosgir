@@ -4,6 +4,8 @@ import io
 _sep = b"\x00\x00"
 _asep = b"\x00"
 
+arr_attribs = ["writing_examples", "history"]
+
 def get_members_arr(gs: GameState):
     members = [m for m in dir(gs) if not m.startswith("__")]
     h_idx = members.index("history")
@@ -44,13 +46,13 @@ class GameStatePersister:
             val = buffer_[start_from:]
         else:
             val = buffer_[start_from:cur_idx]
-        if cur_member == "writing_examples":
+        if cur_member in arr_attribs:
             val = val.split(_asep)
             return ([x.decode(encoding="utf-8") for x in val], cur_idx)
         return (val.decode(encoding="utf-8"), cur_idx)
 
     def save_item(self, val: any, member: str, stream):
-        if member == "writing_examples":
+        if member in arr_attribs:
             for (i, p) in enumerate(val):
                 if i > 0:
                     stream.write(_asep)

@@ -48,15 +48,26 @@ def new_game():
     tb_win.noutrefresh()
     background = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
-    tb_win.erase()
+    s.clear()
+    s.refresh()
+
+    # get narrative style
+    tb, tb_win = textbox(s, 1, YPos.TOP, "What genre should the story be?", True)
+    tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
+    tb_win.noutrefresh()
+    genre = normalize_newlines_str(tb.edit(), 1)
+    curses.doupdate()
+    s.clear()
+    s.refresh()
 
     # get narrative style
     tb, tb_win = textbox(s, 1, YPos.TOP, "What writing style or author should the story emulate?", True)
-    tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
+    tb_win.addstr(0, 0, "Old-school Sierra adventure games")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
-    tb_win.erase()
+    s.clear()
+    s.refresh()
     
     # get file name
     filename = file_name_entry(YPos.TOP, 0, False)
@@ -65,10 +76,12 @@ def new_game():
     notes = ""
     with open(src_dir / "../data/initial_notes.txt", "r") as f:
         notes = f.read()
-    game_state = GameState(history=background, notes=notes, narrative_style=narrative_style, plot="", writing_examples=[])
+
+    # load game state obj
+    game_state = GameState(history=[], notes=notes, genre=genre, narrative_style=narrative_style)
     gs_persist = GameStatePersister(filename)
     
-    return continue_()
+    return continue_(background)
 
 def load_game():
     global gs_persist, game_state
@@ -77,12 +90,12 @@ def load_game():
     filename = file_name_entry(YPos.TOP, 0, True)
     gs_persist = GameStatePersister(filename)
     if not game_state:
-        game_state = GameState(history=None, notes=None, narrative_style=None, plot=None, writing_examples=None)
+        game_state = GameState(history=None, notes=None, genre=None, narrative_style=None)
     gs_persist.load(game_state)
     continue_()
     
-def continue_():
-    ret = game_loop(s, game_state, gs_persist)
+def continue_(initial_msg=None):
+    ret = game_loop(s, game_state, gs_persist, initial_msg)
     if ret == 0:
         choice = main_menu()
         choice()

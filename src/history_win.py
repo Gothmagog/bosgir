@@ -24,9 +24,9 @@ class HistoryWindow(EnhancedWindow):
         else:
             num_lines_showing = num_lines
         self.win.move(num_lines_showing, 0)
-        reset_chunker()
+        # reset_chunker()
 
-    @markedup_chunker_decorator
+    # @markedup_chunker_decorator
     def add_chunk(self, chunk):
         cury, curx = self.win.getyx()
         vp_width = self.get_viewport_width()

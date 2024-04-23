@@ -33,6 +33,14 @@ pricing = {
     "anthropic.claude-v2:0:100k": {
         "price_per_1k_input": 0.008,
         "price_per_1k_output": 0.024
+    },
+    "anthropic.claude-3-sonnet": {
+        "price_per_1k_input": 0.003,
+        "price_per_1k_output": 0.015
+    },
+    "anthropic.claude-3-haiku": {
+        "price_per_1k_input": 0.00025,
+        "price_per_1k_output": 0.00125
     }
 }
 
@@ -41,6 +49,8 @@ def count_tokens(text):
     return len(enc.ids)
 
 def calc_cost(text, for_input, model_id):
+    if model_id.startswith("anthropic.claude-3"):
+        model_id = model_id[:model_id.find("-", 19)]
     tok_count = count_tokens(text)
     price_per_1k = 0
     if for_input:

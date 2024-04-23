@@ -23,7 +23,7 @@ class CursesCallback(BaseCallbackHandler):
         return True
 
     def ignore_chat_model(self):
-        return True
+        return False
         
     def on_llm_start(self, serialized, prompts, **kwargs):
         global ttl_in_cost
