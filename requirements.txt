@@ -11,3 +11,4 @@ thinc[torch]
 -e file:///C:/Users/mbbecha/Source/sayswho/src
 en-coreference-web-trf @ https://github.com/explosion/spacy-experimental/releases/download/v0.6.1/en_coreference_web_trf-3.4.0a2-py3-none-any.whl#sha256=9507f2894d60ac3ca89f2ac925dc2222b63f3e8e5998400581b954cfef859654
 en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.4.1/en_core_web_md-3.4.1-py3-none-any.whl#sha256=96ddc2e0300e1ed142c2e80bacc83438dc09231f2ca4d104f83afc021eba098e
+defusedxml==0.7.1

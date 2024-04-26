@@ -244,7 +244,7 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     chain = prompt3 | llm_update_notes | rem_last_xml
     log.info("***** Invoking Claude Instant V1 API *****")
     response = chain.invoke({"description": description, "notes": notes}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    log.debug(response)
+    # log.debug(response)
     match = embedded_xml_re.search(response)
     if match:
         log.info("Found embedded XML tags in the response, removing it...")
@@ -288,17 +288,17 @@ def get_sentences_to_exclude(sentences, command, category):
     # actions
     if not passive_embeddings:
         log.debug("get_sentences_to_exclude: Querying common table")
-        recs_cur = db_conn.execute("SELECT embeddings FROM common")
+        recs_cur = db_conn.execute("SELECT embeddings, text FROM common")
         recs = recs_cur.fetchmany(size=1000)
 
-        passive_embeddings = [numpy.frombuffer(r[0]).reshape(1, -1) for r in recs]
+        passive_embeddings = [(numpy.frombuffer(r[0]).reshape(1, -1), r[1]) for r in recs]
     for sentence in sentences:
         sent_embedding = numpy.array(embeddings.embed_query(sentence)).reshape(1, -1)
         sentence_embeddings.append((sentence, sent_embedding))
         for passive_em in passive_embeddings:
-            sim = cosine_similarity(sent_embedding, passive_em)[0][0]
+            sim = cosine_similarity(sent_embedding, passive_em[0])[0][0]
             if sim >= thresh:
-                log.debug("get_sentences_to_exclude: '%s' identified as passive.", sentence)
+                log.debug("get_sentences_to_exclude: '%s' identified as passive (%s).", sentence, passive_em[1])
                 passive_sentences.append(sentence)
                 break
         

@@ -13,7 +13,10 @@ from spacy.training import Example
 from spacy.symbols import *
 from spacy_experimental.coref.coref_util import get_clusters_from_doc
 from pathlib import Path
-from text_utils import str_in_arr
+try:
+    from text_utils import str_in_arr
+except:
+    from src.text_utils import str_in_arr
 
 log = logging.getLogger("main")
 

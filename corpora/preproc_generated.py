@@ -27,7 +27,11 @@ db_conn = None
 
 def init_common():
     print("(recreating common table)")
-    db_conn.execute("CREATE TABLE IF NOT EXISTS common(embeddings BLOB NOT NULL)")
+    try:
+        db_conn.execute('DROP TABLE common')
+    except:
+        pass
+    db_conn.execute("CREATE TABLE common(embeddings BLOB NOT NULL, text TEXT NOT NULL)")
     db_conn.execute("DELETE FROM common")
     db_conn.commit()
 
@@ -74,7 +78,7 @@ ins_params = []
 def do_insert(for_common, ins_params):
     print("  (inserting...)")
     if len(ins_params) and for_common:
-        db_conn.executemany("INSERT INTO common VALUES(:embeddings)", ins_params)
+        db_conn.executemany("INSERT INTO common VALUES(:embeddings, :text)", ins_params)
     elif len(ins_params):
         db_conn.executemany("INSERT INTO commands VALUES(:verb, :vp, :category, :embeddings)", ins_params)
     db_conn.commit()
@@ -91,7 +95,7 @@ for file in dir.glob(args.glob):
         for i, line in enumerate(line_filter(args.common, f)):
             if args.common:
                 sentence_embeddings = numpy.array(embeddings.embed_query(line), dtype=numpy.dtype(float)).tobytes()
-                ins_params.append({"embeddings": sentence_embeddings})
+                ins_params.append({"embeddings": sentence_embeddings, "text": line})
             else:
                 # split each entry into the fields that will be stored in
                 # the SQLite DB

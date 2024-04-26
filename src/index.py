@@ -48,15 +48,17 @@ def new_game():
     tb_win.noutrefresh()
     background = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
-    tb_win.erase()
+    s.clear()
+    s.refresh()
 
     # get narrative style
-    tb, tb_win = textbox(s, 1, YPos.TOP, "What writing style or author should the story emulate?", True)
+    tb, tb_win = textbox(s, 1, YPos.TOP, "What writing style or author should the story be?", True)
     tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
     curses.doupdate()
-    tb_win.erase()
+    s.clear()
+    s.refresh()
     
     # get file name
     filename = file_name_entry(YPos.TOP, 0, False)
@@ -65,6 +67,8 @@ def new_game():
     notes = ""
     with open(src_dir / "../data/initial_notes.txt", "r") as f:
         notes = f.read()
+
+    # load game state obj
     game_state = GameState(history=background, notes=notes, narrative_style=narrative_style)
     gs_persist = GameStatePersister(filename)
     
