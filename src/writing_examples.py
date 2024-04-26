@@ -14,8 +14,8 @@ log = logging.getLogger("main")
 
 prompt_text = """Human: Do the following steps:
 
-1. Identify four writing qualities that exemplify the writing style of {style}.
-2. For each quality, write four separate paragraphs in the style of {style} that highlight this quality. Wrap each paragraph inside <Paragraph> XML tags. Wrap each quality group inside XML tags named after the quality highlighted by the paragraphs. Each paragraph should be 2-4 sentences in length, and written in the 3rd person.
+1. Identify four writing qualities that exemplify the writing style of extremely subtle {style}.
+2. For each quality, write four separate paragraphs in the style of extremely subtle {style} that highlight this quality. Wrap each paragraph inside <Paragraph> XML tags. Wrap each quality group inside XML tags named after the quality highlighted by the paragraphs. Each paragraph should be 2-4 sentences in length, and written in the 3rd person.
 
 {format_instructions}
 

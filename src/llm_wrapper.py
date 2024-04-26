@@ -31,6 +31,7 @@ from prompt_examples import examples_notes
 from chevron import render as r
 from chat_history import clean_msg
 from text_utils import get_num_paragraphs
+from writing_examples import get_writing_examples
 
 log = logging.getLogger("api")
 main_log = logging.getLogger("main")
@@ -106,11 +107,9 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
         response = match.group(1)
     return response
 
-def get_new_runnable(chat_hist, hero_name, genre, narrative_style):
-    prompt_sys = SystemMessagePromptTemplate.from_template(pconfig_init.get("SYSTEM", True))
-    template_vars = {"name": hero_name, "genre": genre, "narrative": narrative_style}
+def get_new_runnable(chat_hist, hero_name, genre, writing_examples):
+    template_vars = {"name": hero_name, "genre": genre, "writing_examples": writing_examples}
     p = ChatPromptTemplate.from_messages([
-        prompt_sys,
         MessagesPlaceholder(variable_name="history"),
         HumanMessagePromptTemplate.from_template(r(pconfig_nudges.get("HUMAN_RULES", True), template_vars)),
         AIMessagePromptTemplate.from_template(r(pconfig_nudges.get("AI_RULES"), template_vars)),
@@ -128,7 +127,7 @@ def get_new_runnable(chat_hist, hero_name, genre, narrative_style):
         history_messages_key="history"
     )
 
-def init_chat(hero_name, genre, style, background, chat_hist, status_win, in_tok_win, out_tok_win):
+def init_chat(hero_name, genre, writing_examples, background, chat_hist, status_win, in_tok_win, out_tok_win):
     global with_message_history
 
     log.info("Initializing LLM chat session")
@@ -137,8 +136,8 @@ def init_chat(hero_name, genre, style, background, chat_hist, status_win, in_tok
         AIMessage(content=pconfig_init.get("AI1")),
         HumanMessage(content=pconfig_init.get("HUMAN2")),
         AIMessage(content=pconfig_init.get("AI2")),
-        HumanMessage(content=pconfig_init.get("HUMAN3")),
-        AIMessage(content=pconfig_init.get("AI3")),
+        # HumanMessage(content=pconfig_init.get("HUMAN3")),
+        # AIMessage(content=pconfig_init.get("AI3")),
         HumanMessage(content=pconfig_init.get("HUMAN4")),
         AIMessage(content=pconfig_init.get("AI4")),
         HumanMessage(content=pconfig_init.get("HUMAN5")),
@@ -157,16 +156,16 @@ def init_chat(hero_name, genre, style, background, chat_hist, status_win, in_tok
         AIMessage(content=pconfig_init.get("AI11")),
     ])
     num_priming_msgs = len(chat_hist.messages)
-    with_message_history = get_new_runnable(chat_hist, hero_name, genre, style)
+    with_message_history = get_new_runnable(chat_hist, hero_name, genre, writing_examples)
 
     # Invoke main chat
-    initial_hu_msg = r(pconfig_init.get('HUMAN12'), {"genre": genre, "style": style, "background": background, "name": hero_name})
-    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "style": style, "input": initial_hu_msg}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    initial_hu_msg = r(pconfig_init.get('HUMAN12'), {"genre": genre, "writing_examples": writing_examples, "background": background, "name": hero_name})
+    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": initial_hu_msg}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     log.debug(resp)
 
     return clean_msg(resp)
     
-def proc_command(command, hero_name, genre, style, notes, chat_hist, status_win, in_tok_win, out_tok_win):
+def proc_command(command, hero_name, genre, writing_examples, notes, chat_hist, status_win, in_tok_win, out_tok_win):
     global with_message_history, nudged_length
 #     input = r("""/Here are some story-telling notes that should be top-of-mind for you:
 # {{notes}}
@@ -177,17 +176,17 @@ def proc_command(command, hero_name, genre, style, notes, chat_hist, status_win,
 # """, { "name": hero_name, "notes": notes, "command": command})
     input = command
     if not with_message_history:
-        with_message_history = get_new_runnable(chat_hist, hero_name, genre, style)
-    num_ai_msgs = chat_hist.get_num_ai_messages() - 11
+        with_message_history = get_new_runnable(chat_hist, hero_name, genre, writing_examples)
+    num_ai_msgs = chat_hist.get_num_ai_messages() - 10
     if num_ai_msgs > 1 and num_ai_msgs % 10 == 0:
         # it's time to remind the LLM they need to be thinking about a
         # plot and character archs
         status_win.addstr(0, 0, "Poking plot... ")
         status_win.refresh()
         curses.doupdate()
-        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "style": style, "input": pconfig_nudges.get("HUMAN_PLOT1", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_PLOT1", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         log.debug(resp.content)
-        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "style": style, "input": pconfig_nudges.get("HUMAN_PLOT2")}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_PLOT2")}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         log.debug(resp.content)
         if "<Story>" in resp.content:
             log.debug("LLM responded to plot nudge with story...")
@@ -196,7 +195,7 @@ def proc_command(command, hero_name, genre, style, notes, chat_hist, status_win,
     status_win.addstr(0, 0, "Invoking API...")
     status_win.refresh()
     curses.doupdate()
-    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "style": style, "input": input}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": input}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     # log.debug(resp)
 
     # Post-response nudges
@@ -205,13 +204,13 @@ def proc_command(command, hero_name, genre, style, notes, chat_hist, status_win,
         if num_paragraphs > 3 and not nudged_length:
             log.info("Nudged LLM on length, first time")
             chat_hist.add_user_message(r(pconfig_nudges.get("HUMAN_LENGTHY_PROSE1", True), {"name": hero_name}))
-            chat_hist.add_ai_message(r(pconfig_nudges.get("AI_LENGTHY_PROSE1"), {"name": hero_name, "genre": genre, "narrative": style}))
+            chat_hist.add_ai_message(r(pconfig_nudges.get("AI_LENGTHY_PROSE1"), {"name": hero_name, "genre": genre}))
             nudged_length = True
         elif num_paragraphs > 3:
             status_win.addstr(0, 0, "Nudging length ")
             status_win.refresh()
             curses.doupdate()
             log.info("Nudged LLM on length, again")
-            resp_nudge = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "style": style, "input": pconfig_nudges.get("HUMAN_LENGTHY_PROSE2", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+            resp_nudge = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_LENGTHY_PROSE2", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
             log.debug(resp_nudge)
     return resp

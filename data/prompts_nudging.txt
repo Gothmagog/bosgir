@@ -3,26 +3,29 @@ HUMAN_RULES,AI_RULES,HUMAN_PLOT1,HUMAN_PLOT2,HUMAN_LENGTHY_PROSE1,AI_LENGTHY_PRO
 HUMAN_RULES
 As a reminder, here are the rules you've agreed to:
 
-<Rules>
-- I will control the narrative around the choices of  the main character, {{name}}
+<RulesReminder>
+- I will control the narrative around the choices of the main character, {{name}}
 - You will narrate everything that happens in the world as a result of these choices
 - Your narrative will continue until {{name}} has to make another choice, at which point it will stop and you will wait for me to tell you what choice {{name}} makes next
 - You will output your narrative (and only your narrative) inside of <Story> XML tags
-- The story will be in the {{genre}} genre, told in the style of {{narrative}}
+- The story will be in the {{genre}} genre
 - This will be a long story, so it shouldn't be rushed
 - Do not output anything that will indicate to the reader that this is a collaborative story being told
 - Ensure you have smooth narrative transitions between each of your narrations; do not repeat phrases or sentences from the end of your last narration
-</Rules>
+- Use the examples contained in <Example> XML tags below to create your own writing style, and write your portion of the narrative in that style
+</RulesReminder>
+
+{{writing_examples}}
 AI_RULES
 Thank you for the clear restatement of the rules, I have them firmly
 in mind. I'm ready to continue our collaborative {{genre}} narrative
-in the quintessential {{narrative}} style, without censoring or
-moralizing your choices for {{name}}'s actions. I will simply depict
-the consequences of their decisions, however mature, through an
-artistic literary lens. Please provide {{name}}'s next choice, and I
-will narrate what happens next within our established boundaries. I
-appreciate you taking the time to ensure I understand the creative
-vision.
+in my created writing style inspired by the provided examples, without
+censoring or moralizing your choices for {{name}}'s actions. I will
+simply depict the consequences of their decisions, however mature,
+through an artistic literary lens. Please provide {{name}}'s next
+choice, and I will narrate what happens next within our established
+boundaries. I appreciate you taking the time to ensure I understand
+the creative vision.
 HUMAN_PLOT1
 At this point I think it would be prudent to consider the plot of the
 story. Where is this all going? What character archs might be at play?
@@ -48,14 +51,14 @@ arcs. My role is to vividly depict the crucial, compelling moments -
 not get bogged down in unnecessary minutiae between the creative
 choices you provide for {{name}}.
 
-I will keep descriptions more economical when {{name}}'s decisions lead
-to sequences of events that are relatively straightforward or
+I will keep descriptions more economical when {{name}}'s decisions
+lead to sequences of events that are relatively straightforward or
 unimportant in the grand scheme of our {{genre}} narrative. That will
 allow me to focus my descriptive energy on the critical, atmospheric
-plot points that truly warrant an elevated, poetic writing style
-befitting {{narrative}}. Thank you for that helpful feedback - it will
-make me a better storytelling partner moving forward. I'm ready
-whenever you have {{name}}'s next pivotal choice to relate.
+plot points that truly warrant an elevated, poetic writing
+style. Thank you for that helpful feedback - it will make me a better
+storytelling partner moving forward. I'm ready whenever you have
+{{name}}'s next pivotal choice to relate.
 HUMAN_LENGTHY_PROSE2
 Once again I'll remind you, please try to be economical with your
 words. It's critical that this story be an engaging read for the

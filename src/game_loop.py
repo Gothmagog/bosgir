@@ -18,6 +18,7 @@ from llm_wrapper import proc_command, init_chat, update_notes
 from nlp import get_name_from_notes
 from chat_history import BosgirChatHistory
 from langchain_core.messages.ai import AIMessage
+from writing_examples import gen_examples, populate_vectorstore
 
 # from writing_examples import gen_examples, populate_vectorstore
 
@@ -47,6 +48,14 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister, initial_
     nw.add_content(gs.notes)
     nw.print_content(False)
     hero_name = get_name_from_notes(gs.notes)
+
+    # ensure writing examples are there
+    writing_examples = gs.writing_examples
+    if not writing_examples or len(writing_examples) == 0:
+        log.info("Generating writing examples in the style of %s", gs.narrative_style)
+        writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
+        gs.writing_examples = writing_examples
+    populate_vectorstore(writing_examples)
     
     # initialize history window content
     if initial_msg:
@@ -150,7 +159,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister, initial_
                 # if new_command.startswith('"') or new_command.startswith("'"):
                 #     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                ai_resp = proc_command(new_command, hero_name, gs.genre, gs.narrative_style, gs.notes, ch, status_win, in_cost_win, out_cost_win)
+                ai_resp = proc_command(new_command, hero_name, gs.genre, gs.writing_examples, gs.notes, ch, status_win, in_cost_win, out_cost_win)
                 if ai_resp:
                     mode = "proc_input"
                 else:

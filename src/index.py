@@ -51,11 +51,12 @@ def new_game():
     s.clear()
     s.refresh()
 
-    # get narrative style
+    # get genre
     tb, tb_win = textbox(s, 1, YPos.TOP, "What genre should the story be?", True)
     tb_win.addstr(0, 0, "tongue-in-cheek fantasy adventure")
     tb_win.noutrefresh()
     genre = normalize_newlines_str(tb.edit(), 1)
+    log.info("Genre: %s", genre)
     curses.doupdate()
     s.clear()
     s.refresh()
@@ -65,6 +66,7 @@ def new_game():
     tb_win.addstr(0, 0, "Old-school Sierra adventure games")
     tb_win.noutrefresh()
     narrative_style = normalize_newlines_str(tb.edit(), 1)
+    log.info("Narrative style: %s", narrative_style)
     curses.doupdate()
     s.clear()
     s.refresh()
@@ -78,7 +80,7 @@ def new_game():
         notes = f.read()
 
     # load game state obj
-    game_state = GameState(history=[], notes=notes, genre=genre, narrative_style=narrative_style)
+    game_state = GameState(history=[], notes=notes, genre=genre, narrative_style=narrative_style, writing_examples=[])
     gs_persist = GameStatePersister(filename)
     
     return continue_(background)
@@ -90,7 +92,7 @@ def load_game():
     filename = file_name_entry(YPos.TOP, 0, True)
     gs_persist = GameStatePersister(filename)
     if not game_state:
-        game_state = GameState(history=None, notes=None, genre=None, narrative_style=None)
+        game_state = GameState(history=None, notes=None, genre=None, narrative_style=None, writing_examples=None)
     gs_persist.load(game_state)
     continue_()
     

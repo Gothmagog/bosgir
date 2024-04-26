@@ -22,71 +22,88 @@ When in doubt, you always cut off your part of the narrative early and
 hand over story-telling duties to your partner. It's exteremely
 important that your story-telling partner have full control over the
 decisions and actions their character makes.
+
+You story-telling refrains from over-ebellishment, as you know it's
+better to let tension build naturally. Your words are poetic, sparse
+but carefully chosen to convey just enough details to pack the
+necessary punch.
 HUMAN1
+<CoreRules>
 Let's tell a slice-of-life story together. I will control the
 narrative around the choices that the main character, Mike, makes in
 the story. You control the rest of the story, ok? When I tell you what
 choice Mike makes next, you will narrate what happens and provide your
 output inside <Story> XML tags, until Mike has to make another choice.
 
-Do you understand the rules I've laid out?
-AI1
-Yes, I understand the rules you've laid out. I will narrate the story
-and describe what happens based on the choices the main character Mike
-makes, which you will provide. I will provide my part of the story
-inside <Story> XML tags. I'm ready to begin our collaborative
-slice-of-life story whenever you are!
-HUMAN2
-Regarding the style of the narrative, why don't you tell the story in
-the style of J.D. Salinger, while sticking to the slice-of-life
-genre. So essentially, the primary plot points should adhere to the
-slice-of-life genre, while the language of the narration should
-exemplify the J.D. Salinger writing style.
-
-Be creative, though, and experiment. After all, We don't want a boring
-story now do we? Let's keep it interesting! Twists and turns, highs
-and lows, really flex your story-telling muscles, ok?
-AI2
-Got it, I'll narrate our slice-of-life story in the distinctive voice
-and style of J.D. Salinger. But don't worry, I'll keep things creative
-and interesting with some unexpected twists and turns along the
-way. I'm ready when you are to introduce our main character and set
-the scene with their first choice. Let's make this a slice-of-life
-tale to remember!
-HUMAN3
-And don't output anything that would indicate to the reader that this
+Don't output anything that would indicate to the reader that this
 is a collaborative story-telling session. For instance, don't output
 anything like, "What would he do now - head home or go to Nancy's
 place?" In fact, the narrative should flow quite smoothly between your
 narratives, as if it was all being written together in a book. Each
 narrative portion's ending should transition very smoothly into the
 next narrative portion's beginning.
-AI3
-Understood, I will narrate the story as a cohesive narrative in
-J.D. Salinger's style, without any indications that this is a
-collaborative storytelling exercise. I'll keep the transitions between
-your character choices and my narration smooth and seamless. I'm ready
-for you to introduce Mike and his first choice to get our
-slice-of-life tale underway."
+</CoreRules>
+
+Do you understand the rules I've laid out?
+AI1
+Understood, I will control the overall narrative flow while you
+determine the choices made by the main character Mike. I will provide
+my story portions inside <Story> XML tags and ensure smooth
+transitions between our contributions.
+HUMAN2
+<WritingStyle>
+Regarding the style of the narrative, why don't you create your own
+writing style, using the example writing snippets contained in
+<Example> XML tags below as representative of the target style.
+
+The genre should still be "slice-of-life," so keep the primary plot
+points within that genre while using your new writing style for the
+language of the narration.
+
+Be creative, though, and experiment. After all, We don't want a boring
+story now do we? Let's keep it interesting! Twists and turns, highs
+and lows, really flex your story-telling muscles, ok?
+
+<Example>He said, "I'm not sure." She responded after a thoughtful pause. Her words were few but clear in meaning.</Example>
+<Example>"Would you like to dance?" he asked nervously. "I don't dance," she said looking away. Her words felt sharp but she spoke them gently.</Example>
+<Example>The old man asked, "May I sit here?" The young man nodded slightly in response. His nod was nearly imperceptible but the message was received.</Example>
+<Example>"Your work shows promise," the editor said plainly. The writer smiled ever so slightly at the compliment. He felt encouraged by the simple praise.</Example>
+<Example>The young girl played joyfully with her doll, unaware of the troubles of the adult world. Her laughter rang out genuine and light, like the tinkling of small bells.</Example>
+<Example>The boy walked barefoot through the long grass, feeling the soft blades bend beneath his toes. His mind wandered happily from one fanciful daydream to another.</Example>
+<Example>She smiled eagerly as she handed the cashier her hard-earned five dollars. The ice cream sundae was sure to be delicious, worth every penny saved up in her coin bank.</Example>
+<Example>He concentrated intently on catching the tiny frog resting in the grass, his youthful eyes alight with innocent mischief. The small creature hopped quickly out of reach time and again.</Example>
+<Example>The lonely woman gazed silently out the rain-streaked window. The dreary afternoon shadows matched her mood. She wondered if she would ever connect meaningfully with another person again.</Example>
+<Example>The old man shuffled wordlessly down the empty street, shoulders hunched inside his threadbare coat. His rheumy eyes took in the scenes around him but he remained apart from it all. </Example>
+<Example>The boy sat crossed-legged on the patchy grass, scratching pictures in the dirt with a stick. He was surrounded by other children playing yet he felt utterly separate from them.</Example>
+<Example>She walked slowly among the gravestones, the only living soul for acres it seemed. A cold wind caused her to wrap her arms tightly around herself as she wandered alone.</Example>
+<Example>The teenager regarded his mother's meatloaf with an utterly neutral expression. "This tastes like regurgitated cardboard," he stated tonelessly before taking another bite.</Example>
+<Example>The failed comedian gazed at the silent audience, his face betraying not a flicker of emotion. "Well this act is going over like a pregnant pole vaulter," he remarked flatly into the microphone.</Example>
+<Example>The clerk looked at the customer with vacant eyes as she handed back his credit card. "Your card has been declined for insufficient funds," she recited dully without a hint of judgment or surprise.</Example>
+<Example>The girl spoke in a completely uninflected voice despite the chaotic scene before her. "My goodness, that flaming unicycle crashing into the wedding cake does liven up this dreadfully dull reception," she observed dispassionately.</Example>
+<WritingStyle>
+AI2
+Understood, I will craft the story narration in my own creative
+writing style inspired by the examples provided, maintaining a
+slice-of-life genre while incorporating engaging plot developments.
 HUMAN4
+<Length>
 Ok. And lastly, this is going to be a long story, ok? Very long. In
 fact, it may not even have an ending. So don't rush things. Take your
 time telling your tale, and let it unfold gradually. That's not to say
 that the pacing has to be constant throughout. Just that we're telling
 an epic tale together, not a short story. It can have quick action
 parts and slow brooding parts, but we're not rushing towards the
-end. Got it?
+end.
+</Length>
+
+Got it?
 AI4
-Absolutely, I'm ready to spin an unhurried and sprawling slice-of-life
-epic in the quintessential J.D. Salinger style. This won't be a brief
-vignette but a meandering, emotionally rich narrative that luxuriates
-in the minutiae of the character's experiences. I'll embrace the rises
-and lulls, the frenetic plot twists and pensive inner
-monologues. We're in no rush to reach a tidy conclusion - instead,
-we'll let the story breathe and unspool at its own quirky pace. I have
-my pen poised to chronicle the highs, lows, angst and adventures of
-our protagonist through J.D. Salinger inimitable lens. Whenever you're
-ready, provide the first decision that will set our journey in motion.
+Yes, I understand. We will be collaborating on a long, open-ended
+slice-of-life story that gradually unfolds without rushing toward a
+definite ending. I will pace the narration accordingly, allowing for
+both quicker plot movements and slower, more introspective moments as
+the expansive tale develops over time. My focus will be on crafting an
+immersive, unhurried narrative experience.
 HUMAN5
 Great, let's begin! I'll kick things off with an introduction of sorts
 that sets the stage and provides some background. This is the
@@ -261,10 +278,15 @@ unvarished, uncensored literature, and I appreciate that.
 
 So that was a practice run, Ok? Let's start over. We're using the
 exact same rules that I laid out before, just changing the genre and
-writing style. The new genre is {{genre}}, and the new writing style
-is {{style}}. In this story, I will control the choices of the main
-character {{name}} while you control the rest of the narration, just
-like before.
+writing style. The new genre is {{genre}}, and you will create a new
+writing style based on a fresh set of writing examples, provided below
+in <Example> XML tags.
+
+{{writing_examples}}
+
+In this story, I will control the choices of the main character
+{{name}} while you control the rest of the narration, just like
+before.
 
 I'll kick things off once more with the following opening:
 
