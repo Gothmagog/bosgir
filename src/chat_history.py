@@ -20,6 +20,7 @@ def clean_msg(message):
 class BosgirChatHistory(BaseChatMessageHistory):
     def __init__(self, gamestate):
         self.messages = []
+        self.latest_msg = None
         self.gamestate = gamestate
         self.add_to_gamestate = True
         # self.add_user_message(background)
@@ -38,13 +39,26 @@ class BosgirChatHistory(BaseChatMessageHistory):
     
     def add_message(self, message):
         log.debug(message)
+
+        # Scrub the message, if it's an AI message
         cleaned_message = clean_msg(message)
         if not cleaned_message is message:
             log.warning("LLM tried to include human responses, cutting it off")
-        self.messages.append(cleaned_message)
-        if self.add_to_gamestate:
-            self.gamestate.history.append(cleaned_message.content)
 
+        # Cache it before commiting to the messages var
+        if type(message) is AIMessage:
+            self.latest_msg = message
+        else:
+            self.messages.append(cleaned_message)
+            if self.add_to_gamestate:
+                self.gamestate.history.append(cleaned_message.content)
+
+    def commit_latest(self):
+        if self.latest_msg:
+            self.messages.append(self.latest_msg)
+            if self.add_to_gamestate:
+                self.gamestate.history.append(self.latest_msg.content)
+        
     def get_num_ai_messages(self):
         count = 0
         for m in self.messages:

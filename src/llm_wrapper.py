@@ -9,6 +9,10 @@ from langchain_community.llms import Bedrock
 from langchain_community.chat_models import BedrockChat
 from langchain_community.embeddings import BedrockEmbeddings
 from langchain.schema.runnable.base import RunnableLambda
+from langchain_core.output_parsers import (
+    XMLOutputParser,
+    StrOutputParser
+)
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
@@ -38,6 +42,7 @@ main_log = logging.getLogger("main")
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 pconfig_init = PromptsConfig("prompts_priming.txt")
 pconfig_nudges = PromptsConfig("prompts_nudging.txt")
+pconfig_rewrite = PromptsConfig("prompts_rewrite.txt")
 max_output_tokens = 1500
 src_dir = Path(__file__).parent
 
@@ -51,6 +56,7 @@ except botocore.exceptions.NoCredentialsError as e:
 
 embeddings = BedrockEmbeddings()
 
+# Primary model
 model_id="anthropic.claude-3-sonnet-20240229-v1:0"
 main_llm = BedrockChat(
     model_id=model_id,
@@ -64,8 +70,20 @@ main_llm = BedrockChat(
     metadata={"name": "Story Generation", "model_id": model_id}
 )
 
+# Rewrite model
+model_id="anthropic.claude-3-haiku-20240307-v1:0"
+rewrite_llm = BedrockChat(
+    model_id=model_id,
+    model_kwargs={
+        "max_tokens": 2000,
+        "temperature": 1,
+        "system": pconfig_init.get("SYSTEM", True)
+    },
+    streaming=True,
+    metadata={"name": "Rewrite", "model_id": model_id}
+)
+
 with_message_history = None
-nudged_length = False
 
 # Update notes prompt
 # model_id = "anthropic.claude-3-haiku-20240307-v1:0"
@@ -107,12 +125,12 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
         response = match.group(1)
     return response
 
-def get_new_runnable(chat_hist, hero_name, genre, writing_examples):
-    template_vars = {"name": hero_name, "genre": genre, "writing_examples": writing_examples}
+def get_new_runnable(chat_hist, hero_name, genre):
+    template_vars = {"name": hero_name, "genre": genre}
     p = ChatPromptTemplate.from_messages([
         MessagesPlaceholder(variable_name="history"),
-        HumanMessagePromptTemplate.from_template(r(pconfig_nudges.get("HUMAN_RULES", True), template_vars)),
-        AIMessagePromptTemplate.from_template(r(pconfig_nudges.get("AI_RULES"), template_vars)),
+        # HumanMessagePromptTemplate.from_template(r(pconfig_nudges.get("HUMAN_RULES", True), template_vars)),
+        # AIMessagePromptTemplate.from_template(r(pconfig_nudges.get("AI_RULES"), template_vars)),
         HumanMessagePromptTemplate.from_template("{input}")
     ])
     fix_prompt = RunnableLambda(lambda r: r.to_string().replace("AI:", "Assistant:"))
@@ -127,46 +145,28 @@ def get_new_runnable(chat_hist, hero_name, genre, writing_examples):
         history_messages_key="history"
     )
 
-def init_chat(hero_name, genre, writing_examples, background, chat_hist, status_win, in_tok_win, out_tok_win):
+def init_chat(hero_name, genre, background, chat_hist, status_win, in_tok_win, out_tok_win):
     global with_message_history
 
+    template_vars = {"name": hero_name, "genre": genre}
     log.info("Initializing LLM chat session")
     chat_hist.add_messages([
-        HumanMessage(content=pconfig_init.get("HUMAN1", True)),
-        AIMessage(content=pconfig_init.get("AI1")),
-        HumanMessage(content=pconfig_init.get("HUMAN2")),
-        AIMessage(content=pconfig_init.get("AI2")),
-        # HumanMessage(content=pconfig_init.get("HUMAN3")),
-        # AIMessage(content=pconfig_init.get("AI3")),
-        HumanMessage(content=pconfig_init.get("HUMAN4")),
-        AIMessage(content=pconfig_init.get("AI4")),
-        HumanMessage(content=pconfig_init.get("HUMAN5")),
-        AIMessage(content=pconfig_init.get("AI5")),
-        HumanMessage(content=pconfig_init.get("HUMAN6")),
-        AIMessage(content=pconfig_init.get("AI6")),
-        HumanMessage(content=pconfig_init.get("HUMAN7")),
-        AIMessage(content=pconfig_init.get("AI7")),
-        HumanMessage(content=pconfig_init.get("HUMAN8")),
-        AIMessage(content=pconfig_init.get("AI8")),
-        HumanMessage(content=pconfig_init.get("HUMAN9")),
-        AIMessage(content=pconfig_init.get("AI9")),
-        HumanMessage(content=pconfig_init.get("HUMAN10")),
-        AIMessage(content=pconfig_init.get("AI10")),
-        HumanMessage(content=pconfig_init.get("HUMAN11")),
-        AIMessage(content=pconfig_init.get("AI11")),
+        HumanMessage(content=r(pconfig_init.get("HUMAN1", True), template_vars)),
+        AIMessage(content=r(pconfig_init.get("AI1"), template_vars))
     ])
+    chat_hist.commit_latest()
     num_priming_msgs = len(chat_hist.messages)
-    with_message_history = get_new_runnable(chat_hist, hero_name, genre, writing_examples)
+    with_message_history = get_new_runnable(chat_hist, hero_name, genre)
 
     # Invoke main chat
-    initial_hu_msg = r(pconfig_init.get('HUMAN12'), {"genre": genre, "writing_examples": writing_examples, "background": background, "name": hero_name})
-    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": initial_hu_msg}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-    log.debug(resp)
+    initial_hu_msg = r(pconfig_init.get('HUMAN2'), {"background": background})
+    resp = lin_backoff(with_message_history.invoke, status_win, {"input": initial_hu_msg}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    resp = rewrite(resp, chat_hist, status_win, in_tok_win, out_tok_win)
 
     return clean_msg(resp)
     
-def proc_command(command, hero_name, genre, writing_examples, notes, chat_hist, status_win, in_tok_win, out_tok_win):
-    global with_message_history, nudged_length
+def proc_command(command, hero_name, genre, notes, chat_hist, status_win, in_tok_win, out_tok_win):
+    global with_message_history
 #     input = r("""/Here are some story-telling notes that should be top-of-mind for you:
 # {{notes}}
 
@@ -176,41 +176,53 @@ def proc_command(command, hero_name, genre, writing_examples, notes, chat_hist, 
 # """, { "name": hero_name, "notes": notes, "command": command})
     input = command
     if not with_message_history:
-        with_message_history = get_new_runnable(chat_hist, hero_name, genre, writing_examples)
-    num_ai_msgs = chat_hist.get_num_ai_messages() - 10
+        with_message_history = get_new_runnable(chat_hist, hero_name, genre)
+    num_ai_msgs = chat_hist.get_num_ai_messages() - 1
     if num_ai_msgs > 1 and num_ai_msgs % 10 == 0:
         # it's time to remind the LLM they need to be thinking about a
         # plot and character archs
         status_win.addstr(0, 0, "Poking plot... ")
         status_win.refresh()
         curses.doupdate()
-        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_PLOT1", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        resp = lin_backoff(with_message_history.invoke, status_win, {"input": pconfig_nudges.get("HUMAN_PLOT1", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         log.debug(resp.content)
-        resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_PLOT2")}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+        resp = lin_backoff(with_message_history.invoke, status_win, {"input": pconfig_nudges.get("HUMAN_PLOT2")}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         log.debug(resp.content)
         if "<Story>" in resp.content:
             log.debug("LLM responded to plot nudge with story...")
+            resp = rewrite(resp, chat_hist, status_win, in_tok_win, out_tok_win)
             return resp
     
     status_win.addstr(0, 0, "Invoking API...")
     status_win.refresh()
     curses.doupdate()
-    resp = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": input}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    resp = lin_backoff(with_message_history.invoke, status_win, {"input": input}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
     # log.debug(resp)
+    resp = rewrite(resp, chat_hist, status_win, in_tok_win, out_tok_win)
 
-    # Post-response nudges
-    if num_ai_msgs > 1 and num_ai_msgs < 10:
-        num_paragraphs = get_num_paragraphs(resp.content)
-        if num_paragraphs > 3 and not nudged_length:
-            log.info("Nudged LLM on length, first time")
-            chat_hist.add_user_message(r(pconfig_nudges.get("HUMAN_LENGTHY_PROSE1", True), {"name": hero_name}))
-            chat_hist.add_ai_message(r(pconfig_nudges.get("AI_LENGTHY_PROSE1"), {"name": hero_name, "genre": genre}))
-            nudged_length = True
-        elif num_paragraphs > 3:
-            status_win.addstr(0, 0, "Nudging length ")
-            status_win.refresh()
-            curses.doupdate()
-            log.info("Nudged LLM on length, again")
-            resp_nudge = lin_backoff(with_message_history.invoke, status_win, {"name": hero_name, "genre": genre, "input": pconfig_nudges.get("HUMAN_LENGTHY_PROSE2", True)}, config={"configurable": {"session_id": "abc"}, "callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
-            log.debug(resp_nudge)
     return resp
+
+def rewrite(ai_msg, chat_hist, status_win, in_tok_win, out_tok_win):
+    p = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(pconfig_rewrite.get("HUMAN1", True))])
+    parser = XMLOutputParser(tags=["Passage"])
+    parser_fallback = StrOutputParser()
+    callable_ = p | rewrite_llm | parser.with_fallbacks([parser_fallback])
+    resp = lin_backoff(callable_.invoke, status_win, {"passage": ai_msg.content}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
+    if type(resp) is dict and "Passage" in resp:
+        ret = AIMessage(content=resp["Passage"])
+    elif type(resp) is AIMessage:
+        log.debug("rewrite: fallback #1")
+        ret = resp
+    elif type(resp) is str:
+        log.debug("rewrite: fallback #2")
+        if "<Passage>" in resp:
+            resp = resp[resp.find("<Passage>")+9:resp.find("</Passage>")]
+        ret = AIMessage(content=resp)
+    else:
+        raise Exception(f"Unknown type returned from LLM call to rewrite: {type(resp)}: {resp}")
+    log.debug("rewrite: before - %s", ai_msg.content)
+    log.debug("rewrite: after = %s", ret.content)
+    chat_hist.add_message(ret)
+    chat_hist.commit_latest()
+
+    return ret

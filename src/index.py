@@ -80,7 +80,7 @@ def new_game():
         notes = f.read()
 
     # load game state obj
-    game_state = GameState(history=[], notes=notes, genre=genre, narrative_style=narrative_style, writing_examples=[])
+    game_state = GameState(history=[], notes=notes, genre=genre, narrative_style=narrative_style)
     gs_persist = GameStatePersister(filename)
     
     return continue_(background)
@@ -92,7 +92,7 @@ def load_game():
     filename = file_name_entry(YPos.TOP, 0, True)
     gs_persist = GameStatePersister(filename)
     if not game_state:
-        game_state = GameState(history=None, notes=None, genre=None, narrative_style=None, writing_examples=None)
+        game_state = GameState(history=None, notes=None, genre=None, narrative_style=None)
     gs_persist.load(game_state)
     continue_()
     

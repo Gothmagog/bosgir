@@ -49,20 +49,20 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister, initial_
     nw.print_content(False)
     hero_name = get_name_from_notes(gs.notes)
 
-    # ensure writing examples are there
-    writing_examples = gs.writing_examples
-    if not writing_examples or len(writing_examples) == 0:
-        log.info("Generating writing examples in the style of %s", gs.narrative_style)
-        writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
-        gs.writing_examples = writing_examples
-    populate_vectorstore(writing_examples)
+    # # ensure writing examples are there
+    # writing_examples = gs.writing_examples
+    # if not writing_examples or len(writing_examples) == 0:
+    #     log.info("Generating writing examples in the style of %s", gs.narrative_style)
+    #     writing_examples = gen_examples(gs.narrative_style, status_win, in_cost_win, out_cost_win)
+    #     gs.writing_examples = writing_examples
+    # populate_vectorstore(writing_examples)
     
     # initialize history window content
     if initial_msg:
         hw.add_content(initial_msg, 2)
         hw.print_content(True)
         curses.doupdate()
-        ai_resp = init_chat(hero_name, gs.genre, gs.narrative_style, initial_msg, ch, status_win, in_cost_win, out_cost_win)
+        ai_resp = init_chat(hero_name, gs.genre, initial_msg, ch, status_win, in_cost_win, out_cost_win)
         if type(ai_resp) is AIMessage:
             txt_resp = ai_resp.content
             hw.add_content(txt_resp, 2)
@@ -159,7 +159,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister, initial_
                 # if new_command.startswith('"') or new_command.startswith("'"):
                 #     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                ai_resp = proc_command(new_command, hero_name, gs.genre, gs.writing_examples, gs.notes, ch, status_win, in_cost_win, out_cost_win)
+                ai_resp = proc_command(new_command, hero_name, gs.genre, gs.notes, ch, status_win, in_cost_win, out_cost_win)
                 if ai_resp:
                     mode = "proc_input"
                 else:
