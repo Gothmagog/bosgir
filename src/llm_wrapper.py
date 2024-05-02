@@ -85,7 +85,7 @@ with open(src_dir / "../data/prompt_player_action.txt", "r") as f:
 max_ttl_toks = 2048
 pred_parameters = {
     "max_new_tokens": 500,
-    "num_return_sequences": 1,
+    "num_return_sequences": 4,
     "top_k": 250,
     "top_p": 0.8,
     "do_sample": True,
@@ -168,7 +168,6 @@ def proc_command(command, hero_name, notes, history, narrative, status_win, in_t
         # Generate story from LLM, 1st generate the player action text
         log.info("***** Invoking 1st chain *****")
         main_log.info("***** Invoking 1st chain *****")
-        # response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "narrative": narrative, "name": hero_name, "history": get_last_n_toks(history, 50)}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         response1 = lin_backoff(chain1.invoke, status_win, {"do": command, "narrative": narrative, "name": hero_name}, config={"callbacks": [CursesCallback(status_win, in_tok_win, out_tok_win)]})
         num_toks_player_action = len(tokenize(response1))
 
@@ -180,7 +179,7 @@ def proc_command(command, hero_name, notes, history, narrative, status_win, in_t
         payload = {"inputs": f"{history_snip}\n\n{response1}", "parameters": pred_parameters}
         log.debug(payload)
         response2 = lin_backoff(predictor.predict, status_win, payload)
-        log.debug(response2["generated_text"])
+        log.debug(response2)
 
         # Now get dialog quotes from the snippet, and do speaker
         # attribution (if we have dialog)
@@ -378,4 +377,4 @@ def set_status_win(status_win, text):
 
 def store_command(command):
     with (src_dir / "../data/unknowns.txt").open("w") as f:
-        f.writeline(command)
+        f.writelines(command)
