@@ -2,9 +2,9 @@ from nltk import (
     word_tokenize,
     pos_tag
 )
-from text_utils import get_last_paragraphs
+from text_processing.text_utils import get_last_paragraphs
 
-num_paragraphs_unaltered = 12
+num_paragraphs_unaltered = 6
 
 def do_compression(text):
     abbreviated = ""

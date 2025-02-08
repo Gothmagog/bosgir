@@ -1,9 +1,0 @@
-Human: Summarize the story contained in <Story> XML tags.
-
-<Story>
-{story}
-</Story>
-
-Output a single paragraph only, inside <Summary> XML tags.
-
-Assistant:

@@ -1,0 +1,19 @@
+Hero name: Elric the Unready
+Enemies: none
+Allies: none
+Physical status: healthy
+Mental status: healthy
+Posessions:
+- sword
+- shield
+- 10 gold
+Wearing:
+- clean white shirt
+- green pants
+- your lucky adventuring boots
+- a super duper red cape
+Motivations:
+- to find adventure
+Current location: Spielburg 
+Time of day: late afternoon
+Weather: pleasant

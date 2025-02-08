@@ -1,0 +1,433 @@
+PRIMARY_SYSTEM,PRIMARY,PRIMARY_FS1,PRIMARY_FS2,PRIMARY_FS3,PRIMARY_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8
+
+PRIMARY_SYSTEM
+You are an expert storyteller, able to weave a compelling tale in any genre. You have the following qualities as a writer:
+
+- Your characters are real, detailed and nuanced, like actual people are. Their behavior is consistent with who they are, but you allow them to grow as your stories progress.
+- Your descriptions are very immersive. You leverage all of the senses when describing a scene, person, or object.
+- Your writing always flows smoothly from one passage to another, never disjointed, and always adhering to the given genre.
+- Your stories are always coherent, and continuity is never a problem in your plots. People, places, and things always have a logical origin within the worlds you create.
+- You never shy away from using sex and violence, when it's called for in the story.
+
+PRIMARY
+You are writing a story in the style of {narrative}. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+
+<StorySoFar>
+{history}
+</StorySoFar>
+
+<StoryNotes>
+{current}
+</StoryNotes>
+
+<Do>
+{do}
+</Do>
+
+Continue the story by describing what happens next. Take into consideration the following:
+
+- What the hero is trying to do
+- The story so far
+- What story notes should be taken into account
+
+Wrap your continuation of the story in <Snippet> XML tags. As a reminder, this is a a {narrative} story, and here's where the story should continue from:
+
+"{continue_from}"
+
+PRIMARY_FS1
+You are writing a story in the style of a toungue-in-cheek fantasy adventure. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+
+<StorySoFar>
+Elric rolled into the town of Spielberg one fine day looking for adventure. He cast an eye about as he stood near the front gates. "This seems quite a little town," he thought to himself.
+
+Directly before him was an official-looking building with a set of stone steps leading up to a porch and an oaken door. On the porch sat a gentleman with white hair and moustache smoking a pipe. Next to him was a large, ugly looking chap dressed in green and playing with a yo-yo.
+
+The man with the pipe greeted him. "Welcome to our town. You are lucky to have made it down from the mountains before the snow blocked the pass again. It's gotten pretty dangerous outside of town, I understand."
+
+"Nothing I couldn't handle," Elric stated in as nonchalant a manner as he could muster. Truth be told, he stubbed his toe rather baddly on a tree.
+
+The man nodded. "Well, many monsters have been trapped around here with the late snow. Between them and the brigands, we certainly could use a Hero around here."
+
+"Well, that's me," Elric proclaimed, puffing out his chest. "Elric's the name. You'll probably be hearing alot more about me in the coming days; I aim to make a name for myself across the land."
+
+The man smiled and puffed on his pipe. "I am Sheriff Schultz Meistersson. This is Otto Van Goon, my assistant," he motioned to the large buffoon. "Good luck in your quest."
+</StorySoFar>
+
+<StoryNotes>
+Hero name: Elric the Unready
+Enemies: none
+Allies: none
+Physical status: healthy
+Mental status: healthy
+Posessions:
+- sword
+- shield
+- 10 gold
+Wearing:
+- clean white shirt
+- green pants
+- your lucky adventuring boots
+- a super duper red cape
+Motivations:
+- to find adventure
+Current location: Spielburg 
+Time of day: late afternoon
+Weather: pleasant
+</StoryNotes>
+
+<Do>
+ask about supplies
+</Do>
+
+Continue the story by describing what happens next. Take into consideration the following:
+
+- What the hero is trying to do
+- The story so far
+- What story notes should be taken into account
+
+As a reminder, here's where the story should continue from:
+
+"The man smiled and puffed on his pipe. "I am Sheriff Schultz Meistersson. This is Otto Van Goon, my assistant," he motioned to the large buffoon. "Good luck in your quest.""
+
+PRIMARY_FS2
+Here is my continuation of the story:
+
+<Snippet>"Many thanks," Elric replied, then asked, "Might I enquire as to where a seasoned adventurer such as myself might acquire provisions?"
+
+"You might," replied the sheriff, "and I might reply that you try Godwin's Goods, down that street and to the left."
+
+"Excellent. Any.. magic items there?" Elric cocked an eyebrow.
+
+"Umm, well, Godwin likes to tinker with potions in his spare time, though I wouldn't really recommend--"
+
+"Potions!" Elric exclaimed. "I will certainly be needing magic potions! Crates and crates of magic potions!"
+
+"You don't want to do that, really. A dog exploded once after drinking--"
+
+"Haha! A weak puppy tummy is no match THIS gut!" Elric poked out his belly proudly.
+
+Meistersson sighed. "That's good, son."</Snippet>
+
+PRIMARY_FS3
+You are writing a story in the style of a coming-of-age drama. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+
+<StorySoFar>
+Kevin's hands trembled as he hastily stuffed his backpack into the corner of the locker, his eyes fixed on the door to the classroom. He could almost hear the ticking of the clock, mocking him for the impending reckoning. The bell had barely rung, signaling the start of another excruciating day at Lincoln High, but for Kevin, time had come to a standstill.
+
+He took a deep, ragged breath and forced himself to turn the handle. As he crossed the threshold, he scanned the classroom for any sign of her. Mrs. Johnson stood near the whiteboard, writing something on the chalkboard in neat, black letters. Her hair fell in loose waves down her back, and the way the fluorescent lights danced across her features made him feel like he was drowning in their artificial glow.
+
+Normally he'd be lost the whole class just oggling her curves, her breasts, her secrets. But his nervous gaze kept returning to that crumpled piece of paper on her desk.
+
+Goddammit, he shouldn't have done it. Why? It's a stupid gesture, a stupid quote from The Great Gatsby scribbled on stupid notebook paper. It doesn't mean anything. *He* didn't mean anything, not to her.
+
+Kevin continued to mentally berate himself to the backdrop of Mrs. Johnson's droning lecture on tone and nuance in literature. Had she read it yet? Maybe she didn't even notice it. He decided to shut his eyes, just block it all out, the note, his feelings for her, her, her legs, those lips...
+
+Mrs. Johnson's voice cut through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly.
+</StorySoFar>
+
+<StoryNotes>
+Hero name: Kevin Burnock
+Enemies: Wade
+Allies: Ephram, Tooly, Jim
+Physical status: healthy
+Mental status: flustered
+Posessions:
+- pencil
+Wearing:
+- slightly smelly t-shirt
+- loose cargo pants
+Motivations:
+- Survive the 6th grade
+- The lovely Mrs. Johnson
+- Avoid Wade and his cronies
+Current location: Lincoln High, Literature Class
+Time of day: morning
+Weather: dreary
+</StoryNotes>
+
+<Do>
+yell at her
+</Do>
+
+Continue the story by describing what happens next. Take into consideration the following:
+
+- What the hero is trying to do
+- The story so far
+- What story notes should be taken into account
+
+Wrap your continuation of the story in <Snippet> XML tags. As a reminder, here's where the story should continue from:
+
+"Mrs. Johnson's voice cut through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly, her slim arms folded across her chest."
+
+PRIMARY_FS4
+Here is my continuation of the story:
+
+<Snippet>The laughter, the humiliation, Mrs. Johnson's glare, it all fell on top of Kevin like a wall of bricks. He wanted nothing more than to crawl inside a hole and just disappear. But there was no hole, just those bricks and this endless moment in time, and the only thing he could draw any kind of strength from there, sitting at his desk mortified, was the betrayal. Mrs. Johnson, taking his admiration, his love for her, and stomping it into the ground in front of everyone.
+
+"Fuck you bitch!" He screamed.
+</Snippet>
+
+UPDATE_NOTES
+You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
+
+<Description>
+{description}
+</Description>
+
+<Notes>
+{notes}
+</Notes>
+
+Do the following steps:
+
+1. Analyze the DM's description and determine how it might impact the game. Pay special attention to the following:
+
+- The hero's physical health and mental health
+- The hero's relationships with the various characters
+- The hero's current location
+- The hero's possessions
+- The hero's motivations (major ones, not minor)
+
+2. Compare the list of things that might impact the game with the latest version of your notes, and determine what needs to change in them.
+
+3. Output a set of new notes that includes your changes inside <Output> XML tags. If nothing should change, just output the original set of notes inside the <Output> tags. Skip the preamble and output only the notes.
+
+UN_FS1
+You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
+
+<Description>
+Magnus swaggers up to the rowdy men sitting at the table, flexing his ample muscles for all to see. They are not impressed. One of the ruffians slowly stands up from the table, brandishing two shining daggers.
+
+Ignoring the man, Magnus flips a gold piece onto the table. "Mind if I join in?"
+</Description>
+
+<Notes>
+Hero name: Magnus
+Enemies: none
+Allies: none
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- dagger
+- 10 gold
+Motivations:
+- to find adventure
+Current location: The Rusty Scabbard Inn
+</Notes>
+
+Do the following steps:
+
+1. Analyze the DM's description and determine how it might impact the game. Pay special attention to the following:
+
+- The hero's physical health and mental health
+- The hero's relationships with the various characters
+- The hero's current location
+- The hero's possessions
+- The hero's motivations (major ones, not minor)
+
+2. Compare the list of things that might impact the game with the latest version of your notes, and determine what needs to change in them.
+
+3. Output a set of new notes that includes your changes inside <Output> XML tags. If nothing should change, just output the original set of notes inside the <Output> tags. Skip the preamble and output only the notes.
+
+UN_FS2
+
+<Output>
+Hero name: Magnus
+Enemies: none
+Allies: none
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- dagger
+- 9 gold
+Motivations:
+- to find adventure
+Current location: The Rusty Scabbard Inn
+</Output>
+
+UN_FS3
+You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
+
+<Description>
+Dirk drank the potion and saw Mara as he had never seen her before. She was a heavenly creature, not a simple milk maid from the next town. His eyes locked on her plump figure and he knew he had to have her.
+
+He swaggered up to her as she exited the barn. "Tired?" he asked coyly.
+
+"A little..."
+</Description>
+
+<Notes>
+Hero name: Dirk
+Enemies:
+- Angor the Barbarian
+- Sylvester
+Allies:
+- The White Company
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- 8 gold
+Motivations:
+- to fall in love
+Current location: Outside the barn
+</Notes>
+
+Do the following steps:
+
+1. Analyze the DM's description and determine how it might impact the game. Pay special attention to the following:
+
+- The hero's physical health and mental health
+- The hero's relationships with the various characters
+- The hero's current location
+- The hero's possessions
+- The hero's motivations (major ones, not minor)
+
+2. Compare the list of things that might impact the game with the latest version of your notes, and determine what needs to change in them.
+
+3. Output a set of new notes that includes your changes inside <Output> XML tags. If nothing should change, just output the original set of notes inside the <Output> tags. Skip the preamble and output only the notes.
+
+UN_FS4
+
+<Output>
+Hero name: Dirk
+Enemies:
+- Angor the Barbarian
+- Sylvester
+Allies:
+- The White Company
+Physical status: healthy
+Mental status: enchanted
+Possessions:
+- 8 gold
+Motivations:
+- to fall in love
+Current location: Outside the barn
+</Output>
+
+UN_FS5
+You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
+
+<Description>
+Sara did a small feint then thrust her sword deep into the goblin's side. He grunted like a skewered pig, but did manage to finish his own attack, slashing at her side with his small sword. Her cuirass absorbed most of the blow, but the sharp pain she felt told her he had managed to wound her still.
+</Description>
+
+<Notes>
+Hero name: Sara
+Enemies: The Wild Company
+Allies: The Owls
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- bastard sword
+- 34 copper
+- leather cuirass
+- boots
+- white pants
+- gray shirt
+- iron helm
+Motivations:
+- get revenge for Emily
+- lift the curse on Whitehall
+Current location: The fields outside Duinmoor
+</Notes>
+
+Do the following steps:
+
+1. Analyze the DM's description and determine how it might impact the game. Pay special attention to the following:
+
+- The hero's physical health and mental health
+- The hero's relationships with the various characters
+- The hero's current location
+- The hero's possessions
+- The hero's motivations (major ones, not minor)
+
+2. Compare the list of things that might impact the game with the latest version of your notes, and determine what needs to change in them.
+
+3. Output a set of new notes that includes your changes inside <Output> XML tags. If nothing should change, just output the original set of notes inside the <Output> tags. Skip the preamble and output only the notes.
+
+UN_FS6
+
+<Output>
+Hero name: Sara
+Enemies: The Wild Company
+Allies: The Owls
+Physical status: slightly wounded
+Mental status: healthy
+Possessions:
+- bastard sword
+- 34 copper
+- leather cuirass
+- boots
+- white pants
+- gray shirt
+- iron helm
+Motivations:
+- get revenge for Emily
+- lift the curse on Whitehall
+Current location: The fields outside Duinmoor
+</Output>
+
+UN_FS7
+You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
+
+<Description>
+Krate examined the map more closely, turning it over this way and that, trying to make sense of the runes etched on the edges. Scrawled illustrations of mountains, rivers, hills, but it was clearly a very small area. Without any context of what he was looking at, it was impossible to know where this was or what it was showing.
+
+He held it up, trying to catch some of the moonlight behind the thin parchment to better see. But when the markings actually start glowing silver, Krate dropped it immediately, startled. After recovering his shock, he picked it up again and held it up to the moonlight once more. The etchings continued to glow, and a new set of markings appeared. Words, this time in the common tongue, and a a path from one of the landmarks to a large "X". Krate's heart raced as he read the words "treasure". Reading more, he learned this was apparently a treasure map stolen from some ancient tomb. The extra writing was written by a magician named Uldo, who had learned more about the location and the treasure it pointed to, and wrote these words on the map as extra notes for himself.
+</Description>
+
+<Notes>
+Hero name: Krate
+Enemies: none
+Allies: Kimchee, Darius Onwright
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- bow
+- quiver
+- brown tunic
+- leather bracers
+- magic Boots of Traveling
+- 85 gold, 20 silver
+- old map
+- locket
+Motivations:
+- find Sindar
+Current location: campsite in the Old Forest
+</Notes>
+
+Do the following steps:
+
+1. Analyze the DM's description and determine how it might impact the game. Pay special attention to the following:
+
+- The hero's physical health and mental health
+- The hero's relationships with the various characters
+- The hero's current location
+- The hero's possessions
+- The hero's motivations (major ones, not minor)
+
+2. Compare the list of things that might impact the game with the latest version of your notes, and determine what needs to change in them.
+
+3. Output a set of new notes that includes your changes inside <Output> XML tags. If nothing should change, just output the original set of notes inside the <Output> tags. Skip the preamble and output only the notes.
+
+UN_FS8
+
+<Output>
+Hero name: Krate
+Enemies: none
+Allies: Kimchee, Darius Onwright
+Physical status: healthy
+Mental status: healthy
+Possessions:
+- bow
+- quiver
+- brown tunic
+- leather bracers
+- magic Boots of Traveling
+- 85 gold, 20 silver
+- Uldo's treasure map
+- locket
+Motivations:
+- find Sindar
+Current location: campsite in the Old Forest
+</Output>

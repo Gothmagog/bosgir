@@ -1,8 +1,8 @@
-print("Importing spacy...")
 import spacy
+from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import logging
 from collections import defaultdict
-from nltk import tokenize
+from nltk import tokenize as tokenize_
 from spacy.matcher import Matcher
 from spacy import parts_of_speech as _pos
 from spacy.tokens.span import Span
@@ -11,13 +11,14 @@ from spacy.tokens import Doc
 from spacy.lang.en import English
 from spacy.training import Example
 from spacy.symbols import *
-from spacy_experimental.coref.coref_util import get_clusters_from_doc
 from pathlib import Path
 
 log = logging.getLogger("main")
 
-print("Loading coref model...")
-coref_nlp = spacy.load("en_coreference_web_trf")
+print("Loading tokenizer...")
+#tok_file = str(Path(__file__).parent / "../../data/tokenizer.json")
+#fast_tokenizer = PreTrainedTokenizerFast(tokenizer_file=tok_file)
+fast_tokenizer = AutoTokenizer.from_pretrained("chuanli11/Llama-3.2-3B-Instruct-uncensored")
 print("Loading core web model...")
 web_nlp = spacy.load("en_core_web_md", exclude=["ner"])
 print("Loading verb phrase matcher...")
@@ -78,54 +79,6 @@ quote_matcher = Matcher(web_nlp.vocab)
 quote_matcher.add("quotes", quote_pat, on_match=add_quote)
 sent_quote_matcher = Matcher(web_nlp.vocab)
 sent_quote_matcher.add("sent-quotes", sentence_quote_pat)
-
-def get_hero_action_sentences(text, hero_name):
-    ret = []
-    log.debug("Doing corefs...")
-    coref_doc = coref_nlp(text)
-    log.debug("Doing tokenization...")
-    tok_doc = web_nlp(text)
-    hero_refs = []
-    name_toks = tokenize.word_tokenize(hero_name)
-    log.debug("Name tokens: %s", name_toks)
-    for span_grp in coref_doc.spans.values():
-        log.debug("Checking coref cluster to see if it's the hero")
-        if do_spans_contain_hero(span_grp, name_toks):
-            log.debug("Found hero coref cluster")
-            for sp in span_grp:
-                for i in range(sp.start, sp.end):
-                    hero_refs.append(tok_doc[i])
-            break
-    if len(hero_refs) == 0:
-        # No coref spans, so let's just search all tokens for the name
-        log.debug("No hero coref clusters, looking for direct references to hero")
-        for t in tok_doc:
-            if is_tok_hero(t, name_toks):
-                hero_refs.append(t)
-    log.debug(hero_refs)
-
-    # Get quote spans tagged
-    quote_matcher(tok_doc)
-
-    hero_sentences = set([hr.sent for hr in hero_refs])
-    for sent in get_real_sentences(hero_sentences):
-        log.debug("Sentence with hero ref: %s", sent.text.strip())
-        verb_phrases = get_verb_phrases_from_matcher(sent)
-        for vp in verb_phrases:
-            log.debug("VP: %s", vp)
-        flattened_verb_phrases = flatten(verb_phrases)
-        for hr in hero_refs:
-            if is_span_inside(sent, hr.sent) and hr in flattened_verb_phrases:
-                span_to_add = sent
-                if "quotes" in tok_doc.spans:
-                    for q in tok_doc.spans["quotes"]:
-                        if spans_intersect(q, span_to_add):
-                            log.debug("Got a quote intersection: '%s' '%s'", q.text, span_to_add.text)
-                            span_to_add = union_spans(q, span_to_add)
-                ret.append(span_to_add.text)
-                log.info("Selected: %s", span_to_add.text.strip())
-                break
-    return ret
 
 def flatten(arr):
     ret = []
@@ -301,3 +254,13 @@ def compare_tok_bags(bag1, bag2):
         score += 2 * abs(bag1_pos[k] - bag2_pos[k])
 
     return score
+
+def get_last_n_toks(text, n):
+    doc = web_nlp(text)
+    return doc[-n:].text
+
+def tokenize(text):
+    return tokenize_.word_tokenize(text)
+
+def tokenize_nlp(text):
+    return fast_tokenizer.encode(text)

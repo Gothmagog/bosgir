@@ -1,5 +1,5 @@
 from curses import window
-from text_utils import normalize_newlines_arr, str_from_arr
+from text_processing.text_utils import normalize_newlines_arr, str_from_arr
 import logging
 
 log = logging.getLogger("main")

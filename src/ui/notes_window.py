@@ -1,6 +1,6 @@
 import curses
-from enhanced_window import EnhancedWindow
-from text_utils import normalize_newlines_arr
+from ui.enhanced_window import EnhancedWindow
+from text_processing.text_utils import normalize_newlines_arr
 import platform as _platform
 import logging
 
