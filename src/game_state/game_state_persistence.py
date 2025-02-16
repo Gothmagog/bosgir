@@ -44,13 +44,17 @@ class GameStatePersister:
             val = buffer_[start_from:]
         else:
             val = buffer_[start_from:cur_idx]
-        if cur_member == "writing_examples":
+        if cur_member == "plot_beats":
             val = val.split(_asep)
             return ([x.decode(encoding="utf-8") for x in val], cur_idx)
+        elif cur_member == "num_actions_in_plot_beat":
+            return (int(val.decode(encoding="utf-8")), cur_idx)
         return (val.decode(encoding="utf-8"), cur_idx)
 
     def save_item(self, val: any, member: str, stream):
-        if member == "writing_examples":
+        if type(val) is int:
+            val = str(val)
+        if member == "plot_beats":
             for (i, p) in enumerate(val):
                 if i > 0:
                     stream.write(_asep)

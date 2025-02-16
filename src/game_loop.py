@@ -17,7 +17,6 @@ from llm.llm_wrapper import proc_command, update_notes
 from text_processing.nlp import get_name_from_notes
 
 escaped = False
-apilog = logging.getLogger("api")
 log = logging.getLogger("main")
 
 K_ESC = 27
@@ -102,7 +101,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 if new_command.startswith('"') or new_command.startswith("'"):
                     hw.add_content(new_command, 1)
                 set_win_text(status_win, "Invoking API...", True)
-                new_story = proc_command(new_command, hero_name, gs.notes, gs.history, gs.narrative_style, status_win)
+                new_story, gs.plot_beats, gs.num_actions_in_plot_beat = proc_command(new_command, hero_name, gs.notes, gs.history, gs.plot_beats, gs.num_actions_in_plot_beat, gs.narrative_style, status_win)
                 if new_story:
                     mode = "proc_input"
                 else:

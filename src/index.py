@@ -65,7 +65,7 @@ def new_game():
     notes = ""
     with open(src_dir / "../data/initial_notes.txt", "r") as f:
         notes = f.read()
-    game_state = GameState(history=background, notes=notes, narrative_style=narrative_style)
+    game_state = GameState(history=background, notes=notes, narrative_style=narrative_style, plot_beats=[], num_actions_in_plot_beat=0)
     gs_persist = GameStatePersister(filename)
     
     return continue_()
@@ -77,7 +77,7 @@ def load_game():
     filename = file_name_entry(YPos.TOP, 0, True)
     gs_persist = GameStatePersister(filename)
     if not game_state:
-        game_state = GameState(history=None, notes=None, narrative_style=None)
+        game_state = GameState(history=None, notes=None, narrative_style=None, plot_beats=[], num_actions_in_plot_beat=0)
     gs_persist.load(game_state)
     continue_()
     

@@ -1,129 +1,94 @@
-PRIMARY_SYSTEM,PRIMARY,PRIMARY_FS1,PRIMARY_FS2,PRIMARY_FS3,PRIMARY_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8
+PRIMARY_SYSTEM,PRIMARY,PRIMARY_FS1,PRIMARY_FS2,PRIMARY_FS3,PRIMARY_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
 
 PRIMARY_SYSTEM
-You are an expert storyteller, able to weave a compelling tale in any genre. You have the following qualities as a writer:
+You are an assistant to a blind person. Your job is solely to describe what happens around them, in meticulous detail. You are very good at painting a mental picture for your blind person.
 
-- Your characters are real, detailed and nuanced, like actual people are. Their behavior is consistent with who they are, but you allow them to grow as your stories progress.
-- Your descriptions are very immersive. You leverage all of the senses when describing a scene, person, or object.
-- Your writing always flows smoothly from one passage to another, never disjointed, and always adhering to the given genre.
-- Your stories are always coherent, and continuity is never a problem in your plots. People, places, and things always have a logical origin within the worlds you create.
-- You never shy away from using sex and violence, when it's called for in the story.
+When you describe things, though, you never mention yourself or your blind person. You always describe things as if the both of you were not in the scene at all, and you always use the 3rd person.
 
 PRIMARY
-You are writing a story in the style of {narrative}. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+You and your blind person are watching a {narrative} movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
 
-<StorySoFar>
-{history}
-</StorySoFar>
+<MovieSummary>
+{beats}
+</MovieSummary>
 
 <StoryNotes>
-{current}
+{notes}
 </StoryNotes>
 
-<Do>
+<HeroAction>
 {do}
-</Do>
+</HeroAction>
 
-Continue the story by describing what happens next. Take into consideration the following:
+Describe what happens next, in the context of the following scene summary:
 
-- What the hero is trying to do
-- The story so far
-- What story notes should be taken into account
+<SceneSummary>
+{current_beat}
+</SceneSummary>
 
-Wrap your continuation of the story in <Snippet> XML tags. As a reminder, this is a a {narrative} story, and here's where the story should continue from:
+Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
 "{continue_from}"
 
 PRIMARY_FS1
-You are writing a story in the style of a toungue-in-cheek fantasy adventure. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+You and your blind person are watching a science-fiction movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
 
-<StorySoFar>
-Elric rolled into the town of Spielberg one fine day looking for adventure. He cast an eye about as he stood near the front gates. "This seems quite a little town," he thought to himself.
-
-Directly before him was an official-looking building with a set of stone steps leading up to a porch and an oaken door. On the porch sat a gentleman with white hair and moustache smoking a pipe. Next to him was a large, ugly looking chap dressed in green and playing with a yo-yo.
-
-The man with the pipe greeted him. "Welcome to our town. You are lucky to have made it down from the mountains before the snow blocked the pass again. It's gotten pretty dangerous outside of town, I understand."
-
-"Nothing I couldn't handle," Elric stated in as nonchalant a manner as he could muster. Truth be told, he stubbed his toe rather baddly on a tree.
-
-The man nodded. "Well, many monsters have been trapped around here with the late snow. Between them and the brigands, we certainly could use a Hero around here."
-
-"Well, that's me," Elric proclaimed, puffing out his chest. "Elric's the name. You'll probably be hearing alot more about me in the coming days; I aim to make a name for myself across the land."
-
-The man smiled and puffed on his pipe. "I am Sheriff Schultz Meistersson. This is Otto Van Goon, my assistant," he motioned to the large buffoon. "Good luck in your quest."
-</StorySoFar>
+<MovieSummary>
+* Sheila wakes up in a cryopod with no memory of her past. She's confused. She gets up and starts to explore her surroundings.
+* She see's an old computer terminal. She seems to know how to operate it, and pulls up a message. It's says that it's from her. She starts to read.
+* Sheila is interrupted by flashbacks from before the cryosleep. Some catastrophic event happened, screams, death, but it's all garbled. She reels from the memories.
+* When she tries to finish reading the message, she finds she can no longer access the message on the terminal; it's gone. She decides to explore more of her surroundings.
+* It's some sort of facility, very hi-tech. But she discovers disturbing-looking devices placed about in concealed places.
+* She tests one of the devices and discovers that it's a deadly trap. She renews her search more carefully.
+* After more searching she arrives at a large, empty room, where a well-manicured gentleman is standing. He is silent. Sheila approaches him cautiously.
+</MovieSummary>
 
 <StoryNotes>
-Hero name: Elric the Unready
-Enemies: none
-Allies: none
+Hero name: Sheila Hill
 Physical status: healthy
-Mental status: healthy
+Mental status: amnesia, trepid
 Posessions:
-- sword
-- shield
-- 10 gold
+- AL-5 laz pistol
+- Health monitor (green light)
+Memories:
+- A disaster of some sort
+- Unknown man, grinning
 Wearing:
-- clean white shirt
-- green pants
-- your lucky adventuring boots
-- a super duper red cape
+- Clean white jumpsuit
+- An insignia, unknown significance
 Motivations:
-- to find adventure
-Current location: Spielburg 
-Time of day: late afternoon
-Weather: pleasant
+- Recover memories
+- Figure out current situation
+Current location: Unknown facility, in a large empty room
+Time of day: unknown
+Weather: unknown
 </StoryNotes>
 
-<Do>
-ask about supplies
-</Do>
+<HeroAction>
+pull out my gun
+</HeroAction>
 
-Continue the story by describing what happens next. Take into consideration the following:
+Describe what happens next, in the context of the following scene summary:
 
-- What the hero is trying to do
-- The story so far
-- What story notes should be taken into account
+<SceneSummary>
+Half-way to the man, she has another flashback of just the man's grinning face, and somewhere in the distance more screams. She is shaken.
+</SceneSummary>
 
-As a reminder, here's where the story should continue from:
+Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
-"The man smiled and puffed on his pipe. "I am Sheriff Schultz Meistersson. This is Otto Van Goon, my assistant," he motioned to the large buffoon. "Good luck in your quest.""
+"The screams still echo in her ears as she stumbles back, hands on her head. She looks at the man again, a shadow of horror now on her face. And still his placid countenance, looking forward, ever so still, about ten meters away now."
 
 PRIMARY_FS2
-Here is my continuation of the story:
-
-<Snippet>"Many thanks," Elric replied, then asked, "Might I enquire as to where a seasoned adventurer such as myself might acquire provisions?"
-
-"You might," replied the sheriff, "and I might reply that you try Godwin's Goods, down that street and to the left."
-
-"Excellent. Any.. magic items there?" Elric cocked an eyebrow.
-
-"Umm, well, Godwin likes to tinker with potions in his spare time, though I wouldn't really recommend--"
-
-"Potions!" Elric exclaimed. "I will certainly be needing magic potions! Crates and crates of magic potions!"
-
-"You don't want to do that, really. A dog exploded once after drinking--"
-
-"Haha! A weak puppy tummy is no match THIS gut!" Elric poked out his belly proudly.
-
-Meistersson sighed. "That's good, son."</Snippet>
+<Snippet>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Snippet>
 
 PRIMARY_FS3
-You are writing a story in the style of a coming-of-age drama. The latest portion of the story so far is enclosed in <StorySoFar> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero's next action is enclosed in the <Do> XML tags.
+You and your blind person are watching a coming-of-age movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
 
-<StorySoFar>
-Kevin's hands trembled as he hastily stuffed his backpack into the corner of the locker, his eyes fixed on the door to the classroom. He could almost hear the ticking of the clock, mocking him for the impending reckoning. The bell had barely rung, signaling the start of another excruciating day at Lincoln High, but for Kevin, time had come to a standstill.
-
-He took a deep, ragged breath and forced himself to turn the handle. As he crossed the threshold, he scanned the classroom for any sign of her. Mrs. Johnson stood near the whiteboard, writing something on the chalkboard in neat, black letters. Her hair fell in loose waves down her back, and the way the fluorescent lights danced across her features made him feel like he was drowning in their artificial glow.
-
-Normally he'd be lost the whole class just oggling her curves, her breasts, her secrets. But his nervous gaze kept returning to that crumpled piece of paper on her desk.
-
-Goddammit, he shouldn't have done it. Why? It's a stupid gesture, a stupid quote from The Great Gatsby scribbled on stupid notebook paper. It doesn't mean anything. *He* didn't mean anything, not to her.
-
-Kevin continued to mentally berate himself to the backdrop of Mrs. Johnson's droning lecture on tone and nuance in literature. Had she read it yet? Maybe she didn't even notice it. He decided to shut his eyes, just block it all out, the note, his feelings for her, her, her legs, those lips...
-
-Mrs. Johnson's voice cut through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly.
-</StorySoFar>
+<MovieSummary>
+* Evening in the Burnock home, Kevin is writing something in his room. His mom calls him for dinner, Kevin says he's finishing his homework. He's writing a love sonnet, copied from a book.
+* Next day, end of school, Kevin says bye to his friends, but hangs around waiting for them all to disperse. He then sneaks back into school and puts a crumpled up piece of paper on Mrs. Johnson's desk. He hesitates, then leaves.
+* Next day, Kevin is at his locker, nervous, eyeing the clock. He enters his literature class where Mrs. Johnson teaches and takes his seat. He's visibly worried, looking at the note he left earlier on her desk.
+</MovieSummary>
 
 <StoryNotes>
 Hero name: Kevin Burnock
@@ -145,26 +110,24 @@ Time of day: morning
 Weather: dreary
 </StoryNotes>
 
-<Do>
+<HeroAction>
 yell at her
-</Do>
+</HeroAction>
 
-Continue the story by describing what happens next. Take into consideration the following:
+Describe what happens next, in the context of the following scene summary:
 
-- What the hero is trying to do
-- The story so far
-- What story notes should be taken into account
+<SceneSummary>
+Kevin tries to cope with his raging emotions and hormones, closing his eyes at his desk. Mrs. Johnson, thinking he's sleeping, berates him in front of the class. Everyone laughs, Kevin is mortified.
+</SceneSummary>
 
-Wrap your continuation of the story in <Snippet> XML tags. As a reminder, here's where the story should continue from:
+Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
-"Mrs. Johnson's voice cut through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly, her slim arms folded across her chest."
+"Kevin's eyes flash open. The whole class is laughing."
 
 PRIMARY_FS4
-Here is my continuation of the story:
+<Snippet>The laughter continues, time slows down. Kids laughing, Mrs. Johnson looking sternly at him. Kevin's eyes dart about, like a trapped animal. Tears start to form at the edges of his eyes, everything presses in on him.
 
-<Snippet>The laughter, the humiliation, Mrs. Johnson's glare, it all fell on top of Kevin like a wall of bricks. He wanted nothing more than to crawl inside a hole and just disappear. But there was no hole, just those bricks and this endless moment in time, and the only thing he could draw any kind of strength from there, sitting at his desk mortified, was the betrayal. Mrs. Johnson, taking his admiration, his love for her, and stomping it into the ground in front of everyone.
-
-"Fuck you bitch!" He screamed.
+Suddenly he screams at the top of his lungs, "Fuck off!"
 </Snippet>
 
 UPDATE_NOTES
@@ -431,3 +394,364 @@ Motivations:
 - find Sindar
 Current location: campsite in the Old Forest
 </Output>
+
+PLOT_SYSTEM
+You are a seasoned screenwriter. You've written screenplays for hundreds of movies, spanning many different genres.
+
+You are mature enough to handle adult content that depicts violence and sex.
+
+PLOT
+You're creating a script for a new {narrative} movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+
+<PlotBeats>
+{beats}
+</PlotBeats>
+
+You've decided that {hero_name}'s next action will be to {do}. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+PLOT_FS1
+You're creating a script for a new teen drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+
+<PlotBeats>
+<Beat>Introduce protagonist, Alex, a troubled teen new to an elite high school in a quiet suburban town.</Beat>
+<Beat>Alex locks eyes with popular classmate, Rachel, in history class, sparking an instant connection and tension.</Beat>
+<Beat>Alex's attempts to join the school's debate team are met with ridicule and rejection by the coach.</Beat>
+<Beat>Rachel extends an olive branch, inviting Alex to sit with her and her friends, but at a cost.</Beat>
+<Beat>Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.</Beat>
+</PlotBeats>
+
+You've decided that Alex's next action will be to break the lamp. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+PLOT_FS2
+<PlotBeats>
+<Beat>Alex flies into a rage and starts breaking things around the house. His mom tries to get him to stop, and he accidentally hits her. She falls to the floor unconscious.</Beat>
+<Beat>Alex, scared, checks on his mom. He calls and ambulance. Ambulance arrives, Alex is distraught.</Beat>
+<Beat>Alex is in a police station being questioned about the incident. They grill him on what happened. Alex makes up a story about practicing football indoors and accidentally hitting his mom. The cops don't buy it.</Beat>
+</PlotBeats>
+
+PLOT_FS3
+You're creating a script for a new slasher horror movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+
+<PlotBeats>
+<Beat>Aerial shot of Ravenswood, an isolated, eerie town with a dark history of gruesome murders.</Beat>
+<Beat>A coastal prep drive, introducing the core group of friends: Alex, Emma, Jack, Sarah, and Ryan.</Beat>
+<Beat>Quick cuts of news reports, interviews, and grainy footage from the 1970s massacre.</Beat>
+<Beat>Setting up camp, tension builds as they notice signs of recent human activity in the woods.</Beat>
+<Beat>The group stumbles upon a cryptic phrase etched into a tree, sparking unease and speculation.</Beat>
+<Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
+</PlotBeats>
+
+You've decided that Jack's next action will be to go pee. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+PLOT_FS4
+<PlotBeats>
+<Beat>Jack get's up to go pee. He's a little drunk, stumbles off into the woods. Strange noises follow him, eyes peering from the dark. Jack gets nervous.</Beat>
+<Beat>As Jack is peeing, more sounds, a ferral grunting. Jack turns around and is attacked by a large humanoid figure, hard to see in the dark.</Beat>
+<Beat>Fight scene, Alex versus the figure, then Jack runs. A chase through the woods, alex reaches a ravine, decides to jump. Dark figure looks from above helplessly as Jack falls far into the river below.</Beat>
+</PlotBeats>
+
+PLOT_FS5
+You're creating a script for a new family drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+
+<PlotBeats>
+<Beat>Flashbacks of a family's idyllic life 5 years prior, disturbing recent events.</Beat>
+<Beat>The family's husband, John, discloses infidelity, sparking a nightmarish argument among the children.</Beat>
+<Beat>Realism hits as the family's world crumbles, each relative reeling from the revelation.</Beat>
+<Beat>Networks sensationalize the scandal, putting pressure on the family to restore their reputation.</Beat>
+<Beat>John's eldest, Toby, struggling to cope, begins to spin an elaborate, comforting deceit.</Beat>
+<Beat>As darkness settles, a now-bruised John beseeches the family to reunite for Christmas dinner.</Beat>
+</PlotBeats>
+
+You've decided that John's next action will be to bribe them. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+PLOT_FS6
+<PlotBeats>
+<Beat>When the family balks, John proposes to pay each of them a large sum, just to comply. This backfires, lots of arguing.</Beat>
+<Beat>John, defeated, gets in his car and drives off. Children and wife continue to argue.</Beat>
+<Beat>Toby hits Dan, his sister's husband. John's wife, Susan, throws him out of her house.</Beat>
+</PlotBeats>
+
+PIVOTAL_ACTION
+The outline for a {narrative} unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
+
+<PlotBeats>
+{beats}
+</PlotBeats>
+
+The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
+
+<CurrentPlotBeat>
+{curr_beat}
+</CurrentPlotBeat>
+
+In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
+
+<HeroAction>
+{do}
+</HeroAction>
+
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags, and provide your reasoning inside <Reasoning> XML tags.
+
+PA_FS1
+The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
+
+<PlotBeats>
+<Beat>Introduce protagonist, Alex, a troubled teen new to an elite high school in a quiet suburban town.</Beat>
+<Beat>Alex locks eyes with popular classmate, Rachel, in history class, sparking an instant connection and tension.</Beat>
+<Beat>Alex's attempts to join the school's debate team are met with ridicule and rejection by the coach.</Beat>
+<Beat>Rachel extends an olive branch, inviting Alex to sit with her and her friends, but at a cost.</Beat>
+</PlotBeats>
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
+
+<CurrentPlotBeat>
+Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.
+</CurrentPlotBeat>
+
+In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
+
+<HeroAction>
+eat sandwich
+</HeroAction>
+
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags, and provide your reasoning inside <Reasoning> XML tags.
+
+PA_FS2
+<Output>incidental</Output>
+<Reasoning>The action of eating a sandwich is irrelevant to the main action of the scene, and is very unlikely to alter the course of events unfolding. It is a mundane action, and is of no consequence in this context.</Reasoning>
+
+PA_FS3
+The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
+
+<PlotBeats>
+<Beat>Aerial shot of Ravenswood, an isolated, eerie town with a dark history of gruesome murders.</Beat>
+<Beat>A coastal prep drive, introducing the core group of friends: Alex, Emma, Jack, Sarah, and Ryan.</Beat>
+<Beat>Quick cuts of news reports, interviews, and grainy footage from the 1970s massacre.</Beat>
+<Beat>Setting up camp, tension builds as they notice signs of recent human activity in the woods.</Beat>
+<Beat>The group stumbles upon a cryptic phrase etched into a tree, sparking unease and speculation.</Beat>
+<Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
+</PlotBeats>
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
+
+<CurrentPlotBeat>
+Emma goes missing, leaving the group frantically searching the woods, but finding only signs of disturbance.
+</CurrentPlotBeat>
+
+In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
+
+<HeroAction>
+look in the bushes
+</HeroAction>
+
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, and wrap your output in <Output> XML tags:
+
+PA_FS4
+<Output>pivotal</Output>
+<Reasoning>Given that a primary character, Emma, is missing, it follows that the hero would start looking for her. Examining things like bushes seems to flow with the action of the plot, and is very relevant.</Reasoning>
+
+PA_FS5
+The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
+
+<PlotBeats>
+<Beat>College freshman, Jason, gets lost on campus, stumbles into a quirky dorm's orientation meet.</Beat>
+<Beat>Jason meets his unlikely roommates, Tina & Brody, each with their own bizarre personalities and quirks.</Beat>
+<Beat>Jason reluctantly joins his roommates for a disastrous attempt at a drunken breakfast at off-campus diner.</Beat>
+</PlotBeats>
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
+
+<CurrentPlotBeat>
+Roommate Brody convinces Jason to participate in a bizarre campus event to save their dorm's funding.
+</CurrentPlotBeat>
+
+In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
+
+<HeroAction>
+turn on the light
+</HeroAction>
+
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, and wrap your output in <Output> XML tags:
+
+PA_FS6
+<Output>incidental</Output>
+<Reasoning>The current scene is about a critical conversation Brody has with Jason. Whether or not the light switch is on is completely irrelevant to the action taking place, and so is considered an incidental action.</Reasoning>
+
+ACTION_FIT
+There's a movie script you're looking over. You pull a random action for the hero, {hero_name}, out of a hat: that action is enclosed in <HeroAction> XML tags below:
+
+<HeroAction>
+{do}
+</HeroAction>
+
+What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+
+<StorySoFar>
+{history}
+</StorySoFar>
+
+The current plot beat is enclosed below in <PlotBeat> XML tags:
+
+<PlotBeat>
+{curr_beat}
+</PlotBeat>
+
+Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+
+<ScoringGuidelines>
+- Use a scale of 1 to 10
+- Do not take into account the descriptiveness of the action
+- Do not take into account writerly concerns like building tension, etc.
+- Your interpretation of the action should be somewhat loose
+</ScoringGuidelines>
+
+Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
+
+AF_FS1
+There's a movie script you're looking over. You pull a random action for the hero, Kevin, out of a hat: that action is enclosed in <HeroAction> XML tags below:
+
+<HeroAction>
+yell at her
+</HeroAction>
+
+What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+
+<StorySoFar>
+The bell rings. Kevin sweats, his hands trembling as he hastily stuffs his backpack into the corner of the locker, his eyes fixed on the door to his classroom. He wipes his hands on his pants and makes his way down the hall.
+
+He takes a deep, ragged breath and enters the classroom. The beautiful Mrs. Johnson is near the whiteboard, writing down something about literature in neat, black letters. He pauses a moment, drinking her in. Oggling her, really, as he usually does. Time stands still a moment.
+
+Now his gaze cuts over to a piece of crumpled paper on her desk. He gulps audibly, nervously taking his seat. He runs his hands through his hair, his gaze still fixed on that piece of paper.
+
+The teacher is droning on about her lesson, Kevin isn't paying attention. His brow is sweating. His fingers drum his desk. He closes his eyes tightly and just sits there a moment. His feet shake uncontrollably against the floor. He continues to try to sit still, his eyes shut.
+
+Mrs. Johnson's voice cuts through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly.
+
+Kevin's eyes flash open. The whole class is laughing.
+</StorySoFar>
+
+The current plot beat is enclosed below in <PlotBeat> XML tags:
+
+<PlotBeat>
+Kevin gets embarrassed and leaves class. He runs into the bathroom and locks himself in one of the stalls.
+</PlotBeat>
+
+Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+
+<ScoringGuidelines>
+- Use a scale of 1 to 10
+- Do not take into account the descriptiveness of the action
+- Do not take into account writerly concerns like building tension, etc.
+- Your interpretation of the action should be somewhat loose
+</ScoringGuidelines>
+
+Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
+
+AF_FS2
+<Reasoning>Getting angry and yelling at his teacher is a logical prelude to running out of the classroom. It doesn't immediately get us there, but it fits with the action and seems appropriate  to the current plot beat.</Reasoning>
+
+<Score>7</Score>
+
+AF_FS3
+There's a movie script you're looking over. You pull a random action for the hero, Emily, out of a hat: that action is enclosed in <HeroAction> XML tags below:
+
+<HeroAction>
+hail a taxi
+</HeroAction>
+
+What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+
+<StorySoFar>
+Jack offers Emma his business card, which she accepts with slightly trembling fingers. The papers are gathered, though some remain scattered on the sidewalk. His shirt is still stained with coffee, a large brown splash across the pristine white fabric.
+
+Jack suggests they grab a coffee to replace the one she spilled. Emma hesitates, glancing at her watch - clearly she's running late for something important. But there's a subtle smile playing at the corners of her mouth that suggests she's intrigued.
+
+"I know a cafe just around the corner," Jack says, gesturing down the street. His voice is smooth, confident, with just a hint of playful challenge.
+
+Emma adjusts her blazer, tucking a wayward curl behind her ear. "I really shouldn't," she says, but her tone doesn't sound entirely convincing. The professional facade is starting to crack, revealing a spark of spontaneity.
+
+A taxi honks in the background. Pedestrians continue to stream past them on the busy sidewalk, weaving around the two who seem momentarily frozen in their own small bubble of possibility. Jack's expensive gray suit stands in sharp contrast to the bustling urban environment, and Emma's navy blazer catches the light as she continues to waver between professional responsibility and unexpected attraction.
+</StorySoFar>
+
+The current plot beat is enclosed below in <PlotBeat> XML tags:
+
+<PlotBeat>
+Jack offers to take her out for coffee, Emily hesitates, obviously attracted to him. Work beckons.
+</PlotBeat>
+
+Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+
+<ScoringGuidelines>
+- Use a scale of 1 to 10
+- Do not take into account the descriptiveness of the action
+- Do not take into account writerly concerns like building tension, etc.
+- Your interpretation of the action should be somewhat loose
+</ScoringGuidelines>
+
+Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
+
+AF_FS4
+<Reasoning>
+The current plot beat describes a romantic moment, a critical choice between love and work for Emily. Her voluntarily hailing a taxi to leave just doesn't fit the scene. It's jarring and isn't consistent with the behavior of someone attracted to another, as described in the beat.
+</Reasoning>
+
+<Score>3</Score>
+
+INITIAL_BEATS
+For your new {narrative} movie, a producer has given you the story prelude, provided below in <Prelude> XML tags:
+
+<Prelude>
+{initial_background}
+</Prelude>
+
+Create some plot beats for the prelude. They should encompass the prelude, but shouldn't introduce any additional, major plot elements.
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+IB_FS1
+For your new teen drama movie, a producer has given you the story prelude, provided below in <Prelude> XML tags:
+
+<Prelude>
+Lennox, a brooding and intense teenager, has grown up in the seaside town of Ravenswood. He's lost, his heart filled with bleakness. His charm and charisma, once the stuff of whispered legend, had been slowly drained away, leaving behind a hollow shell of a person.
+
+The sleepy town is abuzz with the arrival of a mysterious outsider, a newcomer who would bring with him a sense of restlessness and discontent. They called him "the storm," and spoke in hushed tones of the chaos he would unleash.
+
+Lennox, however, is not interested in chaos. He's driven by a desire to escape, to leave behind the suffocating grip of Ravenswood and find a way to reclaim his shattered future.
+</Prelude>
+
+Create some plot beats for the prelude. They should encompass the prelude, but shouldn't introduce any additional, major plot elements.
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+IB_FS2
+<PlotBeats>
+<Beat>Eight years ago, Lennox is 10. Lennox's parents argue fiercely. Lennox watches from the wings. He goes to his room, goes to the window, and looks at the ocean.</Beat>
+<Beat>Some time later his father is trying to explain why he's leaving. Lennox doesn't understand.</Beat>
+<Beat>Lennox watches his dad leave with his mom. Is mom looks defeated and tired.</Beat>
+<Beat>Through the years Lennox and his mom struggle to make ends meet. The bills pile up. Lennox takes a job at the local grocery store to help.</Beat>
+<Beat>Lennox's mom takes to drinking. Lennox has to shoulder more and more responsibility.</Beat>
+</PlotBeats>
+
+IB_FS3
+For your new commedy movie, a producer has given you the story prelude, provided below in <Prelude> XML tags:
+
+<Prelude>
+Ugh, stupid alarm clock. Annie fumbled with it, hitting the snooze button for what feels like the hundredth time. She tosses it off the bedside table, where it lands with a clang, and rolls over onto her back. A tangled mess of messy brown hair sprawls across the pillow.
+
+Her phone begins to blow up with a flurry of texts from her ex, Pete, each one more sarcastic than the last. Annie reaches over to silence it, but not before catching a glimpse of the obnoxious selfie he's sent. She facepalms, tossing the phone back onto the bed.
+
+Annie's apartment resembles a tornado went through it. Clothes are strewn about the floor, takeout boxes litter the countertops, and the smell of last night's pizza hangs in the air. It's a reflection of her chaotic life – one that's equal parts chaotic and completely out of control.
+
+As she sits up, her eyes land on the eviction notice taped to the fridge. Annie's mind goes blank, and for a moment, time stops. She stares blankly at the paper, wondering how things escalated to this point. But even in this moment of uncertainty, Annie's already formulating a plan to fix it, or at least make it slightly less terrible.
+</Prelude>
+
+Create some plot beats for the prelude. They should encompass the prelude, but shouldn't introduce any additional, major plot elements.
+
+Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+IB_FS4
+<PlotBeats>
+<Beat>Annie and Pete had a tumultuous relationship, filled with fun, heady times, and intense arguments. They have a huge fight in a coffee shop. Annie storms out, leaving Pete standing alone, looking heartbroken.</Beat>
+<Beat>Six months later, Annie is still reeling from the breakup. She tries to start new hobbies, join social clubs and meet new people, but nothing works. She becomes increasingly withdrawn and isolated.</Beat>
+<Beat>Annie is struggling to pay her bills, and Pete won't stop texting her, trying to patch things up. She's through, though. She's applying for a lot of jobs but can't seem to land anything.</Beat>
+</PlotBeats>
