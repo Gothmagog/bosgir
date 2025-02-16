@@ -6,7 +6,7 @@ You are an assistant to a blind person. Your job is solely to describe what happ
 When you describe things, though, you never mention yourself or your blind person. You always describe things as if the both of you were not in the scene at all, and you always use the 3rd person.
 
 PRIMARY
-You and your blind person are watching a {narrative} movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
+You and your blind person are watching a {narrative} movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
 
 <MovieSummary>
 {beats}
@@ -16,22 +16,18 @@ You and your blind person are watching a {narrative} movie. You've been describi
 {notes}
 </StoryNotes>
 
-<HeroAction>
-{do}
-</HeroAction>
+Currently, the following scene is being played out in the movie, enclosed below in <CurrentScene> XML tags:
 
-Describe what happens next, in the context of the following scene summary:
-
-<SceneSummary>
+<CurrentScene>
 {current_beat}
-</SceneSummary>
+</CurrentScene>
 
-Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The hero has just tried to {do}. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
 "{continue_from}"
 
 PRIMARY_FS1
-You and your blind person are watching a science-fiction movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
+You and your blind person are watching a science-fiction movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
 
 <MovieSummary>
 * Sheila wakes up in a cryopod with no memory of her past. She's confused. She gets up and starts to explore her surroundings.
@@ -64,17 +60,13 @@ Time of day: unknown
 Weather: unknown
 </StoryNotes>
 
-<HeroAction>
-pull out my gun
-</HeroAction>
+Currently, the following scene is being played out in the movie, enclosed below in <CurrentScene> XML tags:
 
-Describe what happens next, in the context of the following scene summary:
-
-<SceneSummary>
+<CurrentScene>
 Half-way to the man, she has another flashback of just the man's grinning face, and somewhere in the distance more screams. She is shaken.
-</SceneSummary>
+</CurrentScene>
 
-Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The hero has just tried to pull out my gun. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
 "The screams still echo in her ears as she stumbles back, hands on her head. She looks at the man again, a shadow of horror now on her face. And still his placid countenance, looking forward, ever so still, about ten meters away now."
 
@@ -82,7 +74,7 @@ PRIMARY_FS2
 <Snippet>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Snippet>
 
 PRIMARY_FS3
-You and your blind person are watching a coming-of-age movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags. The hero has just attempted to do something, which is enclosed in <HeroAction> XML tags.
+You and your blind person are watching a coming-of-age movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
 
 <MovieSummary>
 * Evening in the Burnock home, Kevin is writing something in his room. His mom calls him for dinner, Kevin says he's finishing his homework. He's writing a love sonnet, copied from a book.
@@ -110,17 +102,13 @@ Time of day: morning
 Weather: dreary
 </StoryNotes>
 
-<HeroAction>
-yell at her
-</HeroAction>
+Currently, the following scene is being played out in the movie, enclosed below in <CurrentScene> XML tags:
 
-Describe what happens next, in the context of the following scene summary:
-
-<SceneSummary>
+<CurrentScene>
 Kevin tries to cope with his raging emotions and hormones, closing his eyes at his desk. Mrs. Johnson, thinking he's sleeping, berates him in front of the class. Everyone laughs, Kevin is mortified.
-</SceneSummary>
+</CurrentScene>
 
-Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The hero has just tried to yell at her. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
 
 "Kevin's eyes flash open. The whole class is laughing."
 
@@ -401,16 +389,18 @@ You are a seasoned screenwriter. You've written screenplays for hundreds of movi
 You are mature enough to handle adult content that depicts violence and sex.
 
 PLOT
-You're creating a script for a new {narrative} movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+You're creating a script for a new {narrative} movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that {hero_name}'s next action will be to {do}. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 {beats}
 </PlotBeats>
 
-You've decided that {hero_name}'s next action will be to {do}. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
-
 PLOT_FS1
-You're creating a script for a new teen drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+You're creating a script for a new teen drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that Alex's next action will be to break the lamp. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Introduce protagonist, Alex, a troubled teen new to an elite high school in a quiet suburban town.</Beat>
@@ -420,8 +410,6 @@ You're creating a script for a new teen drama movie. You're in the ideation phas
 <Beat>Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.</Beat>
 </PlotBeats>
 
-You've decided that Alex's next action will be to break the lamp. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
-
 PLOT_FS2
 <PlotBeats>
 <Beat>Alex flies into a rage and starts breaking things around the house. His mom tries to get him to stop, and he accidentally hits her. She falls to the floor unconscious.</Beat>
@@ -430,7 +418,9 @@ PLOT_FS2
 </PlotBeats>
 
 PLOT_FS3
-You're creating a script for a new slasher horror movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+You're creating a script for a new slasher horror movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that Jack's next action will be to go pee. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Aerial shot of Ravenswood, an isolated, eerie town with a dark history of gruesome murders.</Beat>
@@ -441,8 +431,6 @@ You're creating a script for a new slasher horror movie. You're in the ideation 
 <Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
 </PlotBeats>
 
-You've decided that Jack's next action will be to go pee. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
-
 PLOT_FS4
 <PlotBeats>
 <Beat>Jack get's up to go pee. He's a little drunk, stumbles off into the woods. Strange noises follow him, eyes peering from the dark. Jack gets nervous.</Beat>
@@ -451,7 +439,9 @@ PLOT_FS4
 </PlotBeats>
 
 PLOT_FS5
-You're creating a script for a new family drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. The plot beats you have so far are enclosed in <PlotBeats> XML tags below:
+You're creating a script for a new family drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that John's next action will be to bribe them. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Flashbacks of a family's idyllic life 5 years prior, disturbing recent events.</Beat>
@@ -461,8 +451,6 @@ You're creating a script for a new family drama movie. You're in the ideation ph
 <Beat>John's eldest, Toby, struggling to cope, begins to spin an elaborate, comforting deceit.</Beat>
 <Beat>As darkness settles, a now-bruised John beseeches the family to reunite for Christmas dinner.</Beat>
 </PlotBeats>
-
-You've decided that John's next action will be to bribe them. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
 
 PLOT_FS6
 <PlotBeats>

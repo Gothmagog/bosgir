@@ -54,6 +54,17 @@ fast_llm = ChatBedrock(
     callbacks=[LoggingPassthroughCallback()],
     credentials_profile_name="me"
 )
+fast_llm_creative = ChatBedrock(
+    model_id=model_id,
+    model_kwargs={
+        "max_tokens": 8192,
+        "temperature": .8
+    },
+    config=Config(connect_timeout=10, read_timeout=10, retries={"mode": "adaptive"}),
+    streaming=False,
+    callbacks=[LoggingPassthroughCallback()],
+    credentials_profile_name="me"
+)
 
 # Large and slow LLM
 model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"
@@ -166,7 +177,7 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, status_win):
     )
 
     # invoke LLM
-    chain_bedrock = fast_llm | refusal_lambda | out_parser
+    chain_bedrock = fast_llm_creative | refusal_lambda | out_parser
     chain_local = llm | out_parser
     chain = p | chain_bedrock.with_fallbacks([chain_local])
     log.info("***** Invoking LLM for PLOT *****")
@@ -277,7 +288,7 @@ def do_initial_plot_beats(narrative_style, initial_bg, status_win):
         temperature=.8
     )
 
-    chain_bedrock = fast_llm | refusal_lambda | out_parser
+    chain_bedrock = fast_llm_creative | refusal_lambda | out_parser
     chain_local = llm | out_parser
     chain = p | chain_bedrock.with_fallbacks([chain_local])
     log.info("***** Invoking LLM for INITIAL_BEATS *****")
