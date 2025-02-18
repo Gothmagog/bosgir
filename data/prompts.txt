@@ -1,4 +1,4 @@
-PRIMARY_SYSTEM,PRIMARY,PRIMARY_FS1,PRIMARY_FS2,PRIMARY_FS3,PRIMARY_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
+PRIMARY_SYSTEM,PRIMARY,P_FS1,P_FS2,P_FS3,P_FS4,PRIMARY_NEWSCENE,PNS_FS1,PNS_FS2,PNS_FS3,PNS_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
 
 PRIMARY_SYSTEM
 You are an assistant to a blind person. Your job is solely to describe what happens around them, in meticulous detail. You are very good at painting a mental picture for your blind person.
@@ -22,11 +22,21 @@ Currently, the following scene is being played out in the movie, enclosed below 
 {current_beat}
 </CurrentScene>
 
-The hero has just tried to {do}. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
-"{continue_from}"
+<RecentAction>
+{continue_from}
+</RecentAction>
 
-PRIMARY_FS1
+The hero is trying to {do}. Do the following steps:
+
+<Steps>
+1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
+2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
+3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+P_FS1
 You and your blind person are watching a science-fiction movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
 
 <MovieSummary>
@@ -66,14 +76,26 @@ Currently, the following scene is being played out in the movie, enclosed below 
 Half-way to the man, she has another flashback of just the man's grinning face, and somewhere in the distance more screams. She is shaken.
 </CurrentScene>
 
-The hero has just tried to pull out my gun. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
+<RecentAction>
 "The screams still echo in her ears as she stumbles back, hands on her head. She looks at the man again, a shadow of horror now on her face. And still his placid countenance, looking forward, ever so still, about ten meters away now."
+</RecentAction>
 
-PRIMARY_FS2
+The hero is trying to pull out my gun. Do the following steps:
+
+<Steps>
+1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
+2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
+3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+P_FS2
+<HeroLocation>large, empty room inside an unknown facility</HeroLocation>
+<Reasoning>Sheila is exploring the facility and has just come across the silent man in the large room. The current scene indicates that Sheila has a flashback and that she is shaken by this. Since the most recent action references screams in her head and described Sheila being distraught, I would infer that Sheila has already had the flashback. Given that, I would say we're near the end of this scene.</Reasoning>
 <Snippet>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Snippet>
 
-PRIMARY_FS3
+P_FS3
 You and your blind person are watching a coming-of-age movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
 
 <MovieSummary>
@@ -108,15 +130,198 @@ Currently, the following scene is being played out in the movie, enclosed below 
 Kevin tries to cope with his raging emotions and hormones, closing his eyes at his desk. Mrs. Johnson, thinking he's sleeping, berates him in front of the class. Everyone laughs, Kevin is mortified.
 </CurrentScene>
 
-The hero has just tried to yell at her. Describe what happens next. Enclose your output in <Snippet> XML tags. As a reminder, here's what you last said to your blind person:
+The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
+<RecentAction>
 "Kevin's eyes flash open. The whole class is laughing."
+</RecentAction>
 
-PRIMARY_FS4
+The hero is trying to yell at her. Do the following steps:
+
+<Steps>
+1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
+2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
+3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+P_FS4
+<HeroLocation>Mrs. Johnson's literature class</HeroLocation>
+<Reasoning>The previous day Kevin placed a love note on Mrs. Johnson's desk. He is now in her class and is nervous about her reading his note. Mrs. Johnson, however, is teaching class. The current scene describes Kevin closing his eyes to try to deal with his emotions, and Mrs. Johnson scolding him for sleeping.
+
+The most recent action describes Kevin opening his eyes and his classmates laughing at him. Based on this, I could surmise that Mrs. Johnson has already scolded him. Therefore, we should be at the end of this particular scene.</Reasoning>
 <Snippet>The laughter continues, time slows down. Kids laughing, Mrs. Johnson looking sternly at him. Kevin's eyes dart about, like a trapped animal. Tears start to form at the edges of his eyes, everything presses in on him.
 
-Suddenly he screams at the top of his lungs, "Fuck off!"
-</Snippet>
+Suddenly he screams at the top of his lungs, "Fuck off!"</Snippet>
+
+PRIMARY_NEWSCENE
+You and your blind person are watching a {narrative} movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
+
+<MovieSummary>
+{beats}
+</MovieSummary>
+
+<StoryNotes>
+{notes}
+</StoryNotes>
+
+The movie is about to transition from the current scene, enclosed in <CurrentScene> XML tags, to a brand new scene, enclosed below in <NewScene> XML tags:
+
+<CurrentScene>
+{current_beat}
+</CurrentScene>
+
+<NewScene>
+{new_beat}
+</NewScene>
+
+The hero is trying to {do}. Do the following steps:
+
+<Steps>
+1. List everything that has changed in this scene transition: location, items, characters present, actions. Provide your list inside <Changes> XML tags.
+2. Describe the hero's action and the results to your blind person. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+As a reminder, here's what you last said to your blind person:
+
+"{continue_from}"
+
+PNS_FS1
+You and your blind person are watching a western drama movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
+
+<MovieSummary>
+* A lone rider approaches a small, dusty frontier town at sunset, his weathered face partially obscured by a wide-brimmed hat and trail dust.
+* In the town saloon, the rider quietly orders whiskey, drawing suspicious glances from locals who sense he's not just another passing stranger.
+* Through brief, tense interactions, we learn the rider is a former lawman seeking revenge for a past family tragedy involving a powerful local ranching clan.
+* The rider discreetly inquires about the ranch's location, subtly checking his hidden pistol and revealing an old, faded photograph of a woman and child.
+* As night falls, he secures a room at the town's only boarding house, meticulously cleaning his weapon and studying a hand-drawn map of the surrounding territory.
+</MovieSummary>
+
+<StoryNotes>
+Hero name: Bob Dunn
+Allies: (none)
+Enemies: Cletus, The Tangiers Kid
+Physical status: a little tired
+Mental status: healthy
+Posessions:
+- pistol
+- whip
+- 30 silver pieces
+- photo of wife and daughter
+Wearing:
+- dusty hat
+- chaps
+- boots with spurrs
+- leather vest
+- bolo tie
+Motivations:
+- get revenge on The Tangiers Kid
+Current location: the Sunset Sins boarding house
+Time of day: twilight
+Weather: hot
+</StoryNotes>
+
+The movie is about to transition from the current scene, enclosed in <CurrentScene> XML tags, to a brand new scene, enclosed below in <NewScene> XML tags:
+
+<CurrentScene>
+As night falls, he secures a room at the town's only boarding house, meticulously cleaning his weapon and studying a hand-drawn map of the surrounding territory.
+</CurrentScene>
+
+<NewScene>
+An unknown patron spies on Bob through a hidden peephole. Bob hears sounds and creates a ruse of going to the toilet, only to surprise his would-be spy outside his room.
+</NewScene>
+
+The hero is trying to find the low hill country. Do the following steps:
+
+<Steps>
+1. List everything that has changed in this scene transition: location, items, characters present, actions. Provide your list inside <Changes> XML tags.
+2. Describe the hero's action and the results to your blind person. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+As a reminder, here's what you last said to your blind person:
+
+"Bob pulls out a worn, tattered map and studies it for a moment, his eyes narrow as he scans it. On the map is a range called Dead End Hopes, surrounded by a mountain range.
+
+There is a hand-written note next to the ranch's location: "escaped low hill country." Bob scratches his chin a moment and thinks."
+
+PNS_FS2
+<Changes>1. There's a new sound coming from the person spying on Bob
+2. There's an unseen new character, currently hidden
+3. There's a potentially new location, hidden somewhere within the walls</Changes>
+<Snippet>Bob scans the map, trying to find any trace of what might be called the low hills country, but he can't find any trace of it.
+
+Then Bob hears a sound. A bump, low and soft, from his left. Inside the walls? He holds still, his eyes shifting, all of his keen sense on high alert.</Snippet>
+
+PNS_FS3
+You and your blind person are watching a action movie movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
+
+<MovieSummary>
+* Jake drops a coffee mug, startling awake from a combat nightmare. His alarm buzzes - another monotonous security shift begins.
+* While monitoring security cameras, Jake notices a suspicious USB exchange between two men in the parking garage's blind spot.
+* Jake zooms in on the camera, accidentally triggering an alert. One of the men looks directly at the camera, revealing a cold, calculating expression.
+* A sudden loud crash outside Jake's security booth. He turns to see the parking garage door forcibly opened by two masked individuals.
+* Jake finds a discarded encrypted note during the brief confrontation, quickly pocketing it before the intruders can stop him.
+* In his car, Jake uses his military contacts' decryption software to partially decode the note's first few lines.
+</MovieSummary>
+
+<StoryNotes>
+Hero name: Jake Halloway
+Wife: Phyllis
+Allies:
+- Sgt. Otto Husk
+- Nathan Way
+Enemies: (none)
+Physical status: healthy
+Mental status: high alert
+Posessions:
+- wallet
+- car
+- laptop
+Wearing:
+- security uniform
+Motivations:
+- find out what the garage perps were up to
+Current location: Broadway Parking Garage, in his car
+Time of day: night
+Weather: mild
+</StoryNotes>
+
+The movie is about to transition from the current scene, enclosed in <CurrentScene> XML tags, to a brand new scene, enclosed below in <NewScene> XML tags:
+
+<CurrentScene>
+In his car, Jake uses his military contacts' decryption software to partially decode the note's first few lines.
+</CurrentScene>
+
+<NewScene>
+Jake makes a covert phone call to an old military buddy, requesting immediate assistance in tracing the note's origin.
+</NewScene>
+
+The hero is trying to call Otto. Do the following steps:
+
+<Steps>
+1. List everything that has changed in this scene transition: location, items, characters present, actions. Provide your list inside <Changes> XML tags.
+2. Describe the hero's action and the results to your blind person. Enclose your output in <Snippet> XML tags.
+</Steps>
+
+As a reminder, here's what you last said to your blind person:
+
+"The software spins, working on the decryption. Jake waits impatiently, looks out his car window nervously. "C'mon..."
+
+Finally it finishes, a message on the screen: "ERROR: PARTIAL DECRYPTION". Jake curses, but reads the decrypted portion. Some obscure references to Project Ollie, bank accounts, and something called, AX400.
+
+Jake furrows his brow; AX400. Sounds military."
+
+PNS_FS4
+<Changes>1. There's a new item Jake uses, his cell phone
+2. There's a new character introduced, Otto, on the other end of the phone call</Changes>
+<Snippet>Jake pulls out his cell phone and dials a number. A voice answers; "Yeah?"
+
+"Otto, hey, it's Jake."
+
+"Jake? The fuck man, what time izzit? I--"
+
+Jake interrupts, "Listen man, I need a favor."
+
+"Dude, it's, it's 4:20 am."</Snippet>
 
 UPDATE_NOTES
 You are an assistant to a DM running a game of Dungeons and Dragons. The DM is very forgetful and needs you to provide notes on what is most important. The <Description> XML provides the DM's latest description of the action in the game. The <Notes> XML has the latest version of your notes to the DM.
@@ -389,18 +594,44 @@ You are a seasoned screenwriter. You've written screenplays for hundreds of movi
 You are mature enough to handle adult content that depicts violence and sex.
 
 PLOT
-You're creating a script for a new {narrative} movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that {hero_name}'s next action will be to {do}. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+You're in the middle of shooting a {narrative} movie, and have decided to rewrite the plot structure. A summary of the most recent scene that's been shot is enclosed below in <SceneSummary> XML tags.
 
-For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
+<SceneSummary>
+{scene_history}
+</SceneSummary>
+
+You've decided that {hero_name}'s next action will be to {do}. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some additional context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 {beats}
 </PlotBeats>
 
-PLOT_FS1
-You're creating a script for a new teen drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that Alex's next action will be to break the lamp. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
 
-For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
+PLOT_FS1
+You're in the middle of shooting a teen drama movie, and have decided to rewrite the plot structure. A summary of the most recent scene that's been shot is enclosed below in <SceneSummary> XML tags.
+
+<SceneSummary>
+Alex listlessly toys with his dinner.
+
+"I, um, have some good news kiddo," his mom says. "You know that position I applied for, at the testing center? I got it! They're making me head proctor."
+
+Alex scowls. "Uh, isn't that, like, 3 hours from here?"
+
+She nods, "Two actually. But yes, we, umm. We'll have to get a place closer by. There. In Brentwood."
+
+Alex can't believe his ears. "What the fuck, mom?? We just started the school year, I can't just up and move..."
+
+"No, honey, no, you won't have to! I mean yes, eventually, but they'll let you finish out the school year at Scottsdale. It's just one district over, the schoo. in Brentwood is great, you'll love it there! They've got an olympic pool, and a lacross team, and..."
+
+She goes on, trying to sell her son on changing schools.
+</SceneSummary>
+
+You've decided that Alex's next action will be to throw the lamp. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some additional context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Introduce protagonist, Alex, a troubled teen new to an elite high school in a quiet suburban town.</Beat>
@@ -410,6 +641,8 @@ For some context, here are the plot beats you've created for your movie so far, 
 <Beat>Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.</Beat>
 </PlotBeats>
 
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+
 PLOT_FS2
 <PlotBeats>
 <Beat>Alex flies into a rage and starts breaking things around the house. His mom tries to get him to stop, and he accidentally hits her. She falls to the floor unconscious.</Beat>
@@ -418,9 +651,19 @@ PLOT_FS2
 </PlotBeats>
 
 PLOT_FS3
-You're creating a script for a new slasher horror movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that Jack's next action will be to go pee. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+You're in the middle of shooting a slasher horror movie, and have decided to rewrite the plot structure. A summary of the most recent scene that's been shot is enclosed below in <SceneSummary> XML tags.
 
-For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
+<SceneSummary>
+After eating, Emma proposes that they all tell some spooky campfire stories. Jack, already tipsy, woots, but everyone else begrudgingly agrees.
+
+Emma starts a story about a school teacher who gets assigned to do a substitute teaching gig in a foreign country; in the end, the teacher realizes she's teaching a class full of ghosts. Teasing moans come from the others, Ryan volunteers next.
+
+He tells a tale about a chef who gets commissioned to cook for a family who live in a remote mansion in the mountains; in the end, he realizes he has actually cooked the matriarch. More moans, teasing.
+<SceneSummary>
+
+You've decided that Jack's next action will be to go pee. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some additional context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Aerial shot of Ravenswood, an isolated, eerie town with a dark history of gruesome murders.</Beat>
@@ -431,17 +674,31 @@ For some context, here are the plot beats you've created for your movie so far, 
 <Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
 </PlotBeats>
 
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+
 PLOT_FS4
 <PlotBeats>
 <Beat>Jack get's up to go pee. He's a little drunk, stumbles off into the woods. Strange noises follow him, eyes peering from the dark. Jack gets nervous.</Beat>
 <Beat>As Jack is peeing, more sounds, a ferral grunting. Jack turns around and is attacked by a large humanoid figure, hard to see in the dark.</Beat>
-<Beat>Fight scene, Alex versus the figure, then Jack runs. A chase through the woods, alex reaches a ravine, decides to jump. Dark figure looks from above helplessly as Jack falls far into the river below.</Beat>
+<Beat>Fight scene, Jack versus the figure, then Jack runs. A chase through the woods, alex reaches a ravine, decides to jump. Dark figure looks from above helplessly as Jack falls far into the river below.</Beat>
 </PlotBeats>
 
 PLOT_FS5
-You're creating a script for a new family drama movie. You're in the ideation phase, in the middle of creating a list of plot beats. You've decided that John's next action will be to bribe them. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+You're in the middle of shooting a family drama movie, and have decided to rewrite the plot structure. A summary of the most recent scene that's been shot is enclosed below in <SceneSummary> XML tags.
 
-For some context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
+<SceneSummary>
+They all assemble in the great room, wondering what all the fuss is about. It's a generally dark, somber mood; nobody really wants to be here.
+
+John enters from the foyer, not looking particularly contrite. He tries to act like everything is normal, but the family cuts him down and demans to know what he wants.
+
+John clears his throat and states that all he wants is for everyone to be close, like in the old days. He implores everyone to come spend Christmas here, at his house this year.
+
+Everyone starts protesting, talking about existing plans. John presses, insists that recent events demand family unity. But Carla talks about her fiancee and his plans for her to meet his family at Tahoe. June talks about a business appoint with important clients, and so do all the other family members, describing in protest their existing plans.
+</SceneSummary>
+
+You've decided that John's next action will be to bribe them. Create the next 3 plot beats that include and follow from this action. Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. Put each beat inside <Beat> XML tags, and enclose everything inside <PlotBeats> XML tags.
+
+For some additional context, here are the plot beats you've created for your movie so far, enclosed below in <PlotBeats> XML tags:
 
 <PlotBeats>
 <Beat>Flashbacks of a family's idyllic life 5 years prior, disturbing recent events.</Beat>
@@ -451,6 +708,8 @@ For some context, here are the plot beats you've created for your movie so far, 
 <Beat>John's eldest, Toby, struggling to cope, begins to spin an elaborate, comforting deceit.</Beat>
 <Beat>As darkness settles, a now-bruised John beseeches the family to reunite for Christmas dinner.</Beat>
 </PlotBeats>
+
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
 
 PLOT_FS6
 <PlotBeats>
@@ -478,7 +737,7 @@ In the current scene, the hero has taken the following action, enclosed in <Hero
 {do}
 </HeroAction>
 
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags, and provide your reasoning inside <Reasoning> XML tags.
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
 
 PA_FS1
 The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
@@ -502,11 +761,11 @@ In the current scene, the hero has taken the following action, enclosed in <Hero
 eat sandwich
 </HeroAction>
 
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags, and provide your reasoning inside <Reasoning> XML tags.
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
 
 PA_FS2
-<Output>incidental</Output>
 <Reasoning>The action of eating a sandwich is irrelevant to the main action of the scene, and is very unlikely to alter the course of events unfolding. It is a mundane action, and is of no consequence in this context.</Reasoning>
+<Output>incidental</Output>
 
 PA_FS3
 The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
@@ -532,11 +791,11 @@ In the current scene, the hero has taken the following action, enclosed in <Hero
 look in the bushes
 </HeroAction>
 
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, and wrap your output in <Output> XML tags:
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
 
 PA_FS4
-<Output>pivotal</Output>
 <Reasoning>Given that a primary character, Emma, is missing, it follows that the hero would start looking for her. Examining things like bushes seems to flow with the action of the plot, and is very relevant.</Reasoning>
+<Output>pivotal</Output>
 
 PA_FS5
 The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
@@ -559,11 +818,11 @@ In the current scene, the hero has taken the following action, enclosed in <Hero
 turn on the light
 </HeroAction>
 
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please reply with "pivotal" or "incidental" only, and wrap your output in <Output> XML tags:
+Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
 
 PA_FS6
-<Output>incidental</Output>
 <Reasoning>The current scene is about a critical conversation Brody has with Jason. Whether or not the light switch is on is completely irrelevant to the action taking place, and so is considered an incidental action.</Reasoning>
+<Output>incidental</Output>
 
 ACTION_FIT
 There's a movie script you're looking over. You pull a random action for the hero, {hero_name}, out of a hat: that action is enclosed in <HeroAction> XML tags below:

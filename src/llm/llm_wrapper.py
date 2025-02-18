@@ -36,7 +36,7 @@ log = logging.getLogger("llm")
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 passive_embeddings = None
 prompts = PromptsConfig("prompts.txt")
-log_input_context_len = 850
+log_input_context_len = 1200
 
 # Generate story LLM
 max_ttl_toks = 60000
@@ -90,6 +90,9 @@ def get_prompt_templates(prefix, len_msgs):
 
 # exec LLM
 def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_plot_beat, narrative_style, status_win):
+    new_beat = False
+    log.info(f"Player command: {command}")
+    
     # Ensure plot beats are sorted out
     if len(plot_beats) == 0:
         plot_beats = do_initial_plot_beats(narrative_style, history, status_win)
@@ -102,22 +105,28 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
             score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
             log.debug(f"score_bar {score_bar}, score: {score}")
             if score < score_bar:
-                new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, status_win)
+                new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win)
                 log.debug(f"Adding '{new_beats[0]}' to plot")
                 plot_beats.append(new_beats[0])
                 num_actions_in_plot_beat = 0
+                new_beat = True
             num_actions_in_plot_beat += 1
 
     # Generate the story continuation
-    story = do_primary(command, notes, history, plot_beats, narrative_style, status_win)
+    if new_beat:
+        story = do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, False)
+    else:
+        story = do_primary(command, notes, history, plot_beats, narrative_style, status_win, False)
     
     return (story, plot_beats, num_actions_in_plot_beat)
 
-def do_primary(command, notes, history, plot_beats, narrative_style, status_win):
+def do_primary(command, notes, history, plot_beats, narrative_style, status_win, use_claude=True):
     set_status_win(status_win, "Story Generation")
-    out_parser = XMLOutputParser()
+    out_parser = XMLOutputParser(tags=["HeroLocation", "Reasoning", "Snippet"])
+    parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
+    ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
-    example_msgs = [p for p in get_prompt_templates("PRIMARY", 4)]
+    example_msgs = [p for p in get_prompt_templates("P", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY"))
     beats_str = "* " + "\n* ".join(plot_beats[:-1])
     template_vars = {
@@ -142,23 +151,71 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win)
         temperature=.65
     )
 
-    chain_bedrock = fast_llm | refusal_lambda | out_parser
-    chain_local = llm | out_parser
-    chain = p | chain_bedrock.with_fallbacks([chain_local])
+    if use_claude:
+        chain_bedrock = fast_llm_creative | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain_local = llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain = p | chain_bedrock.with_fallbacks([chain_local])
+    else:
+        chain = p | llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
     log.info("***** Invoking LLM for PRIMARY *****")
     ret = chain.invoke(template_vars)
 
-    return get_xml_val(ret, "Snippet")
+    return get_xml_val(ret, "Snippet", "Root")
+
+def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, use_claude=True):
+    set_status_win(status_win, "Story Generation (new scene)")
+    out_parser = XMLOutputParser(tags=["Changes", "Snippet"])
+    parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
+    ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
+    sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
+    example_msgs = [p for p in get_prompt_templates("PNS", 4)]
+    human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY_NEWSCENE"))
+    beats_str = "* " + "\n* ".join(plot_beats[:-1])
+    template_vars = {
+        "narrative": narrative_style,
+        "beats": beats_str,
+        "notes": notes,
+        "do": command,
+        "current_beat": plot_beats[-2],
+        "new_beat": plot_beats[-1],
+        "continue_from": get_last_paragraphs(history, 3)[0]
+    }
+    p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
+    num_prompt_tokens = len(tokenize_nlp(p.format_prompt(**template_vars).to_string())) + 100 # Don't know why, but vllm seems to be adding tokens to the input
+    print(f"num_prompt_tokens {num_prompt_tokens}")
+    log.debug(p.format_prompt(**template_vars).to_string()[-log_input_context_len:])
+
+    llm = ChatOpenAI(
+        openai_api_base="http://localhost:8000/v1",
+        openai_api_key="token-abc123",
+        model_name="local",
+        callbacks=[LoggingPassthroughCallback()],
+        max_tokens=max_ttl_toks - num_prompt_tokens,
+        temperature=.65
+    )
+
+    if use_claude:
+        chain_bedrock = fast_llm_creative | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain_local = llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain = p | chain_bedrock.with_fallbacks([chain_local])
+    else:
+        chain = p | llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+    log.info("***** Invoking LLM for PRIMARY_NEWSCENE *****")
+    ret = chain.invoke(template_vars)
+
+    return get_xml_val(ret, "Snippet", "Root")
     
-def do_plot_gen(narrative_style, hero_name, command, plot_beats, status_win):
+def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, use_claude=True):
     set_status_win(status_win, "Plot Generation")
     out_parser = XMLOutputParser(tags=["Beat"])
     plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats])
+    scene_history = get_last_paragraphs(history, 5)[0]
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("PLOT", 6)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PLOT"))
     template_vars = {
         "narrative": narrative_style,
+        "scene_history": scene_history,
         "hero_name": hero_name,
         "beats": plot_beats_xml,
         "do": command
@@ -177,9 +234,12 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, status_win):
     )
 
     # invoke LLM
-    chain_bedrock = fast_llm_creative | refusal_lambda | out_parser
-    chain_local = llm | out_parser
-    chain = p | chain_bedrock.with_fallbacks([chain_local])
+    if use_claude:
+        chain_bedrock = fast_llm_creative | refusal_lambda | out_parser
+        chain_local = llm | out_parser
+        chain = p | chain_bedrock.with_fallbacks([chain_local])
+    else:
+        chain = p | llm | out_parser
     log.info("***** Invoking LLM for PLOT *****")
     ret = chain.invoke(template_vars)
 
