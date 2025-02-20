@@ -36,7 +36,7 @@ log = logging.getLogger("llm")
 embedded_xml_re = re.compile("<[^>]*>(.*)</[^>]*>")
 passive_embeddings = None
 prompts = PromptsConfig("prompts.txt")
-log_input_context_len = 1200
+log_input_context_len = 1500
 
 # Generate story LLM
 max_ttl_toks = 60000
@@ -72,9 +72,9 @@ big_llm = ChatBedrock(
     model_id=model_id,
     model_kwargs={
         "max_tokens": 8192,
-        "temperature": 0
+        "temperature": .8
     },
-    config=Config(connect_timeout=10, read_timeout=10, retries={"mode": "adaptive"}),
+    config=Config(connect_timeout=20, read_timeout=120, retries={"mode": "adaptive"}),
     streaming=False,
     callbacks=[LoggingPassthroughCallback()],
     credentials_profile_name="me"
@@ -99,13 +99,14 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
         num_actions_in_plot_beat = 1
     else:
         curr_beat = plot_beats[-1] # always assume the last plot beat is the current one
-        action_type = do_is_pivotal_action(narrative_style, plot_beats, command, status_win)
+        # action_type = do_is_pivotal_action(narrative_style, plot_beats, command, status_win)
+        action_type = "pivotal"
         if action_type == "pivotal":
-            score = do_action_fit(history, hero_name, curr_beat, command, status_win)
+            score = do_action_fit(plot_beats, notes, command, status_win, False)
             score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
             log.debug(f"score_bar {score_bar}, score: {score}")
-            if score < score_bar:
-                new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win)
+            if score >= score_bar:
+                new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, True)
                 log.debug(f"Adding '{new_beats[0]}' to plot")
                 plot_beats.append(new_beats[0])
                 num_actions_in_plot_beat = 0
@@ -114,15 +115,15 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
 
     # Generate the story continuation
     if new_beat:
-        story = do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, False)
+        story = do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, True)
     else:
-        story = do_primary(command, notes, history, plot_beats, narrative_style, status_win, False)
+        story = do_primary(command, notes, history, plot_beats, narrative_style, status_win, True)
     
     return (story, plot_beats, num_actions_in_plot_beat)
 
-def do_primary(command, notes, history, plot_beats, narrative_style, status_win, use_claude=True):
+def do_primary(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
     set_status_win(status_win, "Story Generation")
-    out_parser = XMLOutputParser(tags=["HeroLocation", "Reasoning", "Snippet"])
+    out_parser = XMLOutputParser(tags=["HeroLocation", "ScenePotential", "HeroActionResult", "Description"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
@@ -152,7 +153,7 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     )
 
     if use_claude:
-        chain_bedrock = fast_llm_creative | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain_bedrock = big_llm | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
         chain_local = llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
         chain = p | chain_bedrock.with_fallbacks([chain_local])
     else:
@@ -160,9 +161,9 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     log.info("***** Invoking LLM for PRIMARY *****")
     ret = chain.invoke(template_vars)
 
-    return get_xml_val(ret, "Snippet", "Root")
+    return get_xml_val(ret, "Description", "Root")
 
-def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, use_claude=True):
+def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
     set_status_win(status_win, "Story Generation (new scene)")
     out_parser = XMLOutputParser(tags=["Changes", "Snippet"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
@@ -195,7 +196,7 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
     )
 
     if use_claude:
-        chain_bedrock = fast_llm_creative | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
+        chain_bedrock = big_llm | refusal_lambda | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
         chain_local = llm | ensure_parent_xml | out_parser.with_fallbacks([parser_fallback])
         chain = p | chain_bedrock.with_fallbacks([chain_local])
     else:
@@ -205,7 +206,7 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
 
     return get_xml_val(ret, "Snippet", "Root")
     
-def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, use_claude=True):
+def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, use_claude):
     set_status_win(status_win, "Plot Generation")
     out_parser = XMLOutputParser(tags=["Beat"])
     plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats])
@@ -248,18 +249,19 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status
     
     return beats
 
-def do_action_fit(history, hero_name, curr_beat, action, status_win):
+def do_action_fit(plot_beats, notes, action, status_win, use_claude):
     set_status_win(status_win, "Action Fit")
-    history_snippet = get_last_n_toks(history, 200)
+    beats_str = "* " + "\n* ".join(plot_beats[:-1])
+    curr_beat = plot_beats[-1]
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     out_parser = XMLOutputParser(tags=["Score", "Reasoning"])
-    sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
+    sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("ACTION_FIT_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("AF", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("ACTION_FIT"))
     template_vars = {
-        "history": history_snippet,
+        "beats": beats_str,
+        "notes": notes,
         "curr_beat": curr_beat,
-        "hero_name": hero_name,
         "do": action
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
@@ -275,9 +277,13 @@ def do_action_fit(history, hero_name, curr_beat, action, status_win):
         temperature=0
     )
 
-    chain_bedrock = fast_llm | refusal_lambda | ensure_parent_xml | out_parser
-    chain_local = llm | ensure_parent_xml | out_parser
-    chain = p | chain_bedrock.with_fallbacks([chain_local])
+    if use_claude:
+        chain_bedrock = fast_llm | refusal_lambda | ensure_parent_xml | out_parser
+        chain_local = llm | ensure_parent_xml | out_parser
+        chain = p | chain_bedrock.with_fallbacks([chain_local])
+    else:
+        chain = p | llm | ensure_parent_xml | out_parser
+        
     log.info("***** Invoking LLM for ACTION_FIT *****")
     ret = chain.invoke(template_vars)
 

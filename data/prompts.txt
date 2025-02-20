@@ -1,4 +1,4 @@
-PRIMARY_SYSTEM,PRIMARY,P_FS1,P_FS2,P_FS3,P_FS4,PRIMARY_NEWSCENE,PNS_FS1,PNS_FS2,PNS_FS3,PNS_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
+PRIMARY_SYSTEM,PRIMARY,P_FS1,P_FS2,P_FS3,P_FS4,PRIMARY_NEWSCENE,PNS_FS1,PNS_FS2,PNS_FS3,PNS_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT_SYSTEM,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
 
 PRIMARY_SYSTEM
 You are an assistant to a blind person. Your job is solely to describe what happens around them, in meticulous detail. You are very good at painting a mental picture for your blind person.
@@ -31,9 +31,10 @@ The most recent action you've described from the movie is enclosed below in <Rec
 The hero is trying to {do}. Do the following steps:
 
 <Steps>
-1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
-2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
-3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
+2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
+4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
 
 P_FS1
@@ -85,15 +86,23 @@ The most recent action you've described from the movie is enclosed below in <Rec
 The hero is trying to pull out my gun. Do the following steps:
 
 <Steps>
-1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
-2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
-3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
+2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
+4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
 
 P_FS2
 <HeroLocation>large, empty room inside an unknown facility</HeroLocation>
-<Reasoning>Sheila is exploring the facility and has just come across the silent man in the large room. The current scene indicates that Sheila has a flashback and that she is shaken by this. Since the most recent action references screams in her head and described Sheila being distraught, I would infer that Sheila has already had the flashback. Given that, I would say we're near the end of this scene.</Reasoning>
-<Snippet>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Snippet>
+<ScenePotential>I think the following developments are possibilities in this scene:
+
+* Sheila could initiate a conversation with the man.
+* The Man could initiate a conversation with Sheila.
+* Sheila might find out, one way or another, what connection the man has to her history.
+* Sheila might adopt a hostile stance towards the man, and might even attack him.
+* An unknown feature of the facility might reveal itself in this room, like intrusive body probing.</ScenePotential>
+<HeroActionResult>I think her blatantly hostile action will draw no reaction from the man.</HeroActionResult>
+<Description>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Description
 
 P_FS3
 You and your blind person are watching a coming-of-age movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
@@ -139,19 +148,30 @@ The most recent action you've described from the movie is enclosed below in <Rec
 The hero is trying to yell at her. Do the following steps:
 
 <Steps>
-1. Where do you think the hero is currently located? Provide your answer inside <HeroLocation> XML tags.
-2. Reason out where we are in the current scene. Are we at the beginning, middle, or end? Provide your output inside <Reasoning> XML tags.
-3. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Snippet> XML tags.
+1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
+2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
+4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
 
 P_FS4
 <HeroLocation>Mrs. Johnson's literature class</HeroLocation>
-<Reasoning>The previous day Kevin placed a love note on Mrs. Johnson's desk. He is now in her class and is nervous about her reading his note. Mrs. Johnson, however, is teaching class. The current scene describes Kevin closing his eyes to try to deal with his emotions, and Mrs. Johnson scolding him for sleeping.
+<ScenePotential>I think the following developments are possibilities in this scene:
 
-The most recent action describes Kevin opening his eyes and his classmates laughing at him. Based on this, I could surmise that Mrs. Johnson has already scolded him. Therefore, we should be at the end of this particular scene.</Reasoning>
-<Snippet>The laughter continues, time slows down. Kids laughing, Mrs. Johnson looking sternly at him. Kevin's eyes dart about, like a trapped animal. Tears start to form at the edges of his eyes, everything presses in on him.
+* Kevin might leave the classroom abruptly.
+* Kevin might suffer a further embarrassment, like a classmate throwing something at him.
+* Mrs. Johnson might reprimand the class for laughing.
+* Kevin might get angry at the situation and lash out.</ScenePotential>
+<HeroActionResult>I think Kevin's outburst will silence the class and shock Mrs. Johnson, for a moment, before she escorts him out of the classroom.</HeroActionResult>
+<Description>The laughter continues, time slows down. Kids laughing, Mrs. Johnson looking sternly at him. Kevin's eyes dart about, like a trapped animal. Tears start to form at the edges of his eyes, everything presses in on him.
 
-Suddenly he screams at the top of his lungs, "Fuck off!"</Snippet>
+Suddenly he screams at the top of his lungs, "Fuck off!"
+
+It's like a lightswitch was flipped. Time freezes for a moment, the shocked look on Mrs. Johnson's face, framed in perfect silence from the entire class.
+
+Then, "Kevin Burnock, come with me!" Mrs. Johnson grabs Kevin by the arm, pulling him out of his desk, and escorts him out of the classroom.
+
+Kevin stares straight at the floor as he stumbles behind her, hoping no one sees his tears.</Description>
 
 PRIMARY_NEWSCENE
 You and your blind person are watching a {narrative} movie. You've been describing the action to your blind person throughout; the movie summary so far is enclosed below in <MovieSummary> XML tags. Some top-of-mind notes are enclosed in <StoryNotes> XML tags.
@@ -824,69 +844,83 @@ PA_FS6
 <Reasoning>The current scene is about a critical conversation Brody has with Jason. Whether or not the light switch is on is completely irrelevant to the action taking place, and so is considered an incidental action.</Reasoning>
 <Output>incidental</Output>
 
+ACTION_FIT_SYSTEM
+You are a professional movie editor. Your job is to ensure plot continuity and scene cohesion. You know all there is to know about scene pacing, story rhythm, and how a movie should fit together to achieve the director's vision.
+
 ACTION_FIT
-There's a movie script you're looking over. You pull a random action for the hero, {hero_name}, out of a hat: that action is enclosed in <HeroAction> XML tags below:
-
-<HeroAction>
-{do}
-</HeroAction>
-
-What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
 
 <StorySoFar>
-{history}
+{beats}
 </StorySoFar>
 
-The current plot beat is enclosed below in <PlotBeat> XML tags:
+The current scene is summarized below in <CurrentScene> XML tags:
 
-<PlotBeat>
+<CurrentScene>
 {curr_beat}
-</PlotBeat>
+</CurrentScene>
 
-Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
+
+<Notes>
+{notes}
+</Notes>
+
+You pull a random action for the hero out of a hat: {do}. Score how well you think this action deserves a new scene transition using the following guidelines:
 
 <ScoringGuidelines>
-- Use a scale of 1 to 10
+- Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
-- Do not take into account writerly concerns like building tension, etc.
 - Your interpretation of the action should be somewhat loose
 </ScoringGuidelines>
 
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
 
 AF_FS1
-There's a movie script you're looking over. You pull a random action for the hero, Kevin, out of a hat: that action is enclosed in <HeroAction> XML tags below:
-
-<HeroAction>
-yell at her
-</HeroAction>
-
-What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
 
 <StorySoFar>
-The bell rings. Kevin sweats, his hands trembling as he hastily stuffs his backpack into the corner of the locker, his eyes fixed on the door to his classroom. He wipes his hands on his pants and makes his way down the hall.
-
-He takes a deep, ragged breath and enters the classroom. The beautiful Mrs. Johnson is near the whiteboard, writing down something about literature in neat, black letters. He pauses a moment, drinking her in. Oggling her, really, as he usually does. Time stands still a moment.
-
-Now his gaze cuts over to a piece of crumpled paper on her desk. He gulps audibly, nervously taking his seat. He runs his hands through his hair, his gaze still fixed on that piece of paper.
-
-The teacher is droning on about her lesson, Kevin isn't paying attention. His brow is sweating. His fingers drum his desk. He closes his eyes tightly and just sits there a moment. His feet shake uncontrollably against the floor. He continues to try to sit still, his eyes shut.
-
-Mrs. Johnson's voice cuts through the air, "Kevin, if you can't pay attention in my class you could at least get a good night's sleep *before* coming to school." The whole room laughed. She was next to his desk, looking down at him sternly.
-
-Kevin's eyes flash open. The whole class is laughing.
+* Introduce Kevin, an angsty teen who goes to School at Kimbal High.
+* Reveal Kevin comes from a broken home and lives with his mother, who doesn't give him much attention.
+* Kevin's days at school are lonely. Introduce his literature teacher, Miss Johnson, whom Kevin has a crush on.
+* Kevin resolves to tell Miss Johnson how he feels; he decides to write her a sonnet.
+* Kevin waits after school to put the sonnet on Miss Johnson's desk.
+* Next day, a nervous Kevin waits in literature class for Miss Johnson to read his note. He is overcome with anxiety and closes his eyes.
+* Miss Johnson reprimands Kevin for sleeping in her class; his classmates laugh at him.
 </StorySoFar>
 
-The current plot beat is enclosed below in <PlotBeat> XML tags:
+The current scene is summarized below in <CurrentScene> XML tags:
 
-<PlotBeat>
+<CurrentScene>
 Kevin gets embarrassed and leaves class. He runs into the bathroom and locks himself in one of the stalls.
-</PlotBeat>
+</CurrentScene>
 
-Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
+
+<Notes>
+Hero name: Kevin Burnock
+Enemies: Wade
+Allies: Ephram, Tooly, Jim
+Physical status: healthy
+Mental status: flustered
+Posessions:
+- pencil
+Wearing:
+- slightly smelly t-shirt
+- loose cargo pants
+Motivations:
+- Survive the 6th grade
+- The lovely Mrs. Johnson
+- Avoid Wade and his cronies
+Current location: Kimbal High, Literature Class
+Time of day: morning
+Weather: dreary
+</Notes>
+
+You pull a random action for the hero out of a hat: yell at her. Score how well you think this action deserves a new scene transition using the following guidelines:
 
 <ScoringGuidelines>
-- Use a scale of 1 to 10
+- Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
 - Do not take into account writerly concerns like building tension, etc.
 - Your interpretation of the action should be somewhat loose
@@ -895,41 +929,52 @@ Given the hero's action and where we are in the script, score how well the hero'
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
 
 AF_FS2
-<Reasoning>Getting angry and yelling at his teacher is a logical prelude to running out of the classroom. It doesn't immediately get us there, but it fits with the action and seems appropriate  to the current plot beat.</Reasoning>
+<Reasoning>Getting angry and yelling at his teacher is a logical prelude to running out of the classroom. It doesn't immediately get us there, but it fits with the action and seems appropriate to the current scene. A new scene transition doesn't quite appropriate at this point.</Reasoning>
 
-<Score>7</Score>
+<Score>3</Score>
 
 AF_FS3
-There's a movie script you're looking over. You pull a random action for the hero, Emily, out of a hat: that action is enclosed in <HeroAction> XML tags below:
-
-<HeroAction>
-hail a taxi
-</HeroAction>
-
-What's happened so far in the movie is enclosed below in <StorySoFar> XML tags:
+There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
 
 <StorySoFar>
-Jack offers Emma his business card, which she accepts with slightly trembling fingers. The papers are gathered, though some remain scattered on the sidewalk. His shirt is still stained with coffee, a large brown splash across the pristine white fabric.
-
-Jack suggests they grab a coffee to replace the one she spilled. Emma hesitates, glancing at her watch - clearly she's running late for something important. But there's a subtle smile playing at the corners of her mouth that suggests she's intrigued.
-
-"I know a cafe just around the corner," Jack says, gesturing down the street. His voice is smooth, confident, with just a hint of playful challenge.
-
-Emma adjusts her blazer, tucking a wayward curl behind her ear. "I really shouldn't," she says, but her tone doesn't sound entirely convincing. The professional facade is starting to crack, revealing a spark of spontaneity.
-
-A taxi honks in the background. Pedestrians continue to stream past them on the busy sidewalk, weaving around the two who seem momentarily frozen in their own small bubble of possibility. Jack's expensive gray suit stands in sharp contrast to the bustling urban environment, and Emma's navy blazer catches the light as she continues to waver between professional responsibility and unexpected attraction.
+* Introduce Emma, a geeky but pretty girl trying to get by in the big city.
+* At work for a large publishing house, Emma struggles to impress her boss, Mrs. Goring. Emma has missed a deadline and is reprimanded for it.
+* Next morning, Emma struggles to get out of bed. Defeat is her only motivation. She realizes she's late for work and rushes out.
+* Walking quickly to work, she accidentally bumps into a young, attractive man, Jack. He introduces himself.
 </StorySoFar>
 
-The current plot beat is enclosed below in <PlotBeat> XML tags:
+The current scene is summarized below in <CurrentScene> XML tags:
 
-<PlotBeat>
+<CurrentScene>
 Jack offers to take her out for coffee, Emily hesitates, obviously attracted to him. Work beckons.
-</PlotBeat>
+</CurrentScene>
 
-Given the hero's action and where we are in the script, score how well the hero's action fits with the current plot beat using the following guidelines:
+Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
+
+<Notes>
+Hero name: Emma Dooley
+Friends: Phyllis
+Physical status: healthy
+Mental status: flustered
+Posessions:
+- umbrella
+- purse
+- briefcase
+Wearing:
+- a smart, green business suit
+Motivations:
+- succeed at work
+Romantic Situation:
+- just met the attractive Jack
+Current location: middle of a busy intersection
+Time of day: morning
+Weather: drizzly
+</Notes>
+
+You pull a random action for the hero out of a hat: hail a taxi. Score how well you think this action deserves a new scene transition using the following guidelines:
 
 <ScoringGuidelines>
-- Use a scale of 1 to 10
+- Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
 - Do not take into account writerly concerns like building tension, etc.
 - Your interpretation of the action should be somewhat loose
@@ -939,10 +984,10 @@ Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score
 
 AF_FS4
 <Reasoning>
-The current plot beat describes a romantic moment, a critical choice between love and work for Emily. Her voluntarily hailing a taxi to leave just doesn't fit the scene. It's jarring and isn't consistent with the behavior of someone attracted to another, as described in the beat.
+The current scene describes a romantic moment, a critical choice between love and work for Emily. Her voluntarily hailing a taxi to leave doesn't seem to fit the current scene. It suggests a transition to a more desperate desire to leave the situation on Emma's part, and so deserves its own scene.
 </Reasoning>
 
-<Score>3</Score>
+<Score>7</Score>
 
 INITIAL_BEATS
 For your new {narrative} movie, a producer has given you the story prelude, provided below in <Prelude> XML tags:
