@@ -4,7 +4,7 @@ from text_processing.text_utils import normalize_newlines_arr
 import platform as _platform
 import logging
 
-log = logging.getLogger("editor")
+log = logging.getLogger("ui")
 
 unicode_elipse = 8230
 

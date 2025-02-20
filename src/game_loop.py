@@ -9,7 +9,8 @@ from ui.curses_utils import (
     win_labels,
     main_screen,
     label_win,
-    redraw_frame
+    redraw_frame,
+    set_win_text
 )
 from ui.enhanced_window import EnhancedWindow
 from ui.notes_window import NotesWindow
@@ -25,10 +26,19 @@ K_DOWN = curses.KEY_DOWN
 K_1 = 49
 K_2 = 50
 K_3 = 51
+K_LCR = 114
+K_LCU = 117
+K_UCR = 82
+K_UCU = 85
 K_DBLQUOTE = 460
 K_SNGQUOTE = 530
 
+did_inference = False
+prev_num_actions_in_plot_beat = -1
+
 def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
+    global did_inference
+    
     # draw main screen
     s.erase()
     hist_win, notes_win, input_win, status_win, main_tb, in_cost_win, out_cost_win = main_screen(s)
@@ -46,8 +56,8 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
         
     # initial "input" mode
     mode = "input"
-    focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
-    new_command = ""
+    focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win, status_win)
+    cur_command = ""
     char = -1
     new_story = None
     curses.curs_set(1)
@@ -55,15 +65,18 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     
     while True:
         if mode == "none":
+            # debug_char(s, char)
             if char == K_1:
                 mode = "hist"
-                focus(s, win_labels["LAB_HIST"], hist_win, notes_win, input_win)
+                focus(s, win_labels["LAB_HIST"], hist_win, notes_win, input_win, status_win)
             elif char == K_2:
                 mode = "notes"
-                focus(s, win_labels["LAB_NOTES"], hist_win, notes_win, input_win)
+                focus(s, win_labels["LAB_NOTES"], hist_win, notes_win, input_win, status_win)
             elif char == K_3:
                 mode = "input"
-                focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
+                focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win, status_win)
+            elif char in [K_LCR, K_UCR, K_LCU, K_UCU] and did_inference:
+                mode = "undo_inference"
             elif char == K_ESC:
                 return 0
             else:
@@ -72,18 +85,50 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 curses.doupdate()
         elif mode == "update_notes":
             resp = update_notes(gs.notes, output, status_win, in_cost_win, out_cost_win)
-            #log.debug(resp)
             if resp and len(resp):
                 resp = resp.strip()
                 nw.set_content(resp)
                 nw.print_content()
                 gs.notes = resp
+            mode = "save_game"
+        elif mode == "save_game":
             set_win_text(status_win, "Saving game...", False)
             curses.doupdate()
             gs_persist.save(gs)
             set_win_text(status_win, "Complete", True)
             mode = "input"
-        elif mode == "proc_input":
+            focus(s, win_labels["LAB_INPUT"], hist_win, notes_win, input_win)
+        elif mode == "undo_inference":
+            # undo UI & game state
+            hw.undo_content()
+            if should_add_command_to_history(prev_command):
+                hw.undo_content()
+            gs.history = hw.get_ttl_content(False)
+            nw.undo_content()
+            gs.notes = nw.get_ttl_content()
+            if gs.num_actions_in_plot_beat <= 1:
+                gs.num_actions_in_plot_beat = 2
+                if prev_num_actions_in_plot_beat >= 0:
+                    gs.num_actions_in_plot_beat = prev_num_actions_in_plot_beat
+                gs.plot_beats.pop()
+            else:
+                gs.num_actions_in_plot_beat -= 1
+            hw.print_content(True)
+            nw.print_content()
+            curses.doupdate()
+
+            # can only undo once after a single inference
+            did_inference = False
+            
+            # how to proceed from here?
+            if char in [K_LCU, K_UCU]:
+                # undo only, so save the game
+                mode = "save_game"
+            else:
+                # redo, so reprocess the input
+                cur_command = prev_command
+                mode = "proc_input"
+        elif mode == "proc_output":
             curses.curs_set(0)
             input_win.erase()
             output = new_story
@@ -92,20 +137,27 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
             curses.doupdate()
             gs.history = hw.get_ttl_content(False)
             mode = "update_notes"
+        elif mode == "proc_input":
+            log.info(f"Processing command: {cur_command}")
+            if should_add_command_to_history(cur_command):
+                hw.add_content(cur_command, 1)
+            set_win_text(status_win, "Invoking API...", True)
+            prev_num_actions_in_plot_beat = gs.num_actions_in_plot_beat
+            new_story, gs.plot_beats, gs.num_actions_in_plot_beat = proc_command(cur_command, hero_name, gs.notes, gs.history, gs.plot_beats, gs.num_actions_in_plot_beat, gs.narrative_style, status_win)
+            if new_story:
+                did_inference = True
+                mode = "proc_output"
+            else:
+                set_win_text(status_win, "Received null stream!", True)
         elif mode == "input":
             curses.curs_set(1)
-            new_command = main_tb.edit(input_validator)
+            if len(cur_command.strip()):
+                prev_command = cur_command
+            cur_command = main_tb.edit(input_validator)
             if escaped:
-                mode = none_mode(s, hist_win, notes_win, input_win, True)
+                mode = none_mode(s, hist_win, notes_win, input_win, status_win, True)
             else:
-                if new_command.startswith('"') or new_command.startswith("'"):
-                    hw.add_content(new_command, 1)
-                set_win_text(status_win, "Invoking API...", True)
-                new_story, gs.plot_beats, gs.num_actions_in_plot_beat = proc_command(new_command, hero_name, gs.notes, gs.history, gs.plot_beats, gs.num_actions_in_plot_beat, gs.narrative_style, status_win)
-                if new_story:
-                    mode = "proc_input"
-                else:
-                    set_win_text(status_win, "Received null stream!", True)
+                mode = "proc_input"
         elif mode == "hist":
             if char == K_DOWN:
                 hw.set_viewport_offset(hw.viewport_offset + 1)
@@ -114,7 +166,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 hw.set_viewport_offset(hw.viewport_offset - 1)
                 hw.print_content()
             elif char == K_ESC:
-                mode = none_mode(s, hist_win, notes_win, input_win)
+                mode = none_mode(s, hist_win, notes_win, input_win, status_win)
             curses.doupdate()
         elif mode == "notes":
             curses.curs_set(1)
@@ -126,7 +178,7 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
             else:
                 gs.notes = nw.get_ttl_content()
                 hero_name = get_name_from_notes(gs.notes)
-            mode = none_mode(s, hist_win, notes_win, input_win, True)
+            mode = none_mode(s, hist_win, notes_win, input_win, status_win, True)
                 
         if mode in ["hist", "none"]:
             char = s.getch()
@@ -137,7 +189,7 @@ def label_all(s, hw, nw, iw):
     label_win(s, nw, "2. ", "", win_labels["LAB_NOTES"])
     label_win(s, iw, "3. ", "", win_labels["LAB_INPUT"])
 
-def focus(s, window_label, hw, nw, iw):
+def focus(s, window_label, hw, nw, iw, sw=None):
     redraw_frame(s, hw, win_labels["LAB_HIST"])
     redraw_frame(s, nw, win_labels["LAB_NOTES"])
     redraw_frame(s, iw, win_labels["LAB_INPUT"])
@@ -149,10 +201,16 @@ def focus(s, window_label, hw, nw, iw):
     elif window_label == win_labels["LAB_INPUT"]:
         label_win(s, iw, "*", "*", win_labels["LAB_INPUT"])
 
-def none_mode(s, hw, nw, iw, redraw=False):
+    if sw:
+        sw.erase()
+        sw.refresh()
+
+def none_mode(s, hw, nw, iw, sw, redraw=False):
     redraw_frame(s, hw, win_labels["LAB_HIST"])
     redraw_frame(s, nw, win_labels["LAB_NOTES"])
     redraw_frame(s, iw, win_labels["LAB_INPUT"])
+    if did_inference:
+        set_win_text(sw, "U: Undo, R: Redo", redraw)
     label_all(s, hw, nw, iw)
     curses.curs_set(0)
     if redraw:
@@ -182,10 +240,5 @@ def input_validator(char):
 
     return char
 
-def set_win_text(w, str, refresh):
-    w.erase()
-    w.addstr(0, 0, str)
-    if refresh:
-        w.refresh()
-    else:
-        w.noutrefresh()
+def should_add_command_to_history(command):
+    return command.startswith('"') or command.startswith("'")

@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-log = logging.getLogger("main")
+log = logging.getLogger("llm")
 cur_dir = Path(__file__).parent
 
 class PromptsConfig:

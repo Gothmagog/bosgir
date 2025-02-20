@@ -10,7 +10,7 @@ sent_pos = -1
 lstrip_next_chunk = False
 begin_delim = "<Output>"
 end_delim = "</Output>"
-log = logging.getLogger("main")
+log = logging.getLogger("ui")
 
 def reset_chunker():
     global begin_delim_found, end_delim_found, buffer_, sent_pos, lstrip_next_chunk

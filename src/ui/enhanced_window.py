@@ -2,24 +2,38 @@ from curses import window
 from text_processing.text_utils import normalize_newlines_arr, str_from_arr
 import logging
 
-log = logging.getLogger("main")
+log = logging.getLogger("ui")
 
 sep = "\n"
 
 class EnhancedWindow:
     def __init__(self, s: window):
         self.content_lines = []
+        self.previous_content_lines = []
         self.win = s
         self.viewport_offset = 0
+        self.undo_idxs = []
         
     def add_content(self, new_content, num_new_lines_after=0):
         new_lines = normalize_newlines_arr(new_content, num_new_lines_after, self.get_viewport_width())
+        self.undo_idxs.append(len(self.content_lines))
+        self.previous_content_lines = []
         self.content_lines += new_lines
 
     def set_content(self, new_content):
+        self.previous_content_lines = self.content_lines
         self.content_lines = []
+        self.undo_idxs = []
         self.add_content(new_content)
-        
+
+    def undo_content(self):
+        if len(self.undo_idxs):
+            last_len = self.undo_idxs.pop()
+            self.content_lines = self.content_lines[:last_len]
+        elif len(self.previous_content_lines):
+            self.content_lines = self.previous_content_lines
+            self.previous_content_lines = []
+            
     def get_viewport_width(self):
         return self.win.getmaxyx()[1] - 1
 
@@ -52,6 +66,7 @@ class EnhancedWindow:
         self.win.noutrefresh()
 
     # y is relative to the viewport
+    # can / will be overriden in subclasses
     def print_line(self, y, line):
         self.win.addstr(y, 0, line)
         return 0

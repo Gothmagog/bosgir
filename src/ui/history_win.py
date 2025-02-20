@@ -6,7 +6,7 @@ import re
 
 sep = "\n"
 tokenizer_re = re.compile("([a-zA-Z\.-_!?;:0-9""']+)")
-log = logging.getLogger("main")
+log = logging.getLogger("ui")
 
 class HistoryWindow(EnhancedWindow):
     def __init__(self, s: window):

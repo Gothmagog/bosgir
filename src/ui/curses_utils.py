@@ -126,3 +126,13 @@ def label_win(s: window, w: window, before_str: str, after_str: str, label: str 
         label = "*"
     s.addstr(ul_y-1, ul_x+2, f"{before_str}{label}{after_str}")
     s.noutrefresh()
+
+def set_win_text(s: window, text: str, refresh=True):
+    if s:
+        s.erase()
+        s.addstr(0, 0, text)
+        if refresh:
+            s.refresh()
+        else:
+            s.noutrefresh()
+    

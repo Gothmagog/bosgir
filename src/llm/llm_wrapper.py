@@ -30,6 +30,7 @@ from text_processing.summarization import do_compression
 from llm.prompt_config import PromptsConfig
 from llm.refusals import refusal_lambda
 from llm.callbacks import LoggingPassthroughCallback
+from ui.curses_utils import set_win_text
 
 src_dir = Path(__file__).parent
 log = logging.getLogger("llm")
@@ -122,7 +123,7 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
     return (story, plot_beats, num_actions_in_plot_beat)
 
 def do_primary(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
-    set_status_win(status_win, "Story Generation")
+    set_win_text(status_win, "Story Generation")
     out_parser = XMLOutputParser(tags=["HeroLocation", "ScenePotential", "HeroActionResult", "Description"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
@@ -140,7 +141,6 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
     num_prompt_tokens = len(tokenize_nlp(p.format_prompt(**template_vars).to_string())) + 100 # Don't know why, but vllm seems to be adding tokens to the input
-    print(f"num_prompt_tokens {num_prompt_tokens}")
     log.debug(p.format_prompt(**template_vars).to_string()[-log_input_context_len:])
 
     llm = ChatOpenAI(
@@ -164,7 +164,7 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     return get_xml_val(ret, "Description", "Root")
 
 def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
-    set_status_win(status_win, "Story Generation (new scene)")
+    set_win_text(status_win, "Story Generation (new scene)")
     out_parser = XMLOutputParser(tags=["Changes", "Snippet"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
@@ -183,7 +183,6 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
     num_prompt_tokens = len(tokenize_nlp(p.format_prompt(**template_vars).to_string())) + 100 # Don't know why, but vllm seems to be adding tokens to the input
-    print(f"num_prompt_tokens {num_prompt_tokens}")
     log.debug(p.format_prompt(**template_vars).to_string()[-log_input_context_len:])
 
     llm = ChatOpenAI(
@@ -207,7 +206,7 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
     return get_xml_val(ret, "Snippet", "Root")
     
 def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, use_claude):
-    set_status_win(status_win, "Plot Generation")
+    set_win_text(status_win, "Plot Generation")
     out_parser = XMLOutputParser(tags=["Beat"])
     plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats])
     scene_history = get_last_paragraphs(history, 5)[0]
@@ -250,7 +249,7 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status
     return beats
 
 def do_action_fit(plot_beats, notes, action, status_win, use_claude):
-    set_status_win(status_win, "Action Fit")
+    set_win_text(status_win, "Action Fit")
     beats_str = "* " + "\n* ".join(plot_beats[:-1])
     curr_beat = plot_beats[-1]
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
@@ -293,7 +292,7 @@ def do_action_fit(plot_beats, notes, action, status_win, use_claude):
     return float(val)
 
 def do_is_pivotal_action(narrative_style, plot_beats, action, status_win):
-    set_status_win(status_win, "Is Pivotal Action?")
+    set_win_text(status_win, "Is Pivotal Action?")
     out_parser = XMLOutputParser(tags=["Output", "Reasoning"])
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats[:-1]])
@@ -332,7 +331,7 @@ def do_is_pivotal_action(narrative_style, plot_beats, action, status_win):
     return val
 
 def do_initial_plot_beats(narrative_style, initial_bg, status_win):
-    set_status_win(status_win, "Create Initial Plot Beats")
+    set_win_text(status_win, "Create Initial Plot Beats")
     out_parser = XMLOutputParser(tags=["Beat"])
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("IB", 4)]
@@ -384,12 +383,6 @@ def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
         log.info("Found embedded XML tags in the response, removing it...")
         response = match.group(1)
     return response
-    
-def set_status_win(status_win, text):
-    if status_win:
-        status_win.erase()
-        status_win.addstr(0, 0, text)
-        status_win.refresh()
 
 def get_xml_val(obj, attr_name, root=None, is_arr=False):
     ret = None
