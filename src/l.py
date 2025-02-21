@@ -8,7 +8,6 @@ with open("../logging.yml", "r") as f:
     log_config = yaml.safe_load(f)
 
 logging.config.dictConfig(log_config)
-logging.getLogger().setLevel(logging.INFO)
 
 gs = GameState(history=None, notes=None, narrative_style=None, plot_beats=[], num_actions_in_plot_beat=0)
 gsp = GameStatePersister("../saves/test.sav")

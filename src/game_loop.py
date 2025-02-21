@@ -34,7 +34,6 @@ K_DBLQUOTE = 460
 K_SNGQUOTE = 530
 
 did_inference = False
-prev_num_actions_in_plot_beat = -1
 
 def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     global did_inference
@@ -62,6 +61,10 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
     new_story = None
     curses.curs_set(1)
     curses.doupdate()
+
+    # variables for undo memory
+    prev_num_actions_in_plot_beat = -1
+    prev_cur_scene_start = -1
     
     while True:
         if mode == "none":
@@ -108,8 +111,11 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
             gs.notes = nw.get_ttl_content()
             if gs.num_actions_in_plot_beat <= 1:
                 gs.num_actions_in_plot_beat = 2
+                gs.cur_scene_start = 0
                 if prev_num_actions_in_plot_beat >= 0:
                     gs.num_actions_in_plot_beat = prev_num_actions_in_plot_beat
+                if prev_cur_scene_start >= 0:
+                    gs.cur_scene_start = prev_cur_scene_start
                 gs.plot_beats.pop()
             else:
                 gs.num_actions_in_plot_beat -= 1
@@ -143,7 +149,10 @@ def game_loop(s: window, gs: GameState, gs_persist: GameStatePersister) -> int:
                 hw.add_content(cur_command, 1)
             set_win_text(status_win, "Invoking API...", True)
             prev_num_actions_in_plot_beat = gs.num_actions_in_plot_beat
-            new_story, gs.plot_beats, gs.num_actions_in_plot_beat = proc_command(cur_command, hero_name, gs.notes, gs.history, gs.plot_beats, gs.num_actions_in_plot_beat, gs.narrative_style, status_win)
+            new_story, gs.plot_beats, gs.num_actions_in_plot_beat = proc_command(cur_command, hero_name, gs.notes, gs.history, gs.plot_beats, gs.num_actions_in_plot_beat, gs.cur_scene_start, gs.narrative_style, status_win)
+            if gs.num_actions_in_plot_beat == 1:
+                prev_cur_scene_start = gs.cur_scene_start
+                gs.cur_scene_start = len(gs.history)
             if new_story:
                 did_inference = True
                 mode = "proc_output"

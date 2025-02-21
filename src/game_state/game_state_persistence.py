@@ -45,9 +45,9 @@ class GameStatePersister:
         else:
             val = buffer_[start_from:cur_idx]
         if cur_member == "plot_beats":
-            val = val.split(_asep)
-            return ([x.decode(encoding="utf-8") for x in val], cur_idx)
-        elif cur_member == "num_actions_in_plot_beat":
+            bufs = val.split(_asep)
+            return ([buf.decode(encoding="utf-8").split("|") for buf in bufs], cur_idx)
+        elif cur_member in ["num_actions_in_plot_beat", "cur_scene_start"]:
             return (int(val.decode(encoding="utf-8")), cur_idx)
         return (val.decode(encoding="utf-8"), cur_idx)
 
@@ -55,9 +55,10 @@ class GameStatePersister:
         if type(val) is int:
             val = str(val)
         if member == "plot_beats":
-            for (i, p) in enumerate(val):
+            for (i, v) in enumerate(val):
                 if i > 0:
                     stream.write(_asep)
+                p = "|".join(v)
                 stream.write(p.encode(encoding="utf-8", errors="replace"))
         else:
             stream.write(val.encode(encoding="utf-8", errors="replace"))

@@ -176,11 +176,11 @@ class NotesWindow(EnhancedWindow):
         cur_line = self.content_lines[cur_line_idx]
         if curx > 0 or cur_line_idx > 0:
             cur_line_pos -= 1
-            if curx == 0:
+            if self._get_line_height(cur_line) > 1 and cur_line_pos % self.get_viewport_width() == self.get_viewport_width() - 1:
+                cury -= 1
+            elif curx == 0:
                 cur_line_idx -= 1
                 cury -= 1
                 cur_line_pos = len(self.content_lines[cur_line_idx])
-            elif self._get_line_height(cur_line) > 1 and cur_line_pos % self.get_viewport_width() == self.get_viewport_width() - 1:
-                cury -= 1
             self.win.move(cury, cur_line_pos % self.get_viewport_width())
         return (cur_line_pos, cury, cur_line_idx)

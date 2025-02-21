@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import logging
+import math
 from botocore.config import Config
 from pathlib import Path
 from langchain_openai import ChatOpenAI
@@ -90,26 +91,29 @@ def get_prompt_templates(prefix, len_msgs):
             yield AIMessagePromptTemplate.from_template(prompts.get(p))
 
 # exec LLM
-def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_plot_beat, narrative_style, status_win):
+def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_plot_beat, cur_scene_start_pos, narrative_style, status_win):
     new_beat = False
+    new_game = False
+    cur_scene_hist = history[cur_scene_start_pos:]
     log.info(f"Player command: {command}")
     
     # Ensure plot beats are sorted out
     if len(plot_beats) == 0:
         plot_beats = do_initial_plot_beats(narrative_style, history, status_win)
         num_actions_in_plot_beat = 1
+        new_game = True
     else:
-        curr_beat = plot_beats[-1] # always assume the last plot beat is the current one
         # action_type = do_is_pivotal_action(narrative_style, plot_beats, command, status_win)
         action_type = "pivotal"
         if action_type == "pivotal":
-            score = do_action_fit(plot_beats, notes, command, status_win, False)
-            score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
+            score = do_action_fit(plot_beats, notes, command, status_win, True)
+            # score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
+            score_bar = (math.log10((num_actions_in_plot_beat + .5) / 8.0) * -8) + 3
             log.debug(f"score_bar {score_bar}, score: {score}")
             if score >= score_bar:
                 new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, True)
                 log.debug(f"Adding '{new_beats[0]}' to plot")
-                plot_beats.append(new_beats[0])
+                plot_beats.append([new_beats[0], new_beats[0]])
                 num_actions_in_plot_beat = 0
                 new_beat = True
             num_actions_in_plot_beat += 1
@@ -119,6 +123,11 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
         story = do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, True)
     else:
         story = do_primary(command, notes, history, plot_beats, narrative_style, status_win, True)
+        if not new_game:
+            scene_desc_changed, new_scene_desc = do_scene_desc(cur_scene_hist + story, plot_beats[-1][1], status_win, True)
+            if scene_desc_changed:
+                log.debug(f"Changing current plot beat to: {new_scene_desc}")
+                plot_beats[-1][1] = new_scene_desc
     
     return (story, plot_beats, num_actions_in_plot_beat)
 
@@ -130,13 +139,14 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("P", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY"))
-    beats_str = "* " + "\n* ".join(plot_beats[:-1])
+    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1])
+    cur_beat = plot_beats[-1][1]
     template_vars = {
         "narrative": narrative_style,
         "beats": beats_str,
         "notes": notes,
         "do": command,
-        "current_beat": plot_beats[-1],
+        "current_beat": cur_beat,
         "continue_from": get_last_paragraphs(history, 3)[0]
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
@@ -171,14 +181,16 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("PNS", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY_NEWSCENE"))
-    beats_str = "* " + "\n* ".join(plot_beats[:-1])
+    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1]) # 2nd item is the updated plot beat (more accurate desc)
+    cur_beat = plot_beats[-2][1]
+    new_beat = plot_beats[-1][1]
     template_vars = {
         "narrative": narrative_style,
         "beats": beats_str,
         "notes": notes,
         "do": command,
-        "current_beat": plot_beats[-2],
-        "new_beat": plot_beats[-1],
+        "current_beat": cur_beat,
+        "new_beat": new_beat,
         "continue_from": get_last_paragraphs(history, 3)[0]
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
@@ -208,7 +220,7 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
 def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, use_claude):
     set_win_text(status_win, "Plot Generation")
     out_parser = XMLOutputParser(tags=["Beat"])
-    plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats])
+    plot_beats_xml = "\n".join([f"<Beat>{b[1]}</Beat>" for b in plot_beats]) # 2nd item is the updated plot beat (more accurate desc)
     scene_history = get_last_paragraphs(history, 5)[0]
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("PLOT", 6)]
@@ -250,8 +262,8 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status
 
 def do_action_fit(plot_beats, notes, action, status_win, use_claude):
     set_win_text(status_win, "Action Fit")
-    beats_str = "* " + "\n* ".join(plot_beats[:-1])
-    curr_beat = plot_beats[-1]
+    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1]) # 2nd item is the updated plot beat (more accurate desc)
+    curr_beat = plot_beats[-1][0] # first item is original plot beat
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     out_parser = XMLOutputParser(tags=["Score", "Reasoning"])
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("ACTION_FIT_SYSTEM", True))
@@ -362,7 +374,46 @@ def do_initial_plot_beats(narrative_style, initial_bg, status_win):
     # ensure we got valid parsed resp
     beats = get_xml_val(ret, "Beat", "PlotBeats", True)
 
-    return beats
+    return [[b, b] for b in beats]
+
+def do_scene_desc(scene_hist, cur_beat, status_win, use_claude):
+    set_win_text(status_win, "Update Scene Desc")
+    out_parser = XMLOutputParser(tags=["OriginalSceneDescription", "SceneActionSummary", "MissingDetails"])
+    ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
+    sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
+    human_msg = HumanMessagePromptTemplate.from_template(prompts.get("SCENE_DESC"))
+    template_vars = {
+        "scene_hist": scene_hist,
+        "cur_beat": cur_beat
+    }
+    p = ChatPromptTemplate.from_messages([sys_msg, human_msg])
+    num_prompt_tokens = len(tokenize_nlp(p.format_prompt(**template_vars).to_string())) + 100 # Don't know why, but vllm seems to be adding tokens to the input
+    log.debug(p.format_prompt(**template_vars).to_string()[-log_input_context_len:])
+
+    llm = ChatOpenAI(
+        openai_api_base="http://localhost:8000/v1",
+        openai_api_key="token-abc123",
+        model_name="local",
+        callbacks=[LoggingPassthroughCallback()],
+        max_tokens=max_ttl_toks - num_prompt_tokens,
+        temperature=0
+    )
+
+    # invoke LLM
+    if use_claude:
+        chain_bedrock = fast_llm | refusal_lambda | ensure_parent_xml | out_parser
+        chain_local = llm | ensure_parent_xml | out_parser
+        chain = p | chain_bedrock.with_fallbacks([chain_local])
+    else:
+        chain = p | llm | ensure_parent_xml | out_parser
+    log.info("***** Invoking LLM for SCENE_DESC *****")
+    ret = chain.invoke(template_vars)
+
+    # ensure we got valid parsed resp
+    new_desc = get_xml_val(ret, "SceneActionSummary", "Root").strip()
+    changed = get_xml_val(ret, "MissingDetails", "Root").strip()
+
+    return (changed == "yes", new_desc)
     
 def update_notes(notes, description, status_win, in_tok_win, out_tok_win):
     out_parser = RunnableLambda(lambda x: x.content[x.content.find("<Output>")+8:x.content.find("</Output>")])

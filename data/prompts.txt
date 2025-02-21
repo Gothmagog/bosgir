@@ -1,4 +1,4 @@
-PRIMARY_SYSTEM,PRIMARY,P_FS1,P_FS2,P_FS3,P_FS4,PRIMARY_NEWSCENE,PNS_FS1,PNS_FS2,PNS_FS3,PNS_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,PIVOTAL_ACTION,PA_FS1,PA_FS2,PA_FS3,PA_FS4,PA_FS5,PA_FS6,ACTION_FIT_SYSTEM,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4
+PRIMARY_SYSTEM,PRIMARY,P_FS1,P_FS2,P_FS3,P_FS4,PRIMARY_NEWSCENE,PNS_FS1,PNS_FS2,PNS_FS3,PNS_FS4,UPDATE_NOTES,UN_FS1,UN_FS2,UN_FS3,UN_FS4,UN_FS5,UN_FS6,UN_FS7,UN_FS8,PLOT_SYSTEM,PLOT,PLOT_FS1,PLOT_FS2,PLOT_FS3,PLOT_FS4,PLOT_FS5,PLOT_FS6,ACTION_FIT_SYSTEM,ACTION_FIT,AF_FS1,AF_FS2,AF_FS3,AF_FS4,CREATE_INITIAL_BG,INITIAL_BEATS,IB_FS1,IB_FS2,IB_FS3,IB_FS4,SCENE_DESC
 
 PRIMARY_SYSTEM
 You are an assistant to a blind person. Your job is solely to describe what happens around them, in meticulous detail. You are very good at painting a mental picture for your blind person.
@@ -738,112 +738,6 @@ PLOT_FS6
 <Beat>Toby hits Dan, his sister's husband. John's wife, Susan, throws him out of her house.</Beat>
 </PlotBeats>
 
-PIVOTAL_ACTION
-The outline for a {narrative} unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
-
-<PlotBeats>
-{beats}
-</PlotBeats>
-
-The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
-
-<CurrentPlotBeat>
-{curr_beat}
-</CurrentPlotBeat>
-
-In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
-
-<HeroAction>
-{do}
-</HeroAction>
-
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
-
-PA_FS1
-The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
-
-<PlotBeats>
-<Beat>Introduce protagonist, Alex, a troubled teen new to an elite high school in a quiet suburban town.</Beat>
-<Beat>Alex locks eyes with popular classmate, Rachel, in history class, sparking an instant connection and tension.</Beat>
-<Beat>Alex's attempts to join the school's debate team are met with ridicule and rejection by the coach.</Beat>
-<Beat>Rachel extends an olive branch, inviting Alex to sit with her and her friends, but at a cost.</Beat>
-</PlotBeats>
-
-Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
-
-<CurrentPlotBeat>
-Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.
-</CurrentPlotBeat>
-
-In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
-
-<HeroAction>
-eat sandwich
-</HeroAction>
-
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
-
-PA_FS2
-<Reasoning>The action of eating a sandwich is irrelevant to the main action of the scene, and is very unlikely to alter the course of events unfolding. It is a mundane action, and is of no consequence in this context.</Reasoning>
-<Output>incidental</Output>
-
-PA_FS3
-The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
-
-<PlotBeats>
-<Beat>Aerial shot of Ravenswood, an isolated, eerie town with a dark history of gruesome murders.</Beat>
-<Beat>A coastal prep drive, introducing the core group of friends: Alex, Emma, Jack, Sarah, and Ryan.</Beat>
-<Beat>Quick cuts of news reports, interviews, and grainy footage from the 1970s massacre.</Beat>
-<Beat>Setting up camp, tension builds as they notice signs of recent human activity in the woods.</Beat>
-<Beat>The group stumbles upon a cryptic phrase etched into a tree, sparking unease and speculation.</Beat>
-<Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
-</PlotBeats>
-
-Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
-
-<CurrentPlotBeat>
-Emma goes missing, leaving the group frantically searching the woods, but finding only signs of disturbance.
-</CurrentPlotBeat>
-
-In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
-
-<HeroAction>
-look in the bushes
-</HeroAction>
-
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
-
-PA_FS4
-<Reasoning>Given that a primary character, Emma, is missing, it follows that the hero would start looking for her. Examining things like bushes seems to flow with the action of the plot, and is very relevant.</Reasoning>
-<Output>pivotal</Output>
-
-PA_FS5
-The outline for an unfinished movie, as represented by a list of plot beats, is enclosed below in <PlotBeats> XML tags:
-
-<PlotBeats>
-<Beat>College freshman, Jason, gets lost on campus, stumbles into a quirky dorm's orientation meet.</Beat>
-<Beat>Jason meets his unlikely roommates, Tina & Brody, each with their own bizarre personalities and quirks.</Beat>
-<Beat>Jason reluctantly joins his roommates for a disastrous attempt at a drunken breakfast at off-campus diner.</Beat>
-</PlotBeats>
-
-Each plot beat is a scene, equalling roughly 1-3 minutes of movie time. The most recent, current plot beat is enclosed below in <CurrentPlotBeat> XML tags:
-
-<CurrentPlotBeat>
-Roommate Brody convinces Jason to participate in a bizarre campus event to save their dorm's funding.
-</CurrentPlotBeat>
-
-In the current scene, the hero has taken the following action, enclosed in <HeroAction> XML tags:
-
-<HeroAction>
-turn on the light
-</HeroAction>
-
-Given the context, is what the hero trying to do considered pivotal to the plot, or is it incidental action? Please provide your reasoning inside <Reasoning> XML tags, then reply with "pivotal" or "incidental" only, wrapped in <Output> XML tags.
-
-PA_FS6
-<Reasoning>The current scene is about a critical conversation Brody has with Jason. Whether or not the light switch is on is completely irrelevant to the action taking place, and so is considered an incidental action.</Reasoning>
-<Output>incidental</Output>
-
 ACTION_FIT_SYSTEM
 You are a professional movie editor. Your job is to ensure plot continuity and scene cohesion. You know all there is to know about scene pacing, story rhythm, and how a movie should fit together to achieve the director's vision.
 
@@ -871,7 +765,7 @@ You pull a random action for the hero out of a hat: {do}. Score how well you thi
 <ScoringGuidelines>
 - Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
-- Your interpretation of the action should be somewhat loose
+- Your interpretation of the current scene should be quite literal
 </ScoringGuidelines>
 
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
@@ -922,8 +816,7 @@ You pull a random action for the hero out of a hat: yell at her. Score how well 
 <ScoringGuidelines>
 - Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
-- Do not take into account writerly concerns like building tension, etc.
-- Your interpretation of the action should be somewhat loose
+- Your interpretation of the current scene should be quite literal
 </ScoringGuidelines>
 
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
@@ -976,8 +869,7 @@ You pull a random action for the hero out of a hat: hail a taxi. Score how well 
 <ScoringGuidelines>
 - Use a scale of 1 to 10, with a 1 indicating the action fits the current scene and a 10 indicating a new scene is called for
 - Do not take into account the descriptiveness of the action
-- Do not take into account writerly concerns like building tension, etc.
-- Your interpretation of the action should be somewhat loose
+- Your interpretation of the current scene should be quite literal
 </ScoringGuidelines>
 
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
@@ -1047,3 +939,39 @@ IB_FS4
 <Beat>Six months later, Annie is still reeling from the breakup. She tries to start new hobbies, join social clubs and meet new people, but nothing works. She becomes increasingly withdrawn and isolated.</Beat>
 <Beat>Annie is struggling to pay her bills, and Pete won't stop texting her, trying to patch things up. She's through, though. She's applying for a lot of jobs but can't seem to land anything.</Beat>
 </PlotBeats>
+
+SCENE_DESC
+You're reviewing the scene description for a movie outline you're writing. This scene is currently being shot while you review. What's been shot so far is enclosed below in <SceneAction> XML tags:
+
+<SceneAction>
+{scene_hist}
+</SceneAction>
+
+The scene description as written is below, enclosed in <SceneDescription> XML tags:
+
+<SceneDescription>
+{cur_beat}
+</SceneDescription>
+
+Do the following:
+
+1. Output the original scene description inside <OriginalSceneDescription> XML tags.
+2. Summarize the scene action that's been shot, and provide your summary inside <SceneActionSummary> XML tags. Limit your description to 60 words or less.
+3. Compare your summary to the original scene description; are any critical details missing from the original scene description? Answer "yes" or "no" only, and provide your answer inside <MissingDetails> XML tags.
+
+Here are some example outputs:
+
+<Example>
+<OriginalSceneDescription>Amanda gets lost on her way to her first period class, losing and eventually recovering her class schedule written on a piece of paper.</OriginalSceneDescription>
+<SceneActionSummary>Amanda navigates the school, visits the main office for help, receives guidance from Mrs. Martinez, finds her classroom, and enters Mr. Peterson's class, experiencing the anxiety and uncertainty of being a new student.</SceneActionSummary>
+<MissingDetails>yes</MissingDetails>
+</Example>
+<Example>
+<OriginalSceneDescription>Pete fumbles with his phone, hands shaking. Instead of 911, he accidentally dials Sarah. She picks up, hearing his labored breathing and immediate panic in his voice.</OriginalSceneDescription>
+<SceneActionSummary>Pete experiences a medical emergency while preparing a presentation, accidentally calls Sarah instead of 911. He's struggling with chest pain, trembling, and losing consciousness while Sarah tries to help and get emergency services.</SceneActionSummary>
+<MissingDetails>yes</MissingDetails>
+</Example>
+<OriginalSceneDescription>Connor asks Zobo why he killed Fusia, Zobo explains the drug deal that went south, and his connection with Brock's brother.</OriginalSceneDescription>
+<SceneActionSummary>Connor finds Zobo hidden in the bathroom. After interrogating him for awhile, Zobo talks about how Fusia murdered Durango and Chief during a drug deal for 2 kilos of coke. When Connor threatens to kill him, Zobo tells him he is Brock's half-brother.</SceneActionSummary>
+<MissingDetails>no</MissingDetails>
+</Example>

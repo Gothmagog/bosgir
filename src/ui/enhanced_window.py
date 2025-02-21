@@ -13,6 +13,7 @@ class EnhancedWindow:
         self.win = s
         self.viewport_offset = 0
         self.undo_idxs = []
+        log.debug(f"Viewport width: {self.get_viewport_width()}, viewport height: {self.get_viewport_height()}")
         
     def add_content(self, new_content, num_new_lines_after=0):
         new_lines = normalize_newlines_arr(new_content, num_new_lines_after, self.get_viewport_width())
