@@ -142,7 +142,7 @@ class NotesWindow(EnhancedWindow):
                     cur_line_pos, cury, cur_line_idx = self._move_pos_right(cury, curx, cur_line_pos, cur_line_idx)
                     cur_line = self.content_lines[cur_line_idx]
                 self.win.refresh()
-                log.debug("line %s, pos %s, cury %s", cur_line_idx, cur_line_pos, cury)
+                log.debug("line %s, line pos %s, cury %s", cur_line_idx, cur_line_pos, cury)
             elif len(keyname) == 1:
                 # insert into buffer; "name" has the proper
                 # capitalization
@@ -165,10 +165,16 @@ class NotesWindow(EnhancedWindow):
             cur_line_pos += 1
             if self._get_line_height(cur_line) > 1 and cur_line_pos % self.get_viewport_width() == 0 and curx != 0:
                 cury += 1
-            elif cur_line_pos > len(cur_line):
+                if cur_line_pos > len(self.content_lines[cur_line_idx]) and cur_line_idx < len(self.content_lines) - 1:
+                    cur_line_idx += 1
+                    cur_line_pos = 0
+            elif cur_line_pos > len(cur_line) and cur_line_idx < len(self.content_lines) - 1:
                 cur_line_idx += 1
                 cury += 1
                 cur_line_pos = 0
+            elif cur_line_pos > len(cur_line):
+                # at the end of the buffer, undo the line pos increment
+                cur_line_pos -= 1
             self.win.move(cury, cur_line_pos % self.get_viewport_width())
         return (cur_line_pos, cury, cur_line_idx)
             
@@ -178,9 +184,15 @@ class NotesWindow(EnhancedWindow):
             cur_line_pos -= 1
             if self._get_line_height(cur_line) > 1 and cur_line_pos % self.get_viewport_width() == self.get_viewport_width() - 1:
                 cury -= 1
-            elif curx == 0:
+                if cur_line_pos < 0 and cur_line_idx > 0:
+                    cur_line_idx -= 1
+                    cur_line_pos = len(self.content_lines[cur_line_idx])
+            elif curx == 0 and cur_line_idx > 0:
                 cur_line_idx -= 1
                 cury -= 1
                 cur_line_pos = len(self.content_lines[cur_line_idx])
+            elif curx == 0:
+                # at the beginning of the buffer, undo the line pos decrement
+                cur_line_pos += 1
             self.win.move(cury, cur_line_pos % self.get_viewport_width())
         return (cur_line_pos, cury, cur_line_idx)
