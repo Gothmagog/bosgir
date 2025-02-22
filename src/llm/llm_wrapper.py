@@ -106,7 +106,7 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
         # action_type = do_is_pivotal_action(narrative_style, plot_beats, command, status_win)
         action_type = "pivotal"
         if action_type == "pivotal":
-            score = do_action_fit(plot_beats, notes, command, status_win, True)
+            score = do_action_fit(cur_scene_hist, command, status_win, True)
             # score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
             score_bar = (math.log10((num_actions_in_plot_beat + .5) / 8.0) * -8) + 3
             log.debug(f"score_bar {score_bar}, score: {score}")
@@ -260,19 +260,15 @@ def do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status
     
     return beats
 
-def do_action_fit(plot_beats, notes, action, status_win, use_claude):
+def do_action_fit(scene_hist, action, status_win, use_claude):
     set_win_text(status_win, "Action Fit")
-    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1]) # 2nd item is the updated plot beat (more accurate desc)
-    curr_beat = plot_beats[-1][0] # first item is original plot beat
     ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
     out_parser = XMLOutputParser(tags=["Score", "Reasoning"])
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("ACTION_FIT_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("AF", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("ACTION_FIT"))
     template_vars = {
-        "beats": beats_str,
-        "notes": notes,
-        "curr_beat": curr_beat,
+        "scene_hist": scene_hist,
         "do": action
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
@@ -302,45 +298,6 @@ def do_action_fit(plot_beats, notes, action, status_win, use_claude):
     val = get_xml_val(ret, "Score", "Root").strip()
     
     return float(val)
-
-def do_is_pivotal_action(narrative_style, plot_beats, action, status_win):
-    set_win_text(status_win, "Is Pivotal Action?")
-    out_parser = XMLOutputParser(tags=["Output", "Reasoning"])
-    ensure_parent_xml = RunnableLambda(lambda r: AIMessage(content=f"<Root>{r.content}</Root>"))
-    plot_beats_xml = "\n".join([f"<Beat>{b}</Beat>" for b in plot_beats[:-1]])
-    sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PLOT_SYSTEM", True))
-    human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PIVOTAL_ACTION"))
-    template_vars = {
-        "narrative": narrative_style,
-        "beats": plot_beats_xml,
-        "curr_beat": plot_beats[-1],
-        "do": action
-    }
-    example_msgs = [p for p in get_prompt_templates("PA", 6)]
-    p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
-    num_prompt_tokens = len(tokenize_nlp(p.format_prompt(**template_vars).to_string())) + 100 # Don't know why, but vllm seems to be adding tokens to the input
-    log.debug(p.format_prompt(**template_vars).to_string()[-log_input_context_len:])
-
-    llm = ChatOpenAI(
-        openai_api_base="http://localhost:8000/v1",
-        openai_api_key="token-abc123",
-        model_name="local",
-        callbacks=[LoggingPassthroughCallback()],
-        max_tokens=max_ttl_toks - num_prompt_tokens,
-        temperature=0
-    )
-
-    # invoke LLM
-    chain_bedrock = fast_llm | refusal_lambda | ensure_parent_xml | out_parser
-    chain_local = llm | ensure_parent_xml | out_parser
-    chain = p | chain_bedrock.with_fallbacks([chain_local])
-    log.info("***** Invoking LLM for PIVOTAL_ACTION *****")
-    ret = chain.invoke(template_vars)
-
-    # ensure we got valid parsed resp
-    val = get_xml_val(ret, "Output", "Root")
-
-    return val
 
 def do_initial_plot_beats(narrative_style, initial_bg, status_win):
     set_win_text(status_win, "Create Initial Plot Beats")

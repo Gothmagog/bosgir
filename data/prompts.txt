@@ -628,7 +628,7 @@ For some additional context, here are the plot beats you've created for your mov
 {beats}
 </PlotBeats>
 
-Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats. And remember, this is a {narrative} movie; keep everything appropriate to that genre.
 
 PLOT_FS1
 You're in the middle of shooting a teen drama movie, and have decided to rewrite the plot structure. A summary of the most recent scene that's been shot is enclosed below in <SceneSummary> XML tags.
@@ -661,7 +661,7 @@ For some additional context, here are the plot beats you've created for your mov
 <Beat>Alex's mom drops a bombshell: she's leaving her job to start a new business, upending Alex's fragile stability.</Beat>
 </PlotBeats>
 
-Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats. And remember, this is a teen drama movie; keep everything appropriate to that genre.
 
 PLOT_FS2
 <PlotBeats>
@@ -694,7 +694,7 @@ For some additional context, here are the plot beats you've created for your mov
 <Beat>The group shares scary stories, but as the night wears on, the atmosphere shifts to unease and dread.</Beat>
 </PlotBeats>
 
-Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats. And remember, this is a slasher horror movie; keep everything appropriate to that genre.
 
 PLOT_FS4
 <PlotBeats>
@@ -729,7 +729,7 @@ For some additional context, here are the plot beats you've created for your mov
 <Beat>As darkness settles, a now-bruised John beseeches the family to reunite for Christmas dinner.</Beat>
 </PlotBeats>
 
-Make sure the new plot beats are understandable on their own and within the context of the previous plot beats.
+Make sure the new plot beats are understandable on their own and within the context of the previous plot beats. And remember, this is a family drama movie; keep everything appropriate to that genre.
 
 PLOT_FS6
 <PlotBeats>
@@ -742,23 +742,11 @@ ACTION_FIT_SYSTEM
 You are a professional movie editor. Your job is to ensure plot continuity and scene cohesion. You know all there is to know about scene pacing, story rhythm, and how a movie should fit together to achieve the director's vision.
 
 ACTION_FIT
-There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
-
-<StorySoFar>
-{beats}
-</StorySoFar>
-
-The current scene is summarized below in <CurrentScene> XML tags:
+You're reviewing a scene from a movie script you're writing. What's happened so far in this scene is described below in <CurrentScene> XML tags:
 
 <CurrentScene>
-{curr_beat}
+{scene_hist}
 </CurrentScene>
-
-Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
-
-<Notes>
-{notes}
-</Notes>
 
 You pull a random action for the hero out of a hat: {do}. Score how well you think this action deserves a new scene transition using the following guidelines:
 
@@ -771,45 +759,21 @@ You pull a random action for the hero out of a hat: {do}. Score how well you thi
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
 
 AF_FS1
-There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
-
-<StorySoFar>
-* Introduce Kevin, an angsty teen who goes to School at Kimbal High.
-* Reveal Kevin comes from a broken home and lives with his mother, who doesn't give him much attention.
-* Kevin's days at school are lonely. Introduce his literature teacher, Miss Johnson, whom Kevin has a crush on.
-* Kevin resolves to tell Miss Johnson how he feels; he decides to write her a sonnet.
-* Kevin waits after school to put the sonnet on Miss Johnson's desk.
-* Next day, a nervous Kevin waits in literature class for Miss Johnson to read his note. He is overcome with anxiety and closes his eyes.
-* Miss Johnson reprimands Kevin for sleeping in her class; his classmates laugh at him.
-</StorySoFar>
-
-The current scene is summarized below in <CurrentScene> XML tags:
+You're reviewing a scene from a movie script you're writing. What's happened so far in this scene is described below in <CurrentScene> XML tags:
 
 <CurrentScene>
-Kevin gets embarrassed and leaves class. He runs into the bathroom and locks himself in one of the stalls.
+Kevin enters the classroom, slowly. He looks at Mrs. Johnson's desk, sees the crumpled up note he left there yesterday. Still unopened? He shuffles his way to his desk and slumps into it.
+
+Mrs. Johnson is droning on about some writer or something. That beatufuly, silky voice of hers reaches his ears like music. Normally he would be in her thrall, but the weight of this situation is crushing him. Has she read the note? Did she like it? Will she know who it's from? What if she thinks it's stupid? It's a stupid note. A sonnet? What the hell was he thinking?
+
+The clock ticks by at a slow march. A funeral march. Kevin sighs and slumps further into his chair. Sweat starts to form on his brow. His mind is racing, too much in his head right now.
+
+Kevin closes his eyes shut, trying to block it all out. He tries to remember that summer vacation, walking along the railroad tracks with dad, the way the clouds looked, that old-time candy shop they stopped at...
+
+His reverie is interrupted by the sound of Mrs. Johnson. "Kevin Burnock, if you're not going to get enough sleep at night, you could at least take a nap in someone else's class."
+
+His eyes snap open. She's right in fron of him, those lovely arms folded in front of those lovely breasts, frowning at him. The whole class is laughing at him.
 </CurrentScene>
-
-Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
-
-<Notes>
-Hero name: Kevin Burnock
-Enemies: Wade
-Allies: Ephram, Tooly, Jim
-Physical status: healthy
-Mental status: flustered
-Posessions:
-- pencil
-Wearing:
-- slightly smelly t-shirt
-- loose cargo pants
-Motivations:
-- Survive the 6th grade
-- The lovely Mrs. Johnson
-- Avoid Wade and his cronies
-Current location: Kimbal High, Literature Class
-Time of day: morning
-Weather: dreary
-</Notes>
 
 You pull a random action for the hero out of a hat: yell at her. Score how well you think this action deserves a new scene transition using the following guidelines:
 
@@ -822,47 +786,40 @@ You pull a random action for the hero out of a hat: yell at her. Score how well 
 Provide your reasoning inside <Reasoning> XML tags, and your score inside <Score> XML tags.
 
 AF_FS2
-<Reasoning>Getting angry and yelling at his teacher is a logical prelude to running out of the classroom. It doesn't immediately get us there, but it fits with the action and seems appropriate to the current scene. A new scene transition doesn't quite appropriate at this point.</Reasoning>
+<Reasoning>Getting angry and yelling at his teacher is a logical prelude to running out of the classroom. It doesn't immediately get us there, but it fits with the action and seems appropriate to the current scene. Since we're still in the classroom, in the embarassing moment with Kevin, a new scene transition isn't quite appropriate at this point.</Reasoning>
 
 <Score>3</Score>
 
 AF_FS3
-There's a movie script you're looking over. What's happened so far in the movie is summarized below in <StorySoFar> XML tags:
-
-<StorySoFar>
-* Introduce Emma, a geeky but pretty girl trying to get by in the big city.
-* At work for a large publishing house, Emma struggles to impress her boss, Mrs. Goring. Emma has missed a deadline and is reprimanded for it.
-* Next morning, Emma struggles to get out of bed. Defeat is her only motivation. She realizes she's late for work and rushes out.
-* Walking quickly to work, she accidentally bumps into a young, attractive man, Jack. He introduces himself.
-</StorySoFar>
-
-The current scene is summarized below in <CurrentScene> XML tags:
+You're reviewing a scene from a movie script you're writing. What's happened so far in this scene is described below in <CurrentScene> XML tags:
 
 <CurrentScene>
-Jack offers to take her out for coffee, Emily hesitates, obviously attracted to him. Work beckons.
+Emma is walking briskly down the streets of downtown Manhattan. It's a busy morning, lots of pedestrians, and a cacophony of sounds. She readjusts her purse on her shoulder and looks at her watch, then quickens her pace.
+
+Coming up on a crosswalk, the electronic "walk" sign has begun its countdown. Emma hurries and runs across the street. A skater she doesn't notice passes very close by, right in front of her, right when she gets to the other side. Emma screams a little and moves backwards, right into Jack, a young, attractive guy dressed casually.
+
+"Woah there," he holds her shoulders.
+
+"Oh! I'm so sorry! Did I...?"
+
+"No no, it's fine. That guy almost--"
+
+"Yeah," Emma glances back the way the skater left, then at Jack. She smiles a little. "Almost got turned into a pancake."
+
+He smiles. "I'm Jack, by the way." Pedestrians continue to push past them.
+
+"Emma." She extends her hand, they shake. Eye contact is held by both.
+
+"Emma," he repeats. "You, uh, going somewhere?"
+
+"Yes. Oh gosh," she exclaims, looking at her watch. "Look, I gotta--"
+
+"Hey, uh, crazy thought: coffee? With little ole me?"
+
+"What, now?"
+
+"Yeah, you're right. You're obviously busy." He smiles sheepishly.
 </CurrentScene>
-
-Some situational context is provided below for the current scene, enclosed in <Notes> XML tags:
-
-<Notes>
-Hero name: Emma Dooley
-Friends: Phyllis
-Physical status: healthy
-Mental status: flustered
-Posessions:
-- umbrella
-- purse
-- briefcase
-Wearing:
-- a smart, green business suit
-Motivations:
-- succeed at work
-Romantic Situation:
-- just met the attractive Jack
-Current location: middle of a busy intersection
-Time of day: morning
-Weather: drizzly
-</Notes>
 
 You pull a random action for the hero out of a hat: hail a taxi. Score how well you think this action deserves a new scene transition using the following guidelines:
 
