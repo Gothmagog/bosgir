@@ -100,38 +100,48 @@ def proc_command(command, hero_name, notes, history, plot_beats, num_actions_in_
     # Ensure plot beats are sorted out
     if len(plot_beats) == 0:
         plot_beats = do_initial_plot_beats(narrative_style, history, status_win)
+        new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, True)
+        plot_beats.append([new_beats[0], new_beats[0]])
         num_actions_in_plot_beat = 1
         new_game = True
-    else:
-        # action_type = do_is_pivotal_action(narrative_style, plot_beats, command, status_win)
-        action_type = "pivotal"
-        if action_type == "pivotal":
-            score = do_action_fit(cur_scene_hist, command, status_win, True)
-            # score_bar = (-25.0 / (num_actions_in_plot_beat + 3)) + 11
-            score_bar = (math.log10((num_actions_in_plot_beat + .5) / 8.0) * -8) + 3
-            log.debug(f"score_bar {score_bar}, score: {score}")
-            if score >= score_bar:
-                new_beats = do_plot_gen(narrative_style, hero_name, command, plot_beats, history, status_win, True)
-                log.debug(f"Adding '{new_beats[0]}' to plot")
-                plot_beats.append([new_beats[0], new_beats[0]])
-                num_actions_in_plot_beat = 0
-                new_beat = True
-            num_actions_in_plot_beat += 1
+
+    cur_beat = plot_beats[-2]
+    next_beat = plot_beats[-1]
+    prev_beats = plot_beats[:-2]
+
+    if not new_game:
+        score = do_action_fit(cur_scene_hist, command, status_win, True)
+        score_bar = (math.log10((num_actions_in_plot_beat + .5) / 8.0) * -8) + 3
+        log.debug(f"score_bar {score_bar}, score: {score}")
+        if score >= score_bar:
+            new_beats = do_plot_gen(narrative_style, hero_name, command, prev_beats + [cur_beat], history, status_win, True)
+
+            # New beat #1 replaces what was previous thought to be the
+            # "next beat", while new beat #2 will be the "next beat"
+            # after the scene transition. It will not, however, be
+            # used in do_primary_new_scene (the scene transition).
+            log.debug(f"Adding '{new_beats[0]}' to plot")
+            next_beat = [new_beats[0], new_beats[0]]
+            plot_beats[-1] = next_beat
+            plot_beats.append([new_beats[1], new_beats[1]])
+            num_actions_in_plot_beat = 0
+            new_beat = True
+        num_actions_in_plot_beat += 1
 
     # Generate the story continuation
     if new_beat:
-        story = do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, True)
+        story = do_primary_new_scene(command, notes, history, prev_beats, cur_beat, next_beat, narrative_style, status_win, True)
     else:
-        story = do_primary(command, notes, history, plot_beats, narrative_style, status_win, True)
+        story = do_primary(command, notes, history, prev_beats, cur_beat, next_beat, narrative_style, status_win, True)
         if not new_game:
             scene_desc_changed, new_scene_desc = do_scene_desc(cur_scene_hist + story, plot_beats[-1][1], status_win, True)
             if scene_desc_changed:
                 log.debug(f"Changing current plot beat to: {new_scene_desc}")
-                plot_beats[-1][1] = new_scene_desc
+                plot_beats[-2][1] = new_scene_desc
     
     return (story, plot_beats, num_actions_in_plot_beat)
 
-def do_primary(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
+def do_primary(command, notes, history, prev_beats, cur_beat, next_beat, narrative_style, status_win, use_claude):
     set_win_text(status_win, "Story Generation")
     out_parser = XMLOutputParser(tags=["HeroLocation", "ScenePotential", "HeroActionResult", "Description"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
@@ -139,14 +149,14 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("P", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY"))
-    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1])
-    cur_beat = plot_beats[-1][1]
+    beats_str = "* " + "\n* ".join([pb[1] for pb in prev_beats])
     template_vars = {
         "narrative": narrative_style,
         "beats": beats_str,
         "notes": notes,
         "do": command,
-        "current_beat": cur_beat,
+        "current_beat": cur_beat[1],
+        "next_beat": next_beat[1],
         "continue_from": get_last_paragraphs(history, 3)[0]
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])
@@ -173,7 +183,7 @@ def do_primary(command, notes, history, plot_beats, narrative_style, status_win,
 
     return get_xml_val(ret, "Description", "Root")
 
-def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, status_win, use_claude):
+def do_primary_new_scene(command, notes, history, prev_beats, cur_beat, new_beat, narrative_style, status_win, use_claude):
     set_win_text(status_win, "Story Generation (new scene)")
     out_parser = XMLOutputParser(tags=["Changes", "Snippet"])
     parser_fallback = RunnableLambda(lambda r: r[r.find("<Snippet>")+9:r.find("</Snippet>")])
@@ -181,16 +191,14 @@ def do_primary_new_scene(command, notes, history, plot_beats, narrative_style, s
     sys_msg = SystemMessagePromptTemplate.from_template(prompts.get("PRIMARY_SYSTEM", True))
     example_msgs = [p for p in get_prompt_templates("PNS", 4)]
     human_msg = HumanMessagePromptTemplate.from_template(prompts.get("PRIMARY_NEWSCENE"))
-    beats_str = "* " + "\n* ".join([pb[1] for pb in plot_beats][:-1]) # 2nd item is the updated plot beat (more accurate desc)
-    cur_beat = plot_beats[-2][1]
-    new_beat = plot_beats[-1][1]
+    beats_str = "* " + "\n* ".join([pb[1] for pb in prev_beats]) # 2nd item is the updated plot beat (more accurate desc)
     template_vars = {
         "narrative": narrative_style,
         "beats": beats_str,
         "notes": notes,
         "do": command,
-        "current_beat": cur_beat,
-        "new_beat": new_beat,
+        "current_beat": cur_beat[1],
+        "new_beat": new_beat[1],
         "continue_from": get_last_paragraphs(history, 3)[0]
     }
     p = ChatPromptTemplate.from_messages([sys_msg, *example_msgs, human_msg])

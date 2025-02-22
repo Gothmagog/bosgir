@@ -22,6 +22,12 @@ Currently, the following scene is being played out in the movie, enclosed below 
 {current_beat}
 </CurrentScene>
 
+You happen to know what the next scene is going to be. It's summarized below, in <NextScene> XML tags:
+
+<NextScene>
+{next_beat}
+</NextScene>
+
 The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
 <RecentAction>
@@ -32,7 +38,7 @@ The hero is trying to {do}. Do the following steps:
 
 <Steps>
 1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
-2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+2. What all do you think could happen in this scene? Limit your thoughts to things that would either move the plot towards the next scene or develop the current scene further. Provide your output inside <ScenePotential> XML tags.
 3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
 4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
@@ -77,6 +83,12 @@ Currently, the following scene is being played out in the movie, enclosed below 
 Half-way to the man, she has another flashback of just the man's grinning face, and somewhere in the distance more screams. She is shaken.
 </CurrentScene>
 
+You happen to know what the next scene is going to be. It's summarized below, in <NextScene> XML tags:
+
+<NextScene>
+The man reveals that he is a holographic servant of the facility, which is a storage unit. When pressed about her memory, he professes ignorance. Sheila asks him how to leave, but the man says there is no way to leave. Sheila ends the conversation by turning him off at a console.
+</NextScene>
+
 The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
 <RecentAction>
@@ -87,20 +99,20 @@ The hero is trying to pull out my gun. Do the following steps:
 
 <Steps>
 1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
-2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+2. What all do you think could happen in this scene? Limit your thoughts to things that would either move the plot towards the next scene or develop the current scene further. Provide your output inside <ScenePotential> XML tags.
 3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
 4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
 
 P_FS2
 <HeroLocation>large, empty room inside an unknown facility</HeroLocation>
-<ScenePotential>I think the following developments are possibilities in this scene:
+<ScenePotential>I think the following developments could propel the action to the next scene:
 
 * Sheila could initiate a conversation with the man.
 * The Man could initiate a conversation with Sheila.
-* Sheila might find out, one way or another, what connection the man has to her history.
-* Sheila might adopt a hostile stance towards the man, and might even attack him.
-* An unknown feature of the facility might reveal itself in this room, like intrusive body probing.</ScenePotential>
+* The Man might threaten Sheila to lower her weapon.
+* Sheila and the man might have a standoff.
+* The facility might neutralize the threat of Sheila's weapon.</ScenePotential>
 <HeroActionResult>I think her blatantly hostile action will draw no reaction from the man.</HeroActionResult>
 <Description>Slowly she pulls her laz pistol from her belt, a look of steely determination on her face. Absolutely no reaction is registered on the man's face. He continue to just stare forward. She takes aim at him. Again, no reaction.</Description
 
@@ -139,6 +151,12 @@ Currently, the following scene is being played out in the movie, enclosed below 
 Kevin tries to cope with his raging emotions and hormones, closing his eyes at his desk. Mrs. Johnson, thinking he's sleeping, berates him in front of the class. Everyone laughs, Kevin is mortified.
 </CurrentScene>
 
+You happen to know what the next scene is going to be. It's summarized below, in <NextScene> XML tags:
+
+<NextScene>
+Kevin gets sent to the principal's office, who decides that, for punishment, Kevin must stay after school for a week helping Mrs. Johnson with odd jobs.
+</NextScene>
+
 The most recent action you've described from the movie is enclosed below in <RecentAction> XML tags:
 
 <RecentAction>
@@ -149,19 +167,19 @@ The hero is trying to yell at her. Do the following steps:
 
 <Steps>
 1. Where do you think the hero is before they act? Provide your answer inside <HeroLocation> XML tags.
-2. What all do you think could happen in this scene? Provide your output inside <ScenePotential> XML tags.
+2. What all do you think could happen in this scene? Limit your thoughts to things that would either move the plot towards the next scene or develop the current scene further. Provide your output inside <ScenePotential> XML tags.
 3. Make up a result of the hero's action. This should be aligned with the potential action in the current scene. Enclose your output in <HeroActionResult> XML tags.
 4. Describe the hero's action and the results to your blind person, and ensure that in follows smoothly from the most recent action you last described. Enclose your output in <Description> XML tags.
 </Steps>
 
 P_FS4
 <HeroLocation>Mrs. Johnson's literature class</HeroLocation>
-<ScenePotential>I think the following developments are possibilities in this scene:
+<ScenePotential>I think the following developments could propel the action to the next scene:
 
+* Mrs. Johnson might take Kevin to the principal.
 * Kevin might leave the classroom abruptly.
 * Kevin might suffer a further embarrassment, like a classmate throwing something at him.
-* Mrs. Johnson might reprimand the class for laughing.
-* Kevin might get angry at the situation and lash out.</ScenePotential>
+* Mrs. Johnson might reprimand the class for laughing.</ScenePotential>
 <HeroActionResult>I think Kevin's outburst will silence the class and shock Mrs. Johnson, for a moment, before she escorts him out of the classroom.</HeroActionResult>
 <Description>The laughter continues, time slows down. Kids laughing, Mrs. Johnson looking sternly at him. Kevin's eyes dart about, like a trapped animal. Tears start to form at the edges of his eyes, everything presses in on him.
 
