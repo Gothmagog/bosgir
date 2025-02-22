@@ -4,18 +4,18 @@ from curses import wrapper
 import logging
 import logging.config
 import yaml
-from game_state_persistence import GameStatePersister
-from game_state import GameState
-from curses_utils import (
+from game_state.game_state_persistence import GameStatePersister
+from game_state.game_state import GameState
+from ui.curses_utils import (
     centered_text,
     YPos,
     textbox
 )
-from text_utils import normalize_newlines_str
+from text_processing.text_utils import normalize_newlines_str
 from game_loop import game_loop
 from pathlib import Path
 
-version = "1.1.0"
+version = "1.2.0"
 
 src_dir = Path(__file__).parent
 log_config = None
@@ -65,7 +65,7 @@ def new_game():
     notes = ""
     with open(src_dir / "../data/initial_notes.txt", "r") as f:
         notes = f.read()
-    game_state = GameState(history=background, notes=notes, narrative_style=narrative_style, plot="", writing_examples=[])
+    game_state = GameState(history=background, notes=notes, narrative_style=narrative_style, plot_beats=[], num_actions_in_plot_beat=0, cur_scene_start=0)
     gs_persist = GameStatePersister(filename)
     
     return continue_()
@@ -77,7 +77,7 @@ def load_game():
     filename = file_name_entry(YPos.TOP, 0, True)
     gs_persist = GameStatePersister(filename)
     if not game_state:
-        game_state = GameState(history=None, notes=None, narrative_style=None, plot=None, writing_examples=None)
+        game_state = GameState(history=None, notes=None, narrative_style=None, plot_beats=[], num_actions_in_plot_beat=0, cur_scene_start=0)
     gs_persist.load(game_state)
     continue_()
     
